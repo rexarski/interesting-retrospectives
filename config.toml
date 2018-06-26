@@ -1,13 +1,13 @@
 baseurl = "/"
 publishDir = "public"
-title = "interesting retrospectives"
+title = "Rui's blog"
 author = "Qiu Rui"
 canonifyurls = true
 languagecode = "en"
 theme = "hugo-tanka"
 
 googleAnalytics = ""
-disqusShortname = ""
+disqusShortname = "rexarski"
 disable_mathjax = false
 
 pygmentsstyle      = "vs"
@@ -16,11 +16,11 @@ pygmentscodefences = true
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 
 [params]
-  sitename = "Hugo Tanka Theme"
+  sitename = "interesting retrospectives"
 
 [[menu.main]]
     name = "Home"
-    url = "."
+    url = "rexarski.netlify.com"
     weight = 1
 [[menu.main]]
     name = "GitHub"
