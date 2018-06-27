@@ -1,6 +1,6 @@
 baseurl = "/"
 publishDir = "public"
-title = "Rui's blog"
+title = "interetro"
 author = "Qiu Rui"
 canonifyurls = true
 languagecode = "en"
@@ -20,17 +20,22 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 
 [[menu.main]]
     name = "Home"
-    url = "rexarski.netlify.com"
+    url = "https://interetro.netlify.com"
     weight = 1
+[[menu.main]]
+    name = "About"
+    url = "/about/index.html"
+    weight = 2
 [[menu.main]]
     name = "GitHub"
     url = "https://github.com/rexarski"
-    weight = 2
+    weight = 3
 [[menu.main]]
     name = "Twitter"
     url = "https://twitter.com/rexarski"
-    weight = 3
+    weight = 4
 [[menu.main]]
     name = "RSS"
     url = "/index.xml"
-    weight = 4
+    weight = 5
+    
