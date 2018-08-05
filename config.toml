@@ -20,11 +20,11 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 
 [[menu.main]]
     name = "Home"
-    url = "https://interetro.netlify.com"
+    url = "/"
     weight = 1
 [[menu.main]]
     name = "About"
-    url = "/about/index.html"
+    url = "/about/"
     weight = 2
 [[menu.main]]
     name = "GitHub"
@@ -40,6 +40,6 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
     weight = 5
 [[menu.main]]
     name = "Resume"
-    url = "/resume/index.html"
+    url = "/resume/"
     weight = 6
 
