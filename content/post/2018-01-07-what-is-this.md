@@ -2,7 +2,7 @@
 title: What is this?
 author: Qiu Rui
 date: '2018-01-07'
-slug: about
+slug: what-is-this
 ---
 
 _Interesting retrospective_ is a naïve blog still under construction.
