@@ -1,4 +1,4 @@
-baseurl = "/"
+baseurl = "https://interetro.rbind.io/"
 publishDir = "public"
 title = "interetro"
 author = "Qiu Rui"
