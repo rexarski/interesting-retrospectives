@@ -1,0 +1,49 @@
+---
+title: 如何部署一台数据科学专用的简易服务器
+author: Qiu Rui
+date: '2019-01-02'
+slug: deploy-a-server-for-data-science
+categories:
+  - Linux
+tags:
+  - conda
+  - MySQL
+---
+
+
+
+<p>主要是两个部分，一个是conda，一个是MySQL.</p>
+<div class="section level2">
+<h2>准备</h2>
+<ol style="list-style-type: decimal">
+<li>在<a href="https://www.vultr.com/?ref=7316917">Vultr</a>上购置一台服务器，选择$5/月的配置就已经够了，系统选择CentOS。当然了，Ubuntu也是极好的。</li>
+<li>使用<code>ssh</code>连接服务器，ip地址以及临时密码都在Vultr的dashboard里可以查阅。</li>
+</ol>
+</div>
+<div id="conda" class="section level2">
+<h2>conda</h2>
+<ol style="list-style-type: decimal">
+<li>安装<a href="https://www.anaconda.com/download/#linux">Anaconda distribution</a>。因为服务器端没有图形界面，一切都在我们的terminal里完成。在服务器中运行<code>wget https://repo.continuum.io/archive/Anaconda3-2018.12-Linux-x86_64.sh</code> 之前服务器选择的是64位系统，这里就从conda的页面找到对应的64位系统下载地址。</li>
+<li>由于CentOS没有<code>bzip2</code>，此时直接安装则会报错，应先使用<code>yum install bzip2</code>安装。</li>
+<li>接着使用<code>bash Anaconda3-*.*.*-Linux-x86_64.sh</code>安装anaconda. 依照提示，都很直白。</li>
+<li>默认安装路径会在<code>~</code>之下，安装完成后把安装路径添加到环境变量里。</li>
+<li>如果此时没有文本编辑器的话，建议<code>yum install vim</code>，临时抱佛脚学习使用一下。</li>
+<li>使用<code>vim ~/.bashrc</code>打开环境变量储存文件<code>.bashrc</code>. Vim主要有两种模式，一种是插入模式 (insert mode)，一种是指令模式 (command mode)。当前我们处于指令模式下，按<code>i</code>键切入到insert mode，然后在文件末端录入代码<code>export PATH=“$HOME/anaconda3/bin:$PATH”</code>. 按<code>Esc</code>键退出到command mode，录入<code>:wq</code>保存并退出，此时光标会出现在vim的最后一行。推出之后，记得<code>source ~/.bashrc</code>一下。然后我们就可以用conda的指令来检查conda是否成功安装，或者安装其他的package。</li>
+<li>此时conda的安装告一段落，接下来是MySQL数据库的部署。</li>
+</ol>
+</div>
+<div id="mysql" class="section level2">
+<h2>MySQL</h2>
+<ol style="list-style-type: decimal">
+<li>在<a href="https://dev.mysql.com/downloads/repo/yum/">MySQL官网</a>寻找yum源，类似的方法，找到链接就行。这里因为我们用的是CentOS，使用Red Hat Enterprise Linux 7版本。<code>yum localinstall https://dev.mysql.com/get/mysql80-community-release-el7-1.noarch.rpm</code></li>
+<li><code>yum install mysql-community-server -y</code>, 并用<code>mysqld --version</code>查看是否安装成功。</li>
+<li>配置MySQL使其自动启动<code>systemctl enable mysqld.service</code>.</li>
+<li>启动<code>systemctl start mysqld.service</code>.</li>
+<li>对于5.7以上版本的MySQL，还需要以下的方法修改默认root用户的登录密码。第一步是先找到临时密码：<code>sudo grep ‘temporary password’ /var/log/mysqld.log</code></li>
+<li><code>mysql -uroot -p</code>后接temporary password进入MySQL.</li>
+<li>MySQL现在的密码要求规则比较复杂，如果自己想设置简单密码，则需要<code>SET GLOBAL validate_password.policy=LOW</code>.</li>
+<li>最后修改密码<code>ALTER USER ‘root’@‘localhost’ IDENTIFIED BY ‘mynewpassword’;</code></li>
+<li><code>\q</code>退出MySQL, <code>exit</code>退出ssh连接。</li>
+</ol>
+<p>到此为止就基本能用了，然后就是develop, play, and enjoy.</p>
+</div>

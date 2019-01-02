@@ -1,7 +1,7 @@
 ---
 title: 如何部署一台数据科学专用的简易服务器
 author: Qiu Rui
-date: '2019-01-03'
+date: '2019-01-02'
 slug: deploy-a-server-for-data-science
 categories:
   - Linux
