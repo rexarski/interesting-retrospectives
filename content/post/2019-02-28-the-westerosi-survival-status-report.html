@@ -1,0 +1,615 @@
+---
+title: The Westerosi Survival Status Report
+author: Rui Qiu
+date: '2019-02-28'
+slug: the-westerosi-survival-status-report
+categories:
+  - R
+tags: []
+---
+
+
+
+<blockquote>
+<p>“A Bayesian approach to explore the life spans of characters in A Song of Ice and Fire.”</p>
+</blockquote>
+<div id="introduction" class="section level1">
+<h1>1. Introduction</h1>
+<p>The TV series <em>Game of Thrones</em> has been a great success since released. The adaptation is based on the fantasy novel <em>A Song of Ice and Fire</em>, written by George R. R. Martin. As we know, one of the reasons people love to read such a story is its magnificent view, not only chronically, but geologically as well. Consequently, thousands of characters emerged on the continent of Westeros. Due to the fame of killing his own characters in story, Mr. Martin leaves one of the most popular and long-lasting question in fan community: who will be killed next?</p>
+<p>Awoiaf Wiki (Felipe Bini, Scafloc, Rhaenys Targaryen et al. 2017) is a fan-made community website which provides detailed information related to the novel. A complete list of characters appeared in the story so far is scraped from this site and uploaded to Kaggle (Myles O’Neill 2016). Our goal is to explore the data set and try to find how long these characters can live “on stage” and what factors have influences on the life span.</p>
+</div>
+<div id="methodology" class="section level1">
+<h1>2. Methodology</h1>
+<div id="data-cleaning" class="section level2">
+<h2>2.1 Data Cleaning</h2>
+<p>The dataset from the file <code>character-death.csv</code> contains 917 entries and 13 attributes. We do the following steps to clean the raw data:</p>
+<ol style="list-style-type: decimal">
+<li>Unify all the <code>Allegiances</code>, typically remove the prefix “House”, so that there are only 12 political factions left.</li>
+<li>Eliminate all characters not formally introduced in the book, who are just mentioned. For these characters, they have <code>NA</code> as <code>Book.Intro.Chapter</code>.</li>
+<li>Use attributes <code>Book.of.Death</code>, <code>Death.Chapter</code>, <code>Book.Intro.Chapter</code>, appearances in <code>GoT</code>, <code>CoK</code>, <code>SoS</code>, <code>FfC</code>, <code>DwD</code> (five books respectively), plus the numbers of chapters of each book to calculate an overall “lifetime” of a character. Specifically, for some characters with a <code>Book.of.Death</code> but no <code>Death.Chapter</code>, we assume the his/her living chapter numbers is the half of the chapter number of that book.</li>
+<li>Remove characters with negative life span. This is caused by some inconsistency when scraping data from the internet.</li>
+<li>Add a new variable <code>POV</code> to each character based on the number of <em>Point of View</em> (POV) chapters (Kirt, Nittanian, Rhaenys Targaryen et al. 2017).</li>
+<li>Make some modifications on <code>Allegiances</code> by clustering all 12 factions into 3 major groups, we call them <code>first</code>, <code>second</code> and <code>third</code> respectively. The <code>first</code> allegiance group contains <em>Lannister</em>, <em>Stark</em> and <em>Targaryen</em>. The <code>second</code> allegiance group contains <em>Arryn</em>, <em>Baratheon</em>, <em>Greyjoy</em>, <em>Martell</em>, <em>Tully</em> and <em>Tyrell</em>. The <code>third</code> allegiance group contains some lower class factions such as <em>Night’s Watch</em>, <em>Wildling</em> and people with no allegiance (<em>None</em>).</li>
+<li>Include one interaction term between <code>Gender</code> and <code>Nobility</code>.</li>
+</ol>
+<p>Note that we choose to constrain the number of interaction terms as predictor variables based on two major reasons: one is that most of interactions are not interpretable, the other is because of principle of parsimony that we believe a simple model would be enough in this case. We will further discuss the inclusion of interaction terms later.</p>
+<p>So far, the remaining data is stored as a data frame with 899 characters and 11 variables. The complete list of variables are listed below:</p>
+<ul>
+<li><code>Name</code>: String. The name (and nickname) of the character.</li>
+<li><code>Life</code>: Numeric (continuous). The calculated length of life in the book.</li>
+<li><code>Gender</code>: Numeric (binary). 1 if the character is male, 0 if the character is female.</li>
+<li><code>Nobility</code>: Numeric (binary). 1 if the character is a nobleman, 0 if the character is a commoner.</li>
+<li><code>POV</code>: Numeric (continuous). The number of POV chapters of the character.</li>
+<li><code>Allegiances</code>: String (factor). The political faction that character is loyal to.</li>
+<li><code>Status</code>: Numeric (binary). 1 if the character is alive, 0 if the character is perished.</li>
+<li><code>first</code>: Numeric (binary). Includes the “Big 3” major houses in the novel, which are <em>House Lannister</em>, <em>House Stark</em> and <em>House Targaryen</em>.</li>
+<li><code>second</code>: Numeric (binary). Includes some other houses appeared in the novel, which do not have so many main characters. One of the similaries among these houses is that they are not contenders of the Iron Throne in the later game.</li>
+<li><code>third</code>: Numeric (binary). Includes three factions that are technically not “houses”: <em>Night’s Watch</em>, <em>Wildling</em> and <em>None</em>.</li>
+<li><code>GxN</code>: Numeric (binary). Interaction between <code>Gender</code> and <code>Nobility</code>.</li>
+</ul>
+</div>
+<div id="marginal-probability-comparison" class="section level2">
+<h2>2.2 Marginal Probability Comparison</h2>
+<p>In the following paragraphs, we use <span class="math inline">\(y_i\)</span> to denote the life span of the <span class="math inline">\(i\)</span>-th character in our data frame, and <span class="math inline">\(\mathbf{X}_i\)</span> as the vector of all predictor variables except <code>thrid</code> (so we keep <code>Gender</code>, <code>Nobility</code>, <code>POV</code>, <code>first</code>, <code>second</code> and <code>GxN</code>). Next, we divide the data into one training set <span class="math inline">\((\mathbf{y},\mathbf{X})\)</span> and one testing set <span class="math inline">\((\mathbf{y}_\text{test},\mathbf{X}_\text{test})\)</span>. The former contains 800 entries while the latter contains 99. For model selection procedure, we use Bayesian method, where we separate the usual coefficient in linear regression into two parts <span class="math inline">\(\beta_j=z_j\times b_j\)</span> where <span class="math inline">\(z_j\in\{0,1\}\)</span>,<span class="math inline">\(b_j\in\mathbf{R}\)</span>, such that</p>
+<p><span class="math display">\[\begin{split}
+y_i&amp;=z_1b_1x_{i,1}+z_2b_2x_{i,2}+\cdots+z_{8}b_{8}x_{i,8}+\epsilon\\
+x_{i,1} &amp;= 1 \text{ for each subject } i\\
+x_{i,2} &amp;= 1\text{ if subject $i$ is male, 0 otherwise}\\
+x_{i,3} &amp;= 1\text{ if subject $i$ is nobleman, 0 otherwise}\\
+x_{i,4} &amp;= \text{number of POVs that subject $i$ has in the novel}\\
+x_{i,5} &amp;= 1\text{ if subject $i$ is in the first group of allegiances, 0 otherwise}\\
+x_{i,6} &amp;= 1\text{ if subject $i$ is in the second group of allegiances, 0 otherwise}\\
+x_{i,7} &amp;= x_{i,2}\times x_{i,3}\\
+\end{split}\]</span></p>
+<p>In our case, we consider the following combinations of <span class="math inline">\(\mathbf{z}\)</span>’s:</p>
+<p><span class="math display">\[\begin{split}
+   y_i&amp;=b_1\\
+   y_i&amp;=b_1+b_2x_2\\
+   y_i&amp;=b_1+b_3x_3\\
+   y_i&amp;=b_1+b_4\times\text{POV}\\
+   y_i&amp;=b_1+b_5x_5+b_6x_6\\
+   y_i&amp;=b_1+b_2x_2+b_3x_3\\
+   y_i&amp;=b_1+b_2x_2+b_3x_3+b_7x_7\\
+   y_i&amp;=b_1+b_2x_2+b_4\times\text{POV}\\
+  \end{split}\]</span></p>
+<p><span class="math display">\[\begin{split}
+   y_i&amp;=b_1+b_2x_2+b_5x_5+b_6x_6\\
+   y_i&amp;=b_1+b_3x_3+b_4\times\text{POV}\\
+   y_i&amp;=b_1+b_3x_3+b_5x_5+b_6x_6\\
+   y_i&amp;=b_1+b_4\times\text{POV}+b_5x_5+b_6x_6\\
+   y_i&amp;=b_1+b_2x_2+b_3x_3+b_4\times\text{POV}+b_7x_7\\
+   y_i&amp;=b_1+b_2x_2+b_3x_3+b_5x_5+b_6x_6+b_7x_7\\
+   y_i&amp;=b_1+b_2x_2+b_4\text{POV}+b_5x_5+b_6x_6\\
+   y_i&amp;=b_1+b_3x_3+b_4\text{POV}+b_5x_5+b_6x_6\\
+   y_i&amp;=b_1+b_2x_2+b_3x_3+b_4\text{POV}+b_5x_5+b_6x_6+b_7x_7\\
+   \end{split}\]</span></p>
+<p>The Bayesian model selection proceeds by obtaining a posterior distribution for <span class="math inline">\(\mathbf{z}\)</span>, which can be achieved by computing posterior odds for different models (Hoff 2009, p. 164):</p>
+<p><span class="math display">\[\text{odds}(\mathbf{z}_a,\mathbf{z}_b\mid\mathbf{y},\mathbf{X})=\frac{p(\mathbf{z}_a\mid\mathbf{y},\mathbf{X})}{p(\mathbf{z}_b\mid\mathbf{y},\mathbf{X})}=\frac{p(\mathbf{z}_a)}{p(\mathbf{z}_b)}\times\frac{p(\mathbf{y}\mid\mathbf{X},\mathbf{z}_a)}{p(\mathbf{y}\mid\mathbf{X},\mathbf{z}_b)}\]</span></p>
+<p>So now we need to specify the marginal <span class="math inline">\(p(\mathbf{y}\mid\mathbf{X},\mathbf{z})\)</span> of each combination of <span class="math inline">\(\mathbf{z}\)</span>. Assume <span class="math inline">\(\mathbf{\beta}\)</span> follows a <span class="math inline">\(g\)</span>-prior distribution. Given <span class="math inline">\(\mathbf{z}\)</span> and <span class="math inline">\(p_z\)</span> non-zero entries, <span class="math inline">\(\mathbf{X}_z\)</span> is the <span class="math inline">\(n\times p_z\)</span> matrix corresponding to the variable <span class="math inline">\(j\)</span> where <span class="math inline">\(z_j=1\)</span>, and <span class="math inline">\(\mathbf{\beta}_z\)</span> is <span class="math inline">\(p\times 1\)</span> vector consiting of the entries of <span class="math inline">\(\mathbf{\beta}\)</span> where <span class="math inline">\(z_j=1\)</span>. Then <span class="math inline">\(\{\mathbf{\beta}_z\mid\mathbf{X}_z\}\sim MVN\{\mathbf{0},g\sigma^2[\mathbf{X}_z^T\mathbf{X}_z]^{-1}\}\)</span>, and <span class="math inline">\(\sigma^2\)</span> follows a <span class="math inline">\(Inverse-Gamma(\nu_0/2,\nu_0\sigma^2_0/2)\)</span>. After a rather tedious process of mathematical deduction (Hoff 2009, p. 165), the marginal probability is:</p>
+<p><span class="math display">\[\begin{split}p(\mathbf{y}\mid\mathbf{X},\mathbf{z})&amp;=\pi^{-n/2}\frac{\Gamma([\nu_0+n]/2)}{\Gamma(\nu_0/2)}(1+g)^{-p_{\mathbf{z}}/2}\frac{(\nu_0\sigma_0^2)^{\nu_0/2}}{(\nu_0\sigma_0^2+\text{SSR}^z_g)^{(\nu_0+n)/2}},\\ \text{where }&amp;\text{SSR}^z_g=\mathbf{y}^T(\mathbf{I}-\frac{g}{g+1}\mathbf{X}_z(\mathbf{X}_z^T\mathbf{X}_z)^{-1}\mathbf{X}_z)\mathbf{y}.\end{split}\]</span></p>
+<p>Now we suppose again <span class="math inline">\(g=n\)</span> and prior <span class="math inline">\(p(\sigma^2)\)</span> is unit informative for every model <span class="math inline">\(\mathbf{z}\)</span>, so <span class="math inline">\(\nu_0=1, \forall\mathbf{z}\)</span>, but <span class="math inline">\(\sigma_0^2\)</span> is estimated residual variance which differs case by case, such that the posterior odds can be written as:</p>
+<p><span class="math display">\[\frac{p(\mathbf{y}\mid\mathbf{X},\mathbf{z}_a)}{p(\mathbf{y}\mid\mathbf{X},\mathbf{z}_b)}=(1+n)^{(p_{\mathbf{z}_a}-p_{\mathbf{z}_b})/2}\left(\frac{s^2_{\mathbf{z}_a}}{s^2_{\mathbf{z}_b}}\right)^{0.5}\left(\frac{s^2_{\mathbf{z}_b}+\text{SSR}^{\mathbf{z}_b}_g}{s^2_{\mathbf{z}_a}+\text{SSR}^{\mathbf{z}_a}_g}\right)^{(n+1)/2}\]</span></p>
+<p>A predefined function <code>lpy.X()</code> from Professor Peter D. Hoff’s course material (Hoff 2009) calculates the value of <span class="math inline">\(\log p(\mathbf{y}\mid\mathbf{X},\mathbf{z})\)</span>. Since</p>
+<p><span class="math display">\[p(\mathbf{z}\mid\mathbf{y},\mathbf{X})\propto p(\mathbf{z})p(\mathbf{y\mid\mathbf{X},\mathbf{z})}\propto p(\mathbf{y}\mid\mathbf{X},\mathbf{z}),\]</span></p>
+<p>we can derive the corresponding probability of each model <span class="math inline">\(p(\mathbf{z}_j\mid\mathbf{y},\mathbf{X})\)</span>:</p>
+<p><span class="math display">\[\begin{split}p(\mathbf{z}_j\mid\mathbf{y},\mathbf{X})&amp;=\frac{\exp(\log p(\mathbf{y}\mid\mathbf{X},\mathbf{z}_j))}{\sum^n_{i=1}\exp(\log p(\mathbf{y}\mid\mathbf{X},\mathbf{z}_i))}\\
+\end{split}\]</span></p>
+<p>In order to prevent singularity, we perform a little trick on both denominator and numerator, that is to divide them by the mean of all models’ log-likelihood:</p>
+<p><span class="math display">\[\begin{split}p(\mathbf{z}_j\mid\mathbf{y},\mathbf{X})&amp;=\frac{\exp(\log p(\mathbf{y}\mid\mathbf{X},\mathbf{z}_j))/\exp(\frac1{n}\sum^n_{i=1}(\log p(\mathbf{y}\mid\mathbf{X},\mathbf{z}_j)))}{\sum^n_{i=1}\exp(\log p(\mathbf{y}\mid\mathbf{X},\mathbf{z}_i))/\exp(\frac1{n}\sum^n_{i=1}(\log p(\mathbf{y}\mid\mathbf{X},\mathbf{z}_j)))}\\
+&amp;=\frac{\exp\left(\log p(\mathbf{y}\mid\mathbf{X},\mathbf{z}_j)-\frac1{n}\sum^n_{i=1}(\log p(\mathbf{y}\mid\mathbf{X},\mathbf{z}_j))\right)}{\sum^n_{i=1}\exp\left(\log p(\mathbf{y}\mid\mathbf{X},\mathbf{z}_i)-\frac1{n}\sum^n_{i=1}(\log p(\mathbf{y}\mid\mathbf{X},\mathbf{z}_j))\right)}\\\end{split}\]</span></p>
+<p>The detailed table of marginal probabilities of our candidate models are shown below:</p>
+<pre><code>             model MargProb
+1  (1,0,0,0,0,0,0)   0.0000
+2  (1,1,0,0,0,0,0)   0.0000
+3  (1,0,1,0,0,0,0)   0.0000
+4  (1,0,0,1,0,0,0)   0.0013
+5  (1,0,0,0,1,1,0)   0.0000
+6  (1,1,1,0,0,0,0)   0.0000
+7  (1,1,1,0,0,0,1)   0.0000
+8  (1,1,0,1,0,0,0)   0.0000
+9  (1,1,0,0,1,1,0)   0.0000
+10 (1,0,1,1,0,0,0)   0.9194
+11 (1,0,1,0,1,1,0)   0.0000
+12 (1,0,0,1,1,1,0)   0.0007
+13 (1,1,1,1,0,0,1)   0.0019
+14 (1,1,1,0,1,1,1)   0.0000
+15 (1,1,0,1,1,1,0)   0.0000
+16 (1,0,1,1,1,1,0)   0.0765
+17 (1,1,1,1,1,1,1)   0.0002</code></pre>
+<p>It looks like model 10 containing <code>Nobility</code> and <code>POV</code>, has overwhelmingly large marginal probability comparing with other candidates. But this does not guarantee that model 10 is the perfect one. In fact, the confidence intervals of intercept, coefficients of predictors <code>Nobility</code>, <code>POV</code>, <code>first</code> do not contain zeros. In the early stage of listing possible candidates, we bundled both allegiance variables <code>first</code>, <code>second</code> together, so it omitted the combination of <code>intercept+Nobility+POV+first</code> automatically.</p>
+<pre><code>              est       2.5%     97.5%
+int     50.292912  33.911572 66.302044
+G        7.968891  -7.830800 24.821406
+N       29.325912   7.676253 51.498019
+P        6.699714   5.260619  8.078382
+first   13.018643   1.787524 24.323894
+second  -3.607900 -15.342952  7.627577
+G:N    -11.223858 -36.263750 10.681185</code></pre>
+</div>
+<div id="gibbs-sampling-and-model-averaging" class="section level2">
+<h2>2.3 Gibbs Sampling and Model Averaging</h2>
+<p>The 17 candidate models listed in the previous section simply cannot cover all the possible combinations of <span class="math inline">\(\mathbf{z}\)</span>’s. In fact, if we include more higher order interactions, the calculation would take tremendously more time. By subjectively selecting some candidates (like what we did), and applying a Gibbs sampler to iteratively sample <span class="math inline">\(z_j\)</span> from its full conditional distribution, then a <span class="math inline">\(z_j\)</span> is generated from <span class="math inline">\(p(z_j\mid\mathbf{y},\mathbf{X},\mathbf{z}_{-j})\)</span> if we start from <span class="math inline">\(\mathbf{z}=(z_1,\cdots,z_8)\)</span>. Note that we assumed uninformative prior before, so <span class="math inline">\(p(z_j=0)=p(z_j=1)=\frac12\)</span>.</p>
+<p><span class="math display">\[\begin{split}
+p(z_j\mid\mathbf{y},\mathbf{X},\mathbf{z}_{-j})&amp;=\frac{p(z_j=1\mid\mathbf{y},\mathbf{X},\mathbf{z}_{-j})}{p(z_j=1\mid\mathbf{y},\mathbf{X},\mathbf{z}_{-j})+p(z_j=0\mid\mathbf{y},\mathbf{X},\mathbf{z}_{-j})}\\
+&amp;=\frac{1}{1+\frac{p(z_j=0\mid\mathbf{y},\mathbf{X},\mathbf{z}_{-j})}{p(z_j=1\mid\mathbf{y},\mathbf{X},\mathbf{z}_{-j})}}\\
+&amp;=\frac{1}{1+\frac{p(z_j=0)}{p(z_j=1)}\cdot\frac{p(\mathbf{y}\mid\mathbf{X},\mathbf{z}_{-j},z_j=0)}{p(\mathbf{y}\mid\mathbf{X},\mathbf{z}_{-j},z_j=1)}}\\
+&amp;=\frac{1}{1+\frac{p(\mathbf{y}\mid\mathbf{X},\mathbf{z}_{-j},z_j=0)}{p(\mathbf{y}\mid\mathbf{X},\mathbf{z}_{-j},z_j=1)}}\\
+\end{split}\]</span></p>
+<p>The algorithm for one iteration of the Gibbs sampler is shown below:</p>
+<ol style="list-style-type: decimal">
+<li>Set <span class="math inline">\(\mathbf{z}=\mathbf{z}^{(s)}\)</span>.</li>
+<li>For <span class="math inline">\(j\in \{1,2,3,4,5,6,7,8\}\)</span> by random order, replace <span class="math inline">\(z_j\)</span> with a sample from <span class="math inline">\(p(z_j\mid\mathbf{y},\mathbf{X},\mathbf{z}_{-j})\)</span>.</li>
+<li>Update <span class="math inline">\(\mathbf{z}^{(s+1)}\)</span> as previous temporary <span class="math inline">\(\mathbf{z}\)</span>.</li>
+<li>Update <span class="math inline">\(\sigma^{2(s+1)}\)</span> by sampling from <span class="math inline">\(p(\sigma^2\mid\mathbf{z}^{(s+1)},\mathbf{y},\mathbf{X})\)</span>.</li>
+<li>Update <span class="math inline">\(\mathbf{\beta}^{s+1}\)</span> by sampling from <span class="math inline">\(p(\mathbf{\beta}\mid\mathbf{z}^{(s+1)},\sigma^{2(s+1)},\mathbf{y},\mathbf{X})\)</span>. (Step 4 and 5 are implemented in the predefined function <code>lm.gprior()</code> (Hoff 2009).)</li>
+</ol>
+<p>For the MCMC algorithm, we set the burn-in period to be 1000 and the thinning factor to be 10. Additionally, the initial value of <span class="math inline">\(\mathbf{z}=(1,1,1,1,1,1,1,1)\)</span>.</p>
+<p>After Gibbs sampling, the updated coefficients of predictors generally agree with previous results. Specifically, for <span class="math inline">\(\beta_j\)</span> where <span class="math inline">\(p(\beta_j\not=0\mid\mathbf{y})&gt;0.5\)</span>, the corresponding posterior confidence interval does not contain zero. In other words, we still keep <code>Nobility</code>, <code>POV</code> and <code>first</code> as our predictors in the model.</p>
+<pre><code>       pr(beta!=0)         est       2.5%     97.5%
+int         1.0000 57.38566554  49.507418 65.008466
+G           0.0377  0.06087173   0.000000  0.000000
+N           0.9674 19.23460797   0.000000 29.589302
+P           1.0000  6.85320366   5.431207  8.251596
+first       0.6277  9.29707540   0.000000 24.181711
+second      0.0851 -0.65298355 -11.286389  0.000000
+G:N         0.0654  0.33171054   0.000000 10.672953</code></pre>
+</div>
+</div>
+<div id="results" class="section level1">
+<h1>3. Results</h1>
+<div id="mcmc-diagnostics" class="section level2">
+<h2>3.1 MCMC Diagnostics</h2>
+<p>The traceplot<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> of <span class="math inline">\(\beta_1,\cdots,\beta_8\)</span> shows that the Gibbs sampled values are generally stable in trend. For intercept, <code>Nobility</code>, <code>POV</code>, <code>first</code> whose effects are significant, the sampled values are fluctuating around their estimated values. While <code>Gender</code>, <code>second</code> and the only interaction term <code>Gender:Nobility</code> stay as zero for most of the time.</p>
+<p><img src="../img/westerosi/unnamed-chunk-1-1.png" width="672" /></p>
+<p>The autocorrelation functions of <span class="math inline">\(\beta\)</span>’s are also satisfying, indicating that MCMC converges and the effective sample sizes are all greater than <span class="math inline">\(1000\)</span>.</p>
+<pre><code>[1]  9631.787 10000.000  6748.320 10000.000  8933.820  9401.725  6174.081</code></pre>
+<p><img src="../img/westerosi/unnamed-chunk-2-1.png" width="672" /></p>
+<p>So far, we can confirm the legitimacy of our model via Gibbs sampling and model averaging. Then the task remained is to see whether our model is suitable for predicting some other characters’ destinies.</p>
+</div>
+<div id="predictions" class="section level2">
+<h2>3.2 Predictions</h2>
+<p>Recall that the raw data was divided into training and testing set selected randomly. All of our previous model selection was carried out based on training data, so the untouched testing data is a perfect collection to perform prediction testing.</p>
+<p><span class="math display">\[\text{life}=57.38566554+19.23460797\times\text{Nobility}+6.85320366\times\text{POV}+9.29707540\times\text{first}\]</span></p>
+<p>We plug in the predictor values into testing data, calculate the predicted life span of each character, and draw the observation versus prediction scatter plot.</p>
+<p><img src="../img/westerosi/unnamed-chunk-3-1.png" width="672" /></p>
+<p>Based on the scatter plot, we find that the predicted life spans are aggregating at some values. In other words, our predictions form a discrete instead of a continuous distribution. This is not surprising as most of our predictor variables included in this model (or even among all the model candidates) are binary. Moreover, the greatest feature of the sole continuous variable <code>POV</code> is that only some main characters have the privilege to have their own POV chapters. Thus it leads to a situation where most of our 899 characters have a <code>POV</code> with value 0, and the rest of model-related variables are binary, namely either 0 or 1. As a result, the combinations of limited number of binary response is very limited. And this is why we have “stripe-shape” predictions.</p>
+<p>However, the plot actually tells us something in the end. We notice that most of characters within the <code>third</code> allegiance group have relatively short life spans, and our predictions are acceptable down in bottom left corner. Our predictive model is likely to underestimate some long-life-span characters. The fact is, those characters are usually characters with large <code>POV</code> counts. To investigate our prediction performance over characters with non-zero <code>POV</code> counts, we draw another scatter plot on the right hand side. This plot includes characters from both training and testing data.</p>
+<p>The predictions are generally more accurate than those in previous plot. Admittedly, there are some severe underestimations for some characters. Nevertheless, we set a loose standard that if the difference between predicted and observed values are within the averaged number of chapters of a book, then we claim the prediction is correct. In this way, most of our predictions are correct, in the sense of that character lives one book less or more than our prediction.</p>
+</div>
+<div id="survival-analysis" class="section level2">
+<h2>3.3 Survival Analysis</h2>
+<p>From the beginning, we keep discussing the life span of a character as how long they have been on stage since their first introduction. But looking at it from another perspective, we can measure how long they can live by continuously presenting the survival probability as the time proceeds. And we can fulfill such investigation through a Kaplan-Meier survival analysis (Kaplan–Meier estimator 2017). We utlize the function <code>ggsurvplot()</code> in the R package <code>survminer</code> to visualize different survival curves by allegiance group, gender and nobility.</p>
+<p><img src="../img/westerosi/unnamed-chunk-4-1.png" width="672" /></p>
+<p>The survival curves unearth some interesting facts:</p>
+<ul>
+<li><code>Allegiance</code> has influence on survival. To be specific, the first allegiance group, namely the “Big 3” houses tend to have higher survival chance comparing with the other two. Moreover, the second and the third group seem to have no distinct difference. These findings are consistent with our selected model in section 2, which reflects the significance of <code>first</code> while leaving <code>second</code> insignificant. At last, the story of <em>A Song of Ice and Fire</em> is a story of large families fighting for the Iron Throne. It makes sense that people from these families have more exposure time than others.</li>
+<li><code>Gender</code> does not matter. It is like 2nd and 3rd allegiance groups in the first survival curve plot. Even though they are slightly different when time increases, that variation could be caused by lack of samples with large survival time. When time value is small, two curves are entwined.</li>
+<li>Last but not leaset, <code>Nobility</code> affects survival probability as well. As we can see, the curve representing noblemen stays above the one representing commoners all the time. In reality, the clashes and wars indeed cause enormous casualties and losses to common people. While for people from the higher class, they might be the ones who start the war, but they are definitely not the greatest victims of the war.</li>
+</ul>
+</div>
+</div>
+<div id="conclusions" class="section level1">
+<h1>4. Conclusions</h1>
+<p><span class="math display">\[\text{life}=57.38566554+19.23460797\times\text{Nobility}+6.85320366\times\text{POV}+9.29707540\times\text{first}\]</span></p>
+<p>Let us reconsider the model we picked previously. It indicates that an average character in <em>A Song of Ice and Fire</em> automatically has a mean life span of 57 chapters, which is less than the mean chapter numbers of a book (67.8). Furthermore, certain factors have postive effects on the life span:</p>
+<ul>
+<li>If the character is a nobleman, he/she has an average of 19 more chapters of time on stage.</li>
+<li>If the character has his/her POV chapters, his/her life span would be substantially increased. For every one POV chapter, the life span increases by around 7.</li>
+<li>If the character is an allegiance to the “Big 3” <em>House Lannister</em>, <em>House Stark</em> or <em>House Targayen</em>, the life span increases by 9. But note that we divided the allegiance groups by into, and the second group contains mostly smaller houses and the third group contains even more minor factions, the life span difference between these two allegiance groups are not significant.</li>
+</ul>
+<p>Among all predictor variables, <code>POV</code> explains a great amount of variance, mainly because characters with <code>POV</code> chapters usually have longer life spans. But as we addressed in previous section, <code>POV</code> is our only continuous predictor variable and most of characters don’t have a <code>POV</code>. This results in discrete-looking predictions. Therefore, a plausible next step we should take is to include more features in our model so that different characters can be more unique and identified consequently. Students from Technical University of Munich collected a more detailed data set which includes some extra features like age, marital status, survival status of family members, etc (<em>A Song of Ice and Data</em> 2016).</p>
+<p>What’s more, more candidate models should be considered if more computing power and time are granted, so that we are able to explore more into some interaction terms between main effects, although we are highly suspicious about the significance of these interactions.</p>
+</div>
+<div id="self-criticism" class="section level1">
+<h1>5. Self-criticism</h1>
+<p>One thing we need to reconsider is the definition of “life span” in our model. We consider the life span as the duration that character is on stage and the “hibernating time” of a character is excluded. For example, a character may appear in Book 1, 2, 3 but not 4, then appears in Book 5. By our definition, the life span should subtract all chapters in Book 4. We do this tweak based on the facts some characters leave the stage, and we are not sure if they are still alive. So it makes us even harder to determine “how long they live”. However, this definition is not as rigorous as the natural life span. The drawback of our definition could be problematic when the story is not written chronologically. For instance, a chapter could contain stories happened in days, weeks or even months, hence the real duration of a chapter varies. One possible solution is including detailed time-related information about a character, like year of birth, year of death, but this requires more advanced web scraping techniques.</p>
+<p>Another compromise we made is that the allegiance status of a character stays static. In our model, due to the limited information from original data, we are only aware of initial allegiances of characters. In fact, betrayal is not rare in a troubled times so that the allegiance status should be dynamic instead. Furthermore, the allegiance clustering is manually selected in order to control the number of variables in the model. It has advantage in simplifying calculation, but it might just ignore some information within designed allegiance groups. One might wonder, what is the difference between <em>House Targaryen</em> and <em>House Stark</em>? For this type of question, we are unable to answer. Further investigations might be required to explore the relationship between survival and characters’ detailed allegiance history.</p>
+<p>In addition, the fates of living characters are still undetermined. It is impossible for us to know if Jon Snow could survive the next book. Our prediction mainly answers the question “what has made them survive so far” but not “how long they can live in this chaotic world”. This might sound like a bummer, but surely it leaves us some space to improve our model.</p>
+
+</div>
+<div id="references" class="section level1">
+<h1>6. References</h1>
+<ul>
+<li><a href="https://got.show/"><em>A Song of Ice and Data</em> 2016</a>, Technical University of Munich, viewed 2 November 2017.</li>
+<li>Agarwal, S, 16 March 2017, ‘<a href="https://towardsdatascience.com/finding-patterns-of-death-in-game-of-thrones-using-machine-learning-68cf95d7f1d1">Finding patterns in deaths in Game of Thrones using Machine Learning</a>’, <em>Towards Data Science</em>, blog post, viewed 2 November 2017.</li>
+<li>Bini, F, Scafloc, Targaryen, R, 31 March 2017, ‘<a href="http://awoiaf.westeros.org/index.php/Main_Page">Main Page</a>’, <em>A Wiki of Ice and Fire</em>, viewed 2 November 2017.</li>
+<li>Castellano, R, 26 May2016, ‘<a href="https://nycdatascience.com/blog/student-works/scraping-ice-fire/">Scraping Ice and Fire</a>’, <em>NYC Data Science Academy</em>, blogpost, viewed 2 November 2017.</li>
+<li>Funk, S 2017, ‘<a href="https://github.com/sbfnk/fitR">fitR: Functions for model fitting and inference</a>’, <em>GitHub</em>, viewed 2 November 2017.</li>
+<li>Funk, S 2017, ‘<a href="http://sbfnk.github.io/mfiidd/index.html">Practical session: MCMC diagnostics</a>’, <em>Model fitting and inference for infectious disease dynamics</em>, viewed 2 November 2017.</li>
+<li>Gale, N, Zhang, S, Sun, H 2017, ‘Valor Morghulis: Bayesian Prediction of Character Deaths in A Song of Ice and Fire’.</li>
+<li>Hoff, PD 2009, <em><a href="http://www.stat.washington.edu/people/pdhoff/Book/ComputerCode/regression_gprior.r">A First Course in Bayesian Statistical Methods</a></em>, Springer-Verlag, New York, viewed 2 November 2017.</li>
+<li>Kassambara, A 2017, ‘<a href="https://github.com/kassambara/survminer">survminer: Survival Analysis and Visualization</a>’, <em>GitHub</em>, viewed 2 November 2017.</li>
+<li>‘<a href="https://en.wikipedia.org/wiki/Kaplan%E2%80%93Meier_estimator">Kaplan-Meier estimator</a>’ 2017, <em>Wikipedia</em>, viewed 2 November 2017.</li>
+<li>Kirt, Nittanian, Targaryen, R, 30 January 2017, ‘<a href="http://awoiaf.westeros.org/index.php/POV_character">POV character</a>’, <em>A Wiki of Ice and Fire</em>, viewed 2 November 2017.</li>
+<li>Martin, GRR 1996, <em>A Game of Thrones</em>, Bantam, New York.</li>
+<li>Martin, GRR 1999, <em>A Clash of Kings</em>, Bantam, New York.</li>
+<li>Martin, GRR 2000, <em>A Storm of Swords</em>, Bantam, New York.</li>
+<li>Martin, GRR 2005, <em>A Feast for Crows</em>, Bantam Spectra, New York.</li>
+<li>Martin, GRR 2011, <em>A Dance with Dragons</em>, Bantam Spectra, New York.</li>
+<li>O’Neill, M, 2016, ‘<a href="https://www.kaggle.com/mylesoneill/game-of-thrones/data">Game of Thrones: Explore deaths and battles from this fantasy world</a>’, <em>Kaggle</em>, viewed 2 November 2017.</li>
+<li>Pierce, E, Kahle, B 2014, ‘<a href="https://github.com/benkahle/bayesianGameofThrones">Bayesian Analysis of Survival Probability in A Song of Ice and Fire</a>’, <em>GitHub</em>, viewed 2 November 2017.</li>
+<li>Rickert, J, 25 September 2017, ‘<a href="https://rviews.rstudio.com/2017/09/25/survival-analysis-with-r/">Survival Analysis with R</a>’, <em>R Views</em>, blogpost, viewed 2 November 2017.</li>
+<li>Vale, R 2014, ‘<a href="http://www.math.canterbury.ac.nz/~r.vale/got_290814.pdf">Bayesian Prediction for the Winds of Winter</a>’, viewed 2 November 2017.</li>
+</ul>
+</div>
+<div id="appendices" class="section level1">
+<h1>7. Appendices</h1>
+<div id="scripts" class="section level2">
+<h2>7.1 Scripts</h2>
+<pre class="r"><code>set.seed(7016)
+library(ggplot2)
+library(ggfortify)
+library(coda)
+library(fitR)
+library(survival)
+library(survminer)
+library(ggthemes)
+source(&quot;regression_gprior.r&quot;)
+
+# -------------------DATA PREP---------------------
+death &lt;- read.csv(&quot;character-deaths.csv&quot;,header=T)
+death$Allegiances &lt;- sub(&quot;House &quot;,&quot;&quot;,death$Allegiances)
+unique(death$Allegiances)
+death &lt;- death[!is.na(death$Book.Intro.Chapter),] # now we have 905 characters left
+
+# add a Book.of.Intro variable
+death$Book.of.Intro = 0
+X1 = which(death$GoT == 1)
+X2 = which(death$CoK == 1 &amp; death$GoT == 0)
+X3 = which(death$SoS== 1 &amp; death$CoK == 0 &amp; death$GoT == 0)
+X4 = which(death$FfC ==1 &amp; death$SoS == 0 &amp; death$CoK == 0 &amp; death$GoT == 0)
+X5 = which(death$DwD == 1 &amp; death$FfC == 0 &amp; death$SoS == 0 &amp; death$CoK == 0 
+           &amp; death$GoT == 0)
+death$Book.of.Intro[X1] = 1
+death$Book.of.Intro[X2] = 2
+death$Book.of.Intro[X3] = 3
+death$Book.of.Intro[X4] = 4
+death$Book.of.Intro[X5] = 5
+
+# # same book death
+# same.book.death &lt;- which(death$Book.of.Intro==death$Book.of.Death)
+# sbd1 = sum(death$Book.of.Intro[same.book.death]==1)
+# sbd2 = sum(death$Book.of.Intro[same.book.death]==2)
+# sbd3 = sum(death$Book.of.Intro[same.book.death]==3)
+# sbd4 = sum(death$Book.of.Intro[same.book.death]==4)
+# sbd5 = sum(death$Book.of.Intro[same.book.death]==5)
+# summary(c(sbd1,sbd2,sbd3,sbd4,sbd5))
+# # Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+# # 9.0    26.0    48.0    37.8    53.0    53.0 
+
+# life span of a character
+bookch &lt;- c(73-1,70-1,82-1,46-1,73-1) # minus appendix of each book
+max.life &lt;- sum(bookch) # 339
+death$Life &lt;- death$GoT*bookch[1]+death$CoK*bookch[2]+
+    death$SoS*bookch[3]+death$FfC*bookch[4]+death$DwD*bookch[5]
+# subtract chapters in the intro book but before introduction
+for (i in c(X1,X2,X3,X4,X5)) {
+    death$Life[i] &lt;- death$Life[i]-death$Book.Intro.Chapter[i]
+}
+# death[!is.na(death$Book.of.Death)&amp;is.na(death$Death.Chapter),]
+# 8 characters have a book of death but no chapter of death
+# subtract chapters in the death book but after death
+for (i in 1:nrow(death)){
+    if (!is.na(death$Book.of.Death[i])) {
+        if (is.na(death$Death.Chapter[i])) {
+            # the special procedure: we assume they survived 
+            # half of the chapters in that book
+            death$Life[i] &lt;- death$Life[i]-
+                (floor(bookch[death$Book.of.Death[i]]*0.5))
+        } else {
+            # the common procedure
+            death$Life[i] &lt;- death$Life[i]-(bookch[death$Book.of.Death[i]]
+                                            -death$Death.Chapter[i])    
+        }
+    }
+}
+
+death &lt;- death[-which(death$Life&lt;0),] # remove some negative life characters
+
+# add variable Status
+death$Status &lt;- rep(NA,nrow(death))
+for (i in 1:nrow(death)) {
+    if (is.na(death$Death.Chapter[i])) {
+        death$Status[i] &lt;- 1
+    } else {
+        death$Status[i] &lt;- 0
+    }
+}
+
+# add another variable POV for major characters (book 6 excluded)
+
+death$POV &lt;- rep(0,nrow(death))
+POVnames &lt;- c(&quot;Eddard Stark&quot;,&quot;Catelyn Tully&quot;,&quot;Sansa Stark&quot;,&quot;Arya Stark&quot;,
+              &quot;Bran Stark&quot;,&quot;Jon Snow&quot;,&quot;Daenerys Targaryen&quot;,&quot;Tyrion Lannister&quot;,
+              &quot;Theon Greyjoy&quot;,&quot;Davos Seaworth&quot;,&quot;Samwell Tarly&quot;,&quot;Jaime Lannister&quot;,
+              &quot;Cersei Lannister&quot;,&quot;Brienne of Tarth&quot;,&quot;Areo Hotah&quot;,&quot;Arys Oakheart&quot;,
+              &quot;Arianne Martell&quot;,&quot;Asha Greyjoy&quot;,&quot;Aeron Greyjoy&quot;,&quot;Victarion Greyjoy&quot;,
+              &quot;Quentyn Martell&quot;,&quot;Jon Connington&quot;,&quot;Barristan Selmy&quot;,&quot;Melisandre&quot;)
+POVcounts &lt;- c(15,25,24,33,21,42,31,47,13,13,10,17,12,8,2,1,2,4,2,4,4,2,4,1)
+
+for (aMan in 1:length(POVnames)) {
+    death$POV[which(death$Name==POVnames[aMan])] &lt;- POVcounts[aMan]
+}
+
+df &lt;- subset(death,select=c(&quot;Name&quot;,&quot;Life&quot;,&quot;Gender&quot;,&quot;Nobility&quot;,&quot;POV&quot;,&quot;Allegiances&quot;,
+                            &quot;Status&quot;))
+
+# Arryn &lt;- ifelse(df$Allegiances==&quot;Arryn&quot;,1,0)
+# Baratheon &lt;- ifelse(df$Allegiances==&quot;Baratheon&quot;,1,0)
+# Greyjoy &lt;- ifelse(df$Allegiances==&quot;Greyjoy&quot;,1,0)
+# Lannister &lt;- ifelse(df$Allegiances==&quot;Lannister&quot;,1,0)
+# Martell &lt;- ifelse(df$Allegiances==&quot;Martell&quot;,1,0)
+# NightsWatch &lt;- ifelse(df$Allegiances==&quot;Night&#39;s Watch&quot;,1,0)
+# None &lt;- ifelse(df$Allegiances==&quot;None&quot;,1,0)
+# Stark &lt;- ifelse(df$Allegiances==&quot;Stark&quot;,1,0)
+# Targaryen &lt;- ifelse(df$Allegiances==&quot;Targaryen&quot;,1,0)
+# Tully &lt;- ifelse(df$Allegiances==&quot;Tully&quot;,1,0)
+# Tyrell &lt;- ifelse(df$Allegiances==&quot;Tyrell&quot;,1,0)
+# Wildling &lt;- ifelse(df$Allegiances==&quot;Wildling&quot;,1,0)
+
+df$first &lt;- ifelse(df$Allegiances%in%c(&quot;Stark&quot;,&quot;Lannister&quot;,&quot;Targaryen&quot;),1,0)
+df$second &lt;-ifelse(df$Allegiances%in%c(&quot;Arryn&quot;,&quot;Baratheon&quot;,&quot;Greyjoy&quot;,
+                                    &quot;Martell&quot;,&quot;Tully&quot;,&quot;Tyrell&quot;),1,0)
+# df$third &lt;- ifelse(df$Allegiances%in%c(&quot;Night&#39;s Watch&quot;,&quot;None&quot;,&quot;Wildling&quot;),1,0)
+
+df$GxN &lt;- df$Gender*df$Nobility # interactions
+
+# prepare for cross-validation
+dim(df)
+sample.index &lt;- sample(1:899,99,replace=F)
+df.test &lt;- df[sample.index,]
+df &lt;- df[-sample.index,]
+
+# -------------Simple model--------------
+
+# training
+X &lt;- cbind(rep(1,nrow(df)),
+           df$Gender,df$Nobility,df$POV,df$first,df$second,df$GxN) # df$third
+colnames(X) &lt;- c(&quot;int&quot;,&quot;G&quot;,&quot;N&quot;,&quot;P&quot;,&quot;first&quot;,&quot;second&quot;,&quot;G:N&quot;) # ,&quot;third&quot;
+y &lt;- df$Life
+
+# testing
+X.test &lt;- cbind(rep(1,nrow(df.test)),
+           df.test$Gender,df.test$Nobility,df.test$POV,
+           df.test$first,df.test$second,df.test$GxN) #df.test$third,
+colnames(X.test) &lt;- c(&quot;int&quot;,&quot;G&quot;,&quot;N&quot;,&quot;P&quot;,&quot;first&quot;,&quot;second&quot;,&quot;G:N&quot;) # ,&quot;third&quot;
+y.test &lt;- df.test$Life
+
+index &lt;- list(2,3,4,5:6,
+              c(2,3),c(2,3,7),c(2,4),c(2,5:6),
+              c(3,4),c(3,5:6),c(4,5:6),
+              c(2,3,4,7),c(2,3,5:6,7),
+              c(2,4,5:6),c(3,4,5:6),
+              c(2,3,4,5:6,7))
+
+z &lt;- matrix(data=rep(c(1,rep(0,ncol(X)-1)),length(index)+1),ncol=ncol(X),byrow=T)
+
+# G, N, P, allegiances, G:N
+# 2, 3, 4, 5:6,   7
+
+# z[1,] # null model
+for (i in 1:length(index)) {
+    z[1+i,index[[i]]] &lt;- 1
+}
+
+# marginal probability
+lpy.p &lt;- NULL
+for (i in 1:nrow(z)) {
+    z.use &lt;- z[i,]
+    lpy.p &lt;- c(lpy.p,lpy.X(y,X[,z.use==1,drop=FALSE]))
+}
+mprob &lt;- data.frame(matrix(rep(NA,2*(length(index)+1)),ncol=2))
+margin.prob &lt;- round(exp(-mean(lpy.p)+lpy.p)/sum(exp(-mean(lpy.p)+lpy.p)),4)
+
+# store model and marginal probabilities in a data frame
+for(i in 1:nrow(z)){
+    model &lt;- &quot;(&quot;
+    for(j in 1:(ncol(z)-1)){
+        model &lt;- paste(model,z[i,j],&quot;,&quot;,sep=&quot;&quot;)
+    }
+    model &lt;- paste(model,z[i,ncol(z)],&quot;)&quot;,sep=&quot;&quot;)
+    mprob[i,1] &lt;- model
+    mprob[i,2] &lt;- margin.prob[i]
+}
+colnames(mprob) &lt;- c(&quot;model&quot;,&quot;MargProb&quot;)
+mprob
+
+# posterior
+beta.post &lt;- lm.gprior(y,X)$beta
+beta.bar &lt;- apply(beta.post,2,mean)
+beta.post.ci &lt;- apply(beta.post,2,function(x) quantile(x,c(0.025,0.975)))
+beta.post.table &lt;- cbind(beta.bar,t(beta.post.ci))
+colnames(beta.post.table)[1] &lt;- c(&quot;est&quot;)
+beta.post.table
+
+# model averaging with MCMC
+z &lt;- rep(1,ncol(X)) # initial values
+S &lt;- 10000 # number of simulations
+BETA &lt;- matrix(NA,S,ncol(X))
+lpy.c &lt;- lpy.X(y,X[,z==1,drop=FALSE])
+Z &lt;- matrix(NA,S,ncol(X))
+BETA &lt;- matrix(NA,S,ncol(X))
+
+# Gibbs sampler
+start.time &lt;- Sys.time()
+for(s in 1:S) {
+    if (s%%100==0) {
+    looptime &lt;- Sys.time()-start.time
+    cat(s,&quot; LOOPS SIMULATED... AND IT&#39;S BEEN&quot;, 
+        difftime(Sys.time(),start.time,units = &quot;mins&quot;), &quot;MINS! \n&quot;)
+    }
+    for (j in sample(2:dim(X)[2])) {
+        zp &lt;- z; zp[j] &lt;- 1-zp[j]
+        lpy.p &lt;- lpy.X(y,X[,zp==1,drop=FALSE])
+        r &lt;- (lpy.p-lpy.c)*(-1)^(zp[j]==0)
+        z[j] &lt;- rbinom(1,1,1/(1+exp(-r)))
+        if (z[j]==zp[j]) {
+            lpy.c &lt;- lpy.p
+        }
+    }
+    beta &lt;- z
+    if(sum(z)&gt;0){beta[z==1] &lt;- lm.gprior(y,X[,z==1,drop=FALSE],S=1)$beta}
+    Z[s,] &lt;- z
+    BETA[s,] &lt;- beta
+}
+
+p.not0 &lt;- apply(BETA,2,function(x) mean(x!=0))
+beta.bma &lt;- apply(BETA,2,mean,na.rm=TRUE)
+beta.bma.ci &lt;- apply(BETA,2,function(x) quantile(x,probs=c(0.025,0.975)))
+beta.bma.table &lt;- cbind(p.not0,beta.bma,t(beta.bma.ci))
+colnames(beta.bma.table)[1:2] &lt;- c(&quot;pr(beta!=0)&quot;,&quot;est&quot;)
+rownames(beta.bma.table) &lt;- c(&quot;int&quot;,&quot;G&quot;,&quot;N&quot;,&quot;P&quot;,&quot;first&quot;,&quot;second&quot;,&quot;G:N&quot;)
+beta.bma.table
+
+# -------------MCMC diagnostics-------------
+
+# Effective Sample Size 
+ef.beta &lt;- NULL
+apply(BETA,2,effectiveSize)
+
+# traceplot
+my.mcmc &lt;- mcmc(BETA)
+plot(burnAndThin(my.mcmc,burn=1000,thin=10))
+
+# acf
+autocorr.plot(burnAndThin(my.mcmc,burn=1000,thin=10))
+
+# recall model selection mariginal prob
+which(mprob$MargProb&gt;1/(length(index)+1))
+# only model 10 greater than prior
+mprob[c(10),]
+sum(mprob$MargProb[c(10,16)]) #  0.9959
+
+# --------------------Predictions---------------
+# prediction test
+
+# in testing set
+alle &lt;- rep(NA,nrow(X.test))
+for (i in 1:nrow(X.test)) {
+    if (X.test[i,5]==1) {
+        alle[i] &lt;- 1
+    } else if (X.test[i,6]==1) {
+        alle[i] &lt;- 2
+    } else {
+        alle[i] &lt;- 3
+    }
+}
+
+pred.test2 &lt;- data.frame(cbind(X.test%*%beta.bma,y.test,alle))
+colnames(pred.test2) &lt;- c(&quot;predicted&quot;,&quot;true&quot;,&quot;alle&quot;)
+ggplot(pred.test2,aes(x=predicted,y=true))+
+    geom_point(aes(color=cut(alle,c(0,1,2,3))),size=3,alpha=0.6)+
+    scale_color_manual(name=&quot;Allegiance&quot;,
+                       values=c(&quot;(0,1]&quot;=&quot;blue&quot;,&quot;(1,2]&quot;=&quot;green&quot;,&quot;(2,3]&quot;=&quot;red&quot;),
+                       labels=c(&quot;first&quot;,&quot;second&quot;,&quot;third&quot;))+
+    geom_rug(alpha=0.5)+
+    geom_abline(slope=1)+
+    ggtitle(&quot;Observed Life Span vs Predicted Life Span&quot;,subtitle=&quot;in Testing Data&quot;)+
+    labs(alle=&quot;Allegiance Group&quot;,x=&quot;Predicted Life Span&quot;,y=&quot;Observed Life Span&quot;)+
+    theme_minimal()
+    
+
+# only main characters
+pov.index &lt;- c(which(df$POV!=0),which(df.test$POV!=0))
+combine &lt;- rbind(X,X.test)[pov.index,]
+alle.main &lt;- rep(NA,nrow(combine))
+for (i in 1:nrow(combine)) {
+    if (combine[i,5]==1) {
+        alle.main[i] &lt;- 1
+    } else if (combine[i,6]==1) {
+        alle.main[i] &lt;- 2
+    } else {
+        alle.main[i] &lt;- 3
+    }
+}
+pred.main &lt;- data.frame(cbind(combine%*%beta.bma,c(y,y.test)[pov.index],alle.main))
+colnames(pred.main) &lt;- c(&quot;predicted&quot;,&quot;true&quot;,&quot;alle&quot;)
+ggplot(pred.main,aes(x=predicted,y=true))+
+    geom_point(aes(color=cut(alle,c(0,1,2,3))),size=3,alpha=0.6)+
+    scale_color_manual(name=&quot;Allegiance&quot;,
+                       values=c(&quot;(0,1]&quot;=&quot;blue&quot;,&quot;(1,2]&quot;=&quot;green&quot;,&quot;(2,3]&quot;=&quot;red&quot;),
+                       labels=c(&quot;first&quot;,&quot;second&quot;,&quot;third&quot;))+
+    geom_rug(alpha=0.5)+
+    geom_abline(slope=1)+
+    geom_abline(slope=1,intercept=mean(bookch))+
+    geom_abline(slope=1,intercept=-mean(bookch))+
+    ggtitle(&quot;Observed Life Span vs Predicted Life Span&quot;,
+            subtitle=&quot;Characters with POV&quot;)+
+    labs(x=&quot;Predicted Life Span&quot;,y=&quot;Observed Life Span&quot;)+
+    theme_minimal()
+
+# -------------------Survival Analysis-----------
+# KM model
+
+# add a marker
+df.surv &lt;- subset(death,select=c(&quot;Name&quot;,&quot;Life&quot;,&quot;Gender&quot;,&quot;Nobility&quot;,&quot;POV&quot;,
+                                 &quot;Allegiances&quot;,&quot;Status&quot;))
+
+class &lt;- rep(0,nrow(df.surv))
+for (i in 1:nrow(df.surv)) {
+    if (df.surv$Allegiances[i]%in%c(&quot;Lannister&quot;,&quot;Stark&quot;,&quot;Targaryen&quot;)) {
+        class[i] &lt;- &quot;1st&quot;
+    } else if (df.surv$Allegiances[i]%in%c(&quot;Arryn&quot;,&quot;Baratheon&quot;,&quot;Greyjoy&quot;,
+                                   &quot;Martell&quot;,&quot;Tully&quot;,&quot;Tyrell&quot;)) {
+        class[i] &lt;- &quot;2nd&quot;
+    } else if (df.surv$Allegiances[i]%in%c(&quot;Night&#39;s Watch&quot;,&quot;None&quot;,&quot;Wildling&quot;)) {
+        class[i] &lt;- &quot;3rd&quot;
+    }
+}
+df.surv$class &lt;- class
+
+# ggsurvplot(survfit(Surv(Life,Status)~1,data=df),
+           # ggtheme=theme_minimal())
+
+ggsurvplot(survfit(Surv(Life,Status)~class,data=df.surv),
+           ggtheme=theme_minimal(),title=&quot;Survival Curves by Allegiances&quot;)
+
+ggsurvplot(survfit(Surv(Life,Status)~Gender,data=df.surv),
+           ggtheme=theme_minimal(),title=&quot;Survival Curves by Gender&quot;)
+
+ggsurvplot(survfit(Surv(Life,Status)~Nobility,data=df.surv),
+           ggtheme=theme_minimal(),title=&quot;Survival Curves by Nobility&quot;)</code></pre>
+
+</div>
+<div id="codes-from-hoffs-textbook" class="section level2">
+<h2>7.2 Codes from Hoff’s Textbook</h2>
+<pre class="r"><code>lm.gprior&lt;-function(y,X,g=dim(X)[1],nu0=1,s20=try(summary(lm(y~-1+X))$sigma^2,
+                                                  silent=TRUE),S=1000)
+{
+
+  n&lt;-dim(X)[1] ; p&lt;-dim(X)[2]
+  Hg&lt;- (g/(g+1)) * X%*%solve(t(X)%*%X)%*%t(X)
+  SSRg&lt;- t(y)%*%( diag(1,nrow=n)  - Hg ) %*%y
+
+  s2&lt;-1/rgamma(S, (nu0+n)/2, (nu0*s20+SSRg)/2 )
+
+  Vb&lt;- g*solve(t(X)%*%X)/(g+1)
+  Eb&lt;- Vb%*%t(X)%*%y
+
+  E&lt;-matrix(rnorm(S*p,0,sqrt(s2)),S,p)
+  beta&lt;-t(  t(E%*%chol(Vb)) +c(Eb))
+
+  list(beta=beta,s2=s2)                                
+}   
+
+
+lpy.X&lt;-function(y,X,
+   g=length(y),nu0=1,s20=try(summary(lm(y~-1+X))$sigma^2,silent=TRUE)) 
+{
+  n&lt;-dim(X)[1] ; p&lt;-dim(X)[2] 
+  if(p==0) { s20&lt;-mean(y^2) }
+  H0&lt;-0 ; if(p&gt;0) { H0&lt;- (g/(g+1)) * X%*%solve(t(X)%*%X)%*%t(X) }
+  SS0&lt;- t(y)%*%( diag(1,nrow=n)  - H0 ) %*%y
+
+  -.5*n*log(2*pi) +lgamma(.5*(nu0+n)) - lgamma(.5*nu0)  - .5*p*log(1+g) +
+   .5*nu0*log(.5*nu0*s20) -.5*(nu0+n)*log(.5*(nu0*s20+SS0))
+}</code></pre>
+<p><img src="../img/westerosi/unnamed-chunk-7-1.png" width="672" /></p>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Here we used a R package still under development called <code>fitR</code>.<a href="#fnref1">↩</a></p></li>
+</ol>
+</div>
