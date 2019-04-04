@@ -20,7 +20,7 @@ $$</div>
 
 Codes:
 
-```{r, echo=TRUE, eval=FALSE}
+```{R echo=TRUE, eval=FALSE}
 library(Rcpp)
 library(ggplot2)
 library(dplyr)
