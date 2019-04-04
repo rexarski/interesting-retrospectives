@@ -1,0 +1,33 @@
+---
+title: Basic Web Scraping with rvest
+author: Qiu Rui
+date: '2018-06-26'
+slug: basic-web-scraping-with-rvest
+tags:
+  - rvest
+  - spider
+---
+
+
+
+<p>The <a href="https://datascienceplus.com/building-a-hacker-news-scraper-with-8-lines-of-r-code-using-rvest-library/">post</a> here demonstrates an example of Hacker News scraper with <code>rvest</code> library.</p>
+<p>But a tiny problem emerges as sometimes YC-funded startup post job ads on the front page so that the scraper would find different information vector with different lengths. Specifically, the it would not return any score value for that ad. One possible remedy is to log in as a real user, then do the scraping. In R, it is implemented as:</p>
+<pre class="r"><code>library(rvest)
+
+login &lt;- &#39;https://news.ycombinator.com/login&#39;
+session &lt;- html_session(login)
+form &lt;- html_form(session)[[1]]
+filled_form &lt;- set_values(form, acct=&#39;MyAccountName&#39;, pw=&#39;MyPassword&#39;)
+submit_form(session, filled_form)
+content &lt;- jump_to(session, &#39;https://news.ycombinator.com/&#39;)
+
+title &lt;- content %&gt;% 
+    html_nodes(&#39;a.storylink&#39;) %&gt;% html_text()
+link_domain &lt;- content %&gt;% 
+    html_nodes(&#39;span.sitestr&#39;) %&gt;% html_text()
+score &lt;- content %&gt;% 
+    html_nodes(&#39;span.score&#39;) %&gt;% html_text()
+age &lt;- content %&gt;% 
+    html_nodes(&#39;span.age&#39;) %&gt;% html_text()
+df &lt;- data.frame(title = title, link_domain = link_domain, score = score, age = age)</code></pre>
+<p>The saved data frame would contain all the 30 links on the front page of Hacker News.</p>

@@ -1,42 +1,44 @@
-baseurl = "https://interetro.rbind.io/"
+baseurl = "https://interetro.rbind.io"
 publishDir = "public"
 title = "interetro"
 author = "Qiu Rui"
 canonifyurls = true
 languagecode = "en"
-theme = "hugo-tanka"
+paginate = 3
+theme = "hugo-renga"
 
-googleAnalytics = "UA-80926729-1"
+enableEmoji = true
+hasCJKLanguage = true
+
 disqusShortname = "rexarski"
-disable_mathjax = false
-
-pygmentsstyle      = "vs"
-pygmentscodefences = true
 
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
+disableKinds = ["taxonomy", "taxonomyTerm"]
 
 [params]
-  sitename = "interesting retrospectives"
+pagetitle = "interesting retrospectives"
+copyright = "© 2019 Qiu Rui"
+copyrightUrl = "https://interetro.rbind.io"
+faviconfile = "image/favicon.png"
+logofile = "image/rexarski.jpg"
+posts_navigation = true
+uselatex = true
+highlightjs = true
+progressively = false
 
-[[menu.main]]
-    name = "Home"
-    url = "/"
-    weight = 1
-[[menu.main]]
-    name = "GitHub"
-    url = "https://github.com/rexarski"
-    weight = 2
-[[menu.main]]
-    name = "Twitter"
-    url = "https://twitter.com/rexarski"
-    weight = 3
-[[menu.main]]
-    name = "Resume"
-    url = "/pdf/resume.pdf"
-    # url = "/Resume/"
-    weight = 4
-[[menu.main]]
-    name = "RSS"
-    url = "/index.xml"
-    weight = 5
+github = "rexarski"
+# linkedin = ""
+twitter = "rexarski"
+email = "qiurui416@gmail.com"
 
+[[menu.primary]]
+identifier = "blog"
+name = "Blog"
+url = "/blog/"
+weight = 1
+
+[[menu.primary]]
+identifier = "project"
+name = "Project"
+url = "/project/"
+weight = 2

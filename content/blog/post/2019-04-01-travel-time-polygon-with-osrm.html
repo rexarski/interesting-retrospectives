@@ -1,0 +1,69 @@
+---
+title: Travel Time Polygon with osrm
+author: Qiu Rui
+date: '2019-04-01'
+slug: travel-time-polygon-with-osrm
+categories: []
+tags:
+  - osrm
+---
+
+
+
+<p>OpenStreetMap’s <a href="http://project-osrm.org/">OSRM (Open Source Routing Machine)</a> provides not only routing service, but a feature that enables drawing multiple routes to form a time-based polygon range as well. This is also called an isochrone.</p>
+<p>An isochrone, according to Wikipedia, is defined as “”a line drawn on a map connecting points at which something occurs or arrives at the same time“. In other words, it is just like contour lines measuring travel time in urban design.</p>
+<p><a href="https://github.com/rCarto">Timothée Giraud</a> has a repo <a href="https://github.com/rCarto/osrm">osrm</a> that connects OpenStreetMap’s service and R.</p>
+<p>In the README file of this repo, there is also a vanilla example of how to draw <code>osrmIsochrone</code>.</p>
+<pre class="r"><code>library(osrm)
+library(sp)
+library(cartography)
+library(leaflet)
+
+# Get isochones with a SpatialPointsDataFrame, custom breaks
+iso &lt;- osrmIsochrone(loc = c(149.1212457, -35.2766747), breaks = seq(from = 0,to = 30, by = 5))
+
+# Map
+osm &lt;- getTiles(x = iso, crop = FALSE, type = &quot;osm&quot;, zoom = 13)
+tilesLayer(x = osm)
+bks &lt;- sort(c(unique(iso$min), max(iso$max)))
+cols &lt;- paste0(carto.pal(&quot;turquoise.pal&quot;, n1 = length(bks)-1), 80)
+choroLayer(spdf = iso,
+           var = &quot;center&quot;, breaks = bks,
+           border = NA, col = cols,
+           legend.pos = &quot;topleft&quot;,legend.frame = TRUE,
+           legend.title.txt = &quot;Isochrones\n(min)&quot;,
+           add = TRUE)
+plot(apotheke.sp[10,], add=TRUE, col =&quot;red&quot;, pch = 20)</code></pre>
+<div class="figure">
+<img src="/image/canberra-osrm.png" />
+
+</div>
+<p>However, the processing time of this plot is not very satisfying. What about drawing the polygons with <code>leaflet</code>?</p>
+<pre class="r"><code># Map as leaflet
+iso@data$drive_times &lt;- factor(paste(iso@data$min, &quot;to&quot;, iso@data$max, &quot;min&quot;))
+factpal &lt;- colorFactor(&quot;RdYlBu&quot;, iso@data$drive_times)
+
+leaflet() %&gt;%
+    setView(149.1212457, -35.2766747, zoom = 11) %&gt;%
+    addProviderTiles(&quot;CartoDB.Positron&quot;, group=&quot;Greyscale&quot;) %&gt;% 
+    addMarkers(lng = 149.1212457, lat = -35.2766747, popup = &quot;Starting Point&quot;) %&gt;% 
+    addPolygons(fill=TRUE, stroke=TRUE, color = &quot;black&quot;,
+                fillColor = ~factpal(iso@data$drive_times),
+                weight=0.5, fillOpacity=0.2,
+                data = iso, popup = iso@data$drive_times,
+                group = &quot;Drive Time&quot;) %&gt;% 
+    addLegend(&quot;bottomright&quot;, pal = factpal, values = iso@data$drive_time,   title = &quot;Drive Time&quot;)</code></pre>
+<div class="figure">
+<img src="/image/canberra-leaflet.png" />
+
+</div>
+<p>An interactive map is not a bad idea. And can use <code>proc.time()</code> to track the processing time of both methods.</p>
+<pre class="r"><code>ptm &lt;- proc.time()
+# plotting method
+proc.time() - ptm</code></pre>
+<p>Compare the processing of two plotting above. <code>osrm</code> takes around 50 seconds, while <code>leaflet()</code> only requires less than 7 seconds.</p>
+<pre><code>   user  system elapsed 
+ 28.081  13.457  48.232 
+
+   user  system elapsed 
+  5.692   0.173   6.532 </code></pre>

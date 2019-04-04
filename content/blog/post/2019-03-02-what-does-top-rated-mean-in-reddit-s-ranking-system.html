@@ -1,0 +1,75 @@
+---
+title: What does Top-Rated Mean in Reddit’s Ranking System
+author: Qiu Rui
+date: '2019-03-02'
+slug: what-does-top-rated-mean-in-reddit-s-ranking-system
+tags:
+  - maths
+---
+
+
+
+<p>Though Reddit’s comment sorting system has been in use for almost a decade, the fact is that I wasn’t so exposed to western internet community till 2013, it is still, a rather new thing to me.</p>
+<p>Randall, the author of <a href="https://xkcd.com">xkcd</a>, also my favourite internet comics, wrote a blog<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> explaining what the algorithm is. Meanwhile, a detailed version is introduced by Evan Miller<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>.</p>
+<p>In the latter, Evan gave two examples of two “wrong” ranking methods:</p>
+<ol style="list-style-type: decimal">
+<li>Score = positive - negative;</li>
+<li>Score = positive / total.</li>
+</ol>
+<p>To say they are “wrong”, does not mean that they are not possible to give a rough idea in all scenarios. But the reality is always complex, a rough idea is probably a synonym of “meaninglessness”. To be specific, the first case ignore the “ratio” part in the term of “highest rated”, that means a more controversial comment might exceed a quality post simply due to more people voting on it. The second case, however, ignores the scenario where the sample space is limited. For instance, we can hardly say that a 1 of 1 upvoted comment is better than that of 99 of 100 upvoted comment.</p>
+<p>How Reddit deals with this problem is trying to reach a confident balance between positive proportion and small number of observations. Now suppose the following:</p>
+<ol style="list-style-type: decimal">
+<li>Each voting event is independent.</li>
+<li>Each event can either be a positive or a negative.</li>
+<li>The total number of votes is <code>$ n $</code>, the number of positive votes is <code>$ k $</code>, <code>$ \hat{p}=k/n $</code> is the positive proportion.</li>
+</ol>
+<p>Now the idea is to first find each <code>$ \hat{p} $</code>, then calculate the corresponding confidence intervals, and finally rank the items by their lower bounds of confidence intervals.</p>
+<p>The perfect expression of these confidence intervals here is:</p>
+<div>
+<p><span class="math display">\[ \left(\hat{p}+\frac{z^2_{\alpha/2}}{2n} \pm z_{\alpha/2}\sqrt{[\hat{p}(1-\hat{p})+z^2_{\alpha/2}/4n]/n}\right)/(1+z^2_{\alpha/2}/n) \]</span></p>
+</div>
+<p>In 1928, mathematician Edwin Bidwell Wilson<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> developed this score interval above to estimate the successful (or positive, in our case) probability <code>$ \hat{p} $</code>.</p>
+<p>Here’s my R script to simulate a comment ranking situation possibly happening every day on Reddit.</p>
+<pre class="r"><code>library(dplyr)
+
+Wilson &lt;- function(n, k, alpha=0.95) {
+    phat &lt;- k/n
+    score &lt;- qnorm(1-(1-alpha)/2)
+    lbound &lt;- (phat+score**2/(2*n)-score*sqrt((phat*(1-phat)+score**2/(4*n))/n))/(1+score**2/n)
+    return(lbound)
+}
+
+seed(2019)
+x &lt;- sample(1:500,200,replace=T)
+y &lt;- sample(1:500,200,replace=T)
+
+votes &lt;- data.frame(x,y)
+votes %&gt;%
+    rowwise() %&gt;%
+    mutate(pos=min(x,y),total=max(x,y)) %&gt;%
+    select(total, pos) %&gt;%
+    mutate(Wilson=Wilson(total,pos)) %&gt;%
+    arrange(desc(Wilson))</code></pre>
+<p>And the pseudo-results are:</p>
+<pre><code># A tibble: 200 x 3
+   total   pos Wilson
+   &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;
+ 1   473   467  0.973
+ 2   494   487  0.971
+ 3   390   385  0.970
+ 4   234   232  0.969
+ 5   354   347  0.960
+ 6   237   233  0.957
+ 7   123   121  0.943
+ 8   391   376  0.938
+ 9   296   285  0.935
+10   415   397  0.932
+# ... with 190 more rows</code></pre>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p><a href="https://redditblog.com/2009/10/15/reddits-new-comment-sorting-system/">reddit’s new comment sorting system</a>.<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p><a href="http://www.evanmiller.org/how-not-to-sort-by-average-rating.html">How Not To Sort By Average Rating</a>.<a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p><a href="https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Wilson_score_interval">Binomial proportion confidence interval</a>.<a href="#fnref3">↩</a></p></li>
+</ol>
+</div>

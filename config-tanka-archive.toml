@@ -1,0 +1,42 @@
+baseurl = "https://interetro.rbind.io/"
+publishDir = "public"
+title = "interetro"
+author = "Qiu Rui"
+canonifyurls = true
+languagecode = "en"
+theme = "hugo-tanka"
+
+googleAnalytics = "UA-80926729-1"
+disqusShortname = "rexarski"
+disable_mathjax = false
+
+pygmentsstyle      = "vs"
+pygmentscodefences = true
+
+ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
+
+[params]
+  sitename = "interesting retrospectives"
+
+[[menu.main]]
+    name = "Home"
+    url = "/"
+    weight = 1
+[[menu.main]]
+    name = "GitHub"
+    url = "https://github.com/rexarski"
+    weight = 2
+[[menu.main]]
+    name = "Twitter"
+    url = "https://twitter.com/rexarski"
+    weight = 3
+[[menu.main]]
+    name = "Resume"
+    url = "/pdf/resume.pdf"
+    # url = "/Resume/"
+    weight = 4
+[[menu.main]]
+    name = "RSS"
+    url = "/index.xml"
+    weight = 5
+
