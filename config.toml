@@ -1,4 +1,4 @@
-baseurl = "https://interetro.rbind.io"
+baseurl = "https://interetro.rbind.io/"
 publishDir = "public"
 title = "interetro"
 author = "Qiu Rui"
@@ -11,6 +11,7 @@ enableEmoji = true
 hasCJKLanguage = true
 
 disqusShortname = "rexarski"
+googleAnalytics = "UA-80926729-1"
 
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 disableKinds = ["taxonomy", "taxonomyTerm"]
