@@ -1,0 +1,122 @@
+---
+title: What a Rmd Cheatsheet Doesn't Tell Me
+author: Qiu Rui
+date: '2019-04-16'
+slug: what-a-rmd-cheatsheet-doesnt-tell-me
+categories: []
+tags:
+  - rmarkdown
+---
+
+Two common misunderstanding for longtime `blogdown` lurkers (like me) or R markdown newbies:
+
+1. Blogging with `blogdown` $\equiv$ writing reports with `knitr`. There is no need to "knit" every post you write, no matter which format (`.md` or `.Rmd`) you are using, since `blogdown` will handle them itself.
+
+2. Deploying HTML inside a R markdown file can make the blog post more expressive than merely using Rmd syntax.
+
+I didn't realize the second one until when I was browsing Nan Xiao's [blog](https://nanx.me/blog/), who is the author of this theme I'm using. At one point, I was wondering why his post looks so different from mine. Out of curiosity, I digged a little into his raw files and came up with these following "hacks".
+
+### Insert an image with style
+
+This has nothing to do with direct usage of HTML, but still is different from traditional markdown rendering. R markdown will not render the name/caption of an image automatically, but it's not the same case in `blogdown` here.
+
+I used to like inserting an image with placeholder name like `img`, so the R markdown codes would look like this:
+
+```
+![img](path-to-this-image)
+```
+
+Somehow if this is the case, `blogdown` will render the image without any problem but leave you a weird image caption "img".
+
+**Solution:** Either you ignore the `img` with a pair of blank square brackets,
+
+```
+![](path-to-this-image)
+```
+or you figure out a nice caption for the image and do the rest like before. And you can even insert a hyperlink inside the caption. For example:
+
+```
+![This is a [logo](https://www.r-project.org/Rlogo.png) of R project.](https://www.r-project.org/Rlogo.png)
+```
+
+![This is a [logo](https://www.r-project.org/Rlogo.png) of R project.](https://www.r-project.org/Rlogo.png)
+
+### Insert a YouTube video
+
+Here's something R markdown cannot do. We need to borrow the power from HTML.
+
+```html
+<div class="py-3 col-10 offset-1">
+<div class="embed-responsive embed-responsive-16by9">
+  <iframe class="embed-responsive-item" src="https://www.youtube.com/watch?v=jKp-WuK6iv8" allowfullscreen></iframe>
+</div>
+</div>
+
+<p class="caption">"How could this happen?"</p>
+
+<p></p>
+```
+
+<div class="py-3 col-10 offset-1">
+<div class="embed-responsive embed-responsive-16by9">
+  <iframe class="embed-responsive-item" src="https://www.youtube.com/watch?v=jKp-WuK6iv8" allowfullscreen></iframe>
+</div>
+</div>
+
+<p class="caption">"How could this happen?"</p>
+
+<p></p>
+
+### Pre-formatted table
+
+R markdown tables look nice most of the time. But sometimes we need more. With html tag `<pre></pre>`, one can easily display a pre-formatted table.
+
+```html
+<pre><output>
+item1   item2   item3   item4
+=============================
+Gou     Li      Guo     Jia
+-----------------------------
+Qi      Yin     Huo     Fu
+=============================
+run_time: 59.0s
+total_time: 60.0s
+</output></pre>
+```
+
+<pre><output>
+item1   item2   item3   item4
+=============================
+Gou     Li      Guo     Jia
+-----------------------------
+Qi      Yin     Huo     Fu
+=============================
+run_time: 59.0s
+total_time: 60.0s
+</output></pre>
+
+A real example of [WYSIWYG](https://en.wikipedia.org/wiki/WYSIWYG).
+
+### Code display
+
+One way to do so is, of course, to write in a code block. Alternatively, we can attach an external link like this:
+
+```html
+<script src="https://gist.github.com/rexarski/92e120c3ffad70877716d99f6bfd66a3.js"></script>
+```
+
+<script src="https://gist.github.com/rexarski/92e120c3ffad70877716d99f6bfd66a3.js"></script>
+<p class="caption">"Read Markdown table into R data frame."</p>
+
+There is also a convenient button to generate this html script in GitHub.
+
+![](/image/embed.png)
+
+### And finally this ...
+
+I thought the shadow under some inserted images come from some extra HTML scripts. The fact is that it's a native feature in macOS.
+
+- **Command + Shift + 4:** Take a screen shot with area selection, traditionally.
+- **Command + Shift + 5:** Bring out the screenshot tool bar. If a screenshot is taken to capture the selected window, it will generate some shadow below.
+
+![Shadow!](/image/shadow.png)

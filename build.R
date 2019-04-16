@@ -1,5 +1,6 @@
 # housekeeping
 unlink("content/blog/post/*.html")
+unlink("content/project/*.html")
 unlink("public/*", recursive = TRUE)
 
 # preview

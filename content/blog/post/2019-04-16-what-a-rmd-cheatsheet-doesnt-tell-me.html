@@ -1,0 +1,107 @@
+---
+title: What a Rmd Cheatsheet Doesn't Tell Me
+author: Qiu Rui
+date: '2019-04-16'
+slug: what-a-rmd-cheatsheet-doesnt-tell-me
+categories: []
+tags:
+  - rmarkdown
+---
+
+
+
+<p>Two common misunderstanding for longtime <code>blogdown</code> lurkers (like me) or R markdown newbies:</p>
+<ol style="list-style-type: decimal">
+<li><p>Blogging with <code>blogdown</code> <span class="math inline">\(\equiv\)</span> writing reports with <code>knitr</code>. There is no need to “knit” every post you write, no matter which format (<code>.md</code> or <code>.Rmd</code>) you are using, since <code>blogdown</code> will handle them itself.</p></li>
+<li><p>Deploying HTML inside a R markdown file can make the blog post more expressive than merely using Rmd syntax.</p></li>
+</ol>
+<p>I didn’t realize the second one until when I was browsing Nan Xiao’s <a href="https://nanx.me/blog/">blog</a>, who is the author of this theme I’m using. At one point, I was wondering why his post looks so different from mine. Out of curiosity, I digged a little into his raw files and came up with these following “hacks”.</p>
+<div id="insert-an-image-with-style" class="section level3">
+<h3>Insert an image with style</h3>
+<p>This has nothing to do with direct usage of HTML, but still is different from traditional markdown rendering. R markdown will not render the name/caption of an image automatically, but it’s not the same case in <code>blogdown</code> here.</p>
+<p>I used to like inserting an image with placeholder name like <code>img</code>, so the R markdown codes would look like this:</p>
+<pre><code>![img](path-to-this-image)</code></pre>
+<p>Somehow if this is the case, <code>blogdown</code> will render the image without any problem but leave you a weird image caption “img”.</p>
+<p><strong>Solution:</strong> Either you ignore the <code>img</code> with a pair of blank square brackets,</p>
+<pre><code>![](path-to-this-image)</code></pre>
+<p>or you figure out a nice caption for the image and do the rest like before. And you can even insert a hyperlink inside the caption. For example:</p>
+<pre><code>![This is a [logo](https://www.r-project.org/Rlogo.png) of R project.](https://www.r-project.org/Rlogo.png)</code></pre>
+<div class="figure">
+<img src="https://www.r-project.org/Rlogo.png" alt="This is a logo of R project." />
+<p class="caption">This is a <a href="https://www.r-project.org/Rlogo.png">logo</a> of R project.</p>
+</div>
+</div>
+<div id="insert-a-youtube-video" class="section level3">
+<h3>Insert a YouTube video</h3>
+<p>Here’s something R markdown cannot do. We need to borrow the power from HTML.</p>
+<pre class="html"><code>&lt;div class=&quot;py-3 col-10 offset-1&quot;&gt;
+&lt;div class=&quot;embed-responsive embed-responsive-16by9&quot;&gt;
+  &lt;iframe class=&quot;embed-responsive-item&quot; src=&quot;https://www.youtube.com/watch?v=jKp-WuK6iv8&quot; allowfullscreen&gt;&lt;/iframe&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p class=&quot;caption&quot;&gt;&quot;How could this happen?&quot;&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</code></pre>
+<div class="py-3 col-10 offset-1">
+<div class="embed-responsive embed-responsive-16by9">
+<p><iframe class="embed-responsive-item" src="https://www.youtube.com/watch?v=jKp-WuK6iv8" allowfullscreen></iframe></p>
+</div>
+</div>
+<p class="caption">
+“How could this happen?”
+</p>
+<p>
+</p>
+</div>
+<div id="pre-formatted-table" class="section level3">
+<h3>Pre-formatted table</h3>
+<p>R markdown tables look nice most of the time. But sometimes we need more. With html tag <code>&lt;pre&gt;&lt;/pre&gt;</code>, one can easily display a pre-formatted table.</p>
+<pre class="html"><code>&lt;pre&gt;&lt;output&gt;
+item1   item2   item3   item4
+=============================
+Gou     Li      Guo     Jia
+-----------------------------
+Qi      Yin     Huo     Fu
+=============================
+run_time: 59.0s
+total_time: 60.0s
+&lt;/output&gt;&lt;/pre&gt;</code></pre>
+<pre><output>
+item1   item2   item3   item4
+=============================
+Gou     Li      Guo     Jia
+-----------------------------
+Qi      Yin     Huo     Fu
+=============================
+run_time: 59.0s
+total_time: 60.0s
+</output></pre>
+<p>A real example of <a href="https://en.wikipedia.org/wiki/WYSIWYG">WYSIWYG</a>.</p>
+</div>
+<div id="code-display" class="section level3">
+<h3>Code display</h3>
+<p>One way to do so is, of course, to write in a code block. Alternatively, we can attach an external link like this:</p>
+<pre class="html"><code>&lt;script src=&quot;https://gist.github.com/rexarski/92e120c3ffad70877716d99f6bfd66a3.js&quot;&gt;&lt;/script&gt;</code></pre>
+<script src="https://gist.github.com/rexarski/92e120c3ffad70877716d99f6bfd66a3.js"></script>
+<p class="caption">
+“Read Markdown table into R data frame.”
+</p>
+<p>There is also a convenient button to generate this html script in GitHub.</p>
+<div class="figure">
+<img src="/image/embed.png" />
+
+</div>
+</div>
+<div id="and-finally-this" class="section level3">
+<h3>And finally this …</h3>
+<p>I thought the shadow under some inserted images come from some extra HTML scripts. The fact is that it’s a native feature in macOS.</p>
+<ul>
+<li><strong>Command + Shift + 4:</strong> Take a screen shot with area selection, traditionally.</li>
+<li><strong>Command + Shift + 5:</strong> Bring out the screenshot tool bar. If a screenshot is taken to capture the selected window, it will generate some shadow below.</li>
+</ul>
+<div class="figure">
+<img src="/image/shadow.png" alt="Shadow!" />
+<p class="caption">Shadow!</p>
+</div>
+</div>
