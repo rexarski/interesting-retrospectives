@@ -41,31 +41,27 @@ or you figure out a nice caption for the image and do the rest like before. And 
 
 ![This is a [logo](https://www.r-project.org/Rlogo.png) of R project.](https://www.r-project.org/Rlogo.png)
 
-### Insert a YouTube video
+### Embed a YouTube video
 
-Here's something R markdown cannot do. We need to borrow the power from HTML.
+<strike>Here's something R markdown cannot do. We need to borrow the power from HTML.</strike>.
 
-```html
-<div class="py-3 col-10 offset-1">
-<div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" src="https://www.youtube.com/watch?v=jKp-WuK6iv8" allowfullscreen></iframe>
-</div>
-</div>
+**Update:** According to this post "[Use shortcodes to embed tweets, videos, etc. in your blogdown blog posts ](http://www.reigo.eu/2018/04/shortcodes/)", one line code can solve the problem:
 
-<p class="caption">"How could this happen?"</p>
-
-<p></p>
+```{r, eval=TRUE}
+blogdown::shortcode("youtube", "jKp-WuK6iv8")
 ```
 
-<div class="py-3 col-10 offset-1">
-<div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" src="https://www.youtube.com/watch?v=jKp-WuK6iv8" allowfullscreen></iframe>
-</div>
-</div>
-
 <p class="caption">"How could this happen?"</p>
 
 <p></p>
+
+Note that in the code blog, we need to flag the argument `eval=TRUE`.
+
+Additionally, I guess one line of HTML as caption `<p class="caption">"How could this happen?"</p>` will increase the "stylelishness" of an embedded media by all means.
+
+```html
+<p class="caption">"How could this happen?"</p>
+```
 
 ### Pre-formatted table
 
