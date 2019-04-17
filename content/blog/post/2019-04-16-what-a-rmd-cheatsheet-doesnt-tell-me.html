@@ -26,15 +26,28 @@ tags:
 <pre><code>![](path-to-this-image)</code></pre>
 <p>or you figure out a nice caption for the image and do the rest like before. And you can even insert a hyperlink inside the caption. For example:</p>
 <pre><code>![This is a [logo](https://www.r-project.org/Rlogo.png) of R project.](https://www.r-project.org/Rlogo.png)</code></pre>
-<div class="figure">
+<p><strong>Update on 2019-04-17:</strong> You might also want to <em><a href="https://stackoverflow.com/questions/24677642/centering-image-and-text-in-r-markdown-for-a-pdf-report">center images</a></em> in the post. This can be done with a pair of <code>&lt;center&gt;&lt;/center&gt;</code> tags.</p>
+<center>
 <img src="https://www.r-project.org/Rlogo.png" alt="This is a logo of R project." />
-<p class="caption">This is a <a href="https://www.r-project.org/Rlogo.png">logo</a> of R project.</p>
-</div>
+</center>
+<p>
+</p>
+<p>But somehow the caption disappears. Try this:</p>
+<pre class="html"><code>&lt;center&gt;
+![This is a [logo](https://www.r-project.org/Rlogo.png) of R project.](https://www.r-project.org/Rlogo.png)
+&lt;p class=&quot;caption&quot;&gt;&quot;Logo here!&quot;&lt;/p&gt;
+&lt;/center&gt;</code></pre>
+<center>
+<img src="https://www.r-project.org/Rlogo.png" alt="This is a logo of R project." />
+<p class="caption">
+“Logo here!”
+</p>
+</center>
 </div>
 <div id="embed-a-youtube-video" class="section level3">
 <h3>Embed a YouTube video</h3>
 <p><strike>Here’s something R markdown cannot do. We need to borrow the power from HTML.</strike>.</p>
-<p><strong>Update:</strong> According to this post “<a href="http://www.reigo.eu/2018/04/shortcodes/">Use shortcodes to embed tweets, videos, etc. in your blogdown blog posts</a>”, one line code can solve the problem:</p>
+<p><strong>Update on 2019-04-17:</strong> According to this post “<a href="http://www.reigo.eu/2018/04/shortcodes/">Use shortcodes to embed tweets, videos, etc. in your blogdown blog posts</a>”, one line code can solve the problem:</p>
 <pre class="r"><code>blogdown::shortcode(&quot;youtube&quot;, &quot;jKp-WuK6iv8&quot;)</code></pre>
 {{% youtube "jKp-WuK6iv8" %}}
 <p class="caption">
@@ -80,10 +93,12 @@ total_time: 60.0s
 “Read Markdown table into R data frame.”
 </p>
 <p>There is also a convenient button to generate this html script in GitHub.</p>
+<center>
 <div class="figure">
 <img src="/image/embed.png" />
 
 </div>
+</center>
 </div>
 <div id="and-finally-this" class="section level3">
 <h3>And finally this …</h3>
@@ -92,8 +107,7 @@ total_time: 60.0s
 <li><strong>Command + Shift + 4:</strong> Take a screen shot with area selection, traditionally.</li>
 <li><strong>Command + Shift + 5:</strong> Bring out the screenshot tool bar. If a screenshot is taken to capture the selected window, it will generate some shadow below.</li>
 </ul>
-<div class="figure">
+<center>
 <img src="/image/shadow.png" alt="Shadow!" />
-<p class="caption">Shadow!</p>
-</div>
+</center>
 </div>

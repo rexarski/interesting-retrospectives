@@ -39,13 +39,32 @@ or you figure out a nice caption for the image and do the rest like before. And 
 ![This is a [logo](https://www.r-project.org/Rlogo.png) of R project.](https://www.r-project.org/Rlogo.png)
 ```
 
+**Update on 2019-04-17:** You might also want to *[center images](https://stackoverflow.com/questions/24677642/centering-image-and-text-in-r-markdown-for-a-pdf-report)* in the post. This can be done with a pair of `<center></center>` tags.
+
+<center>
 ![This is a [logo](https://www.r-project.org/Rlogo.png) of R project.](https://www.r-project.org/Rlogo.png)
+</center>
+<p></p>
+
+But somehow the caption disappears. Try this:
+
+```html
+<center>
+![This is a [logo](https://www.r-project.org/Rlogo.png) of R project.](https://www.r-project.org/Rlogo.png)
+<p class="caption">"Logo here!"</p>
+</center>
+```
+
+<center>
+![This is a [logo](https://www.r-project.org/Rlogo.png) of R project.](https://www.r-project.org/Rlogo.png)
+<p class="caption">"Logo here!"</p>
+</center>
 
 ### Embed a YouTube video
 
 <strike>Here's something R markdown cannot do. We need to borrow the power from HTML.</strike>.
 
-**Update:** According to this post "[Use shortcodes to embed tweets, videos, etc. in your blogdown blog posts ](http://www.reigo.eu/2018/04/shortcodes/)", one line code can solve the problem:
+**Update on 2019-04-17:** According to this post "[Use shortcodes to embed tweets, videos, etc. in your blogdown blog posts ](http://www.reigo.eu/2018/04/shortcodes/)", one line code can solve the problem:
 
 ```{r, eval=TRUE}
 blogdown::shortcode("youtube", "jKp-WuK6iv8")
@@ -106,7 +125,11 @@ One way to do so is, of course, to write in a code block. Alternatively, we can 
 
 There is also a convenient button to generate this html script in GitHub.
 
+<center>
+
 ![](/image/embed.png)
+
+</center>
 
 ### And finally this ...
 
@@ -115,4 +138,6 @@ I thought the shadow under some inserted images come from some extra HTML script
 - **Command + Shift + 4:** Take a screen shot with area selection, traditionally.
 - **Command + Shift + 5:** Bring out the screenshot tool bar. If a screenshot is taken to capture the selected window, it will generate some shadow below.
 
+<center>
 ![Shadow!](/image/shadow.png)
+</center>
