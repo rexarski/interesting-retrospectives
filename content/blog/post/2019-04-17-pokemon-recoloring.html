@@ -16,20 +16,24 @@ tags:
 </center>
 <p>Inspired by Alex Onsager and his wacky web app <a href="https://pokemon.alexonsager.net/">Pokemon Fusion</a>, I was thinking about improving his approaches myself. In his post <em> <a href="https://www.alexonsager.net/2013/06/04/behind-the-scenes-pokemon-fusion.html">Pokemon Fusion: Behind the Scenes</a></em>, he explains how he makes the head-swapping. Basically this can be included in three steps:</p>
 <ol style="list-style-type: decimal">
-<li>Manually prepare separate parts (a head and a body) of a Pokémon. <img src="/image/pokemon-1.png" /></li>
+<li>Manually prepare separate parts (a head and a body) of a Pokémon.
+<center>
+<img src="/image/pokemon-1.png" />
+</center></li>
 <li>Determine the face size.</li>
 <li>Determine the main palette of a Pokémon.</li>
 <li><em>Transplant</em> the head to its new owner and unify the torso color.</li>
 </ol>
-<div class="figure">
+<center>
 <img src="/image/pokemon-dugking.png" alt="Introducing the King in the Soil: Dugking!" />
-<p class="caption">Introducing the King in the Soil: Dugking!</p>
-</div>
+<p class="caption">
+Introducing the King in the Soil: Dugking!
+</p>
+</center>
 <p>The resizing part is definitely a highlight. But some weird combinations could be easily noticed due to the “manual separation”, such as this Magikarp head on a Gyarados body:</p>
-<div class="figure">
+<center>
 <img src="/image/pokemon-4.png" />
-
-</div>
+</center>
 <p>Nevertheless, it is some brilliant work done by Alex.</p>
 <div id="crawler" class="section level2">
 <h2>Crawler</h2>
@@ -41,7 +45,7 @@ tags:
 t1 &lt;- Sys.time()
 Sys.sleep(0.5*as.numeric(t1-t0))</code></pre>
 <p class="caption">
-“Sleep time is proportional to response time.
+Sleeping time is proportional to response time.
 </p>
 </div>
 <div id="color-picker" class="section level2">
@@ -69,14 +73,16 @@ Sys.sleep(0.5*as.numeric(t1-t0))</code></pre>
 <hr />
 <p>Are <a href="https://bulbapedia.bulbagarden.net/wiki/Red_Gyarados">Red Gyarados</a> extremely rare? <em>Maybe</em>.</p>
 <p>But ladies and gentlemen, I present you the <em>Elite Four of Blue Magikarps</em>!</p>
-<div class="figure">
-<img src="/image/pokemon-4xkarp.JPG" alt="Elite Four of Blue Magikarps" />
-<p class="caption"><em>Elite Four of Blue Magikarps</em></p>
-</div>
-<div class="figure">
+<center>
+<img src="/image/pokemon-4xkarp.JPG" alt="Elite Four of Blue Magikarps." />
+<p class="caption">
+<i>Elite Four of Blue Magikarps.</i>
+</p>
 <img src="/image/pokemon-4xgyara.JPG" alt="And four mediocore red worms. Meh!" />
-<p class="caption"><em>And four mediocore red worms. Meh!</em></p>
-</div>
+<p class="caption">
+<i>And four mediocore red worms. Meh!</i>
+</p>
+</center>
 <p>As I mentioned above, the head swapping process cannot be fulfilled with this scale of data. The least I can do is to implement the color swapping. You can find my codes in the repo below. Have fun playing with it!</p>
 <p><a href="https://github.com/rexarski/pokeswapR" class="btn btn-outline-primary">GitHub</a></p>
 </div>

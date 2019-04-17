@@ -126,9 +126,7 @@ One way to do so is, of course, to write in a code block. Alternatively, we can 
 There is also a convenient button to generate this html script in GitHub.
 
 <center>
-
 ![](/image/embed.png)
-
 </center>
 
 ### And finally this ...

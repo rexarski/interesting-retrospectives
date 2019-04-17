@@ -16,16 +16,22 @@ tags:
 Inspired by Alex Onsager and his wacky web app [Pokemon Fusion](https://pokemon.alexonsager.net/), I was thinking about improving his approaches myself. In his post *
 [Pokemon Fusion: Behind the Scenes](https://www.alexonsager.net/2013/06/04/behind-the-scenes-pokemon-fusion.html)*, he explains how he makes the head-swapping. Basically this can be included in three steps:
 
-1. Manually prepare separate parts (a head and a body) of a Pokémon. ![](/image/pokemon-1.png)
+1. Manually prepare separate parts (a head and a body) of a Pokémon. 
+<center>
+![](/image/pokemon-1.png)
+</center>
 2. Determine the face size.
 3. Determine the main palette of a Pokémon.
 4. *Transplant* the head to its new owner and unify the torso color.
 
+<center>
 ![Introducing the King in the Soil: Dugking!](/image/pokemon-dugking.png)
-
+<p class="caption">Introducing the King in the Soil: Dugking!</p>
+</center>
 The resizing part is definitely a highlight. But some weird combinations could be easily noticed due to the "manual separation", such as this Magikarp head on a Gyarados body:
 
-![](/image/pokemon-4.png)
+<center>
+![](/image/pokemon-4.png)</center>
 
 Nevertheless, it is some brilliant work done by Alex.
 
@@ -44,7 +50,7 @@ t1 <- Sys.time()
 Sys.sleep(0.5*as.numeric(t1-t0))
 ```
 
-<p class="caption">"Sleep time is proportional to response time.</p>
+<p class="caption">Sleeping time is proportional to response time.</p>
 
 ## Color picker
 
@@ -71,9 +77,12 @@ Are [Red Gyarados](https://bulbapedia.bulbagarden.net/wiki/Red_Gyarados) extreme
 
 But ladies and gentlemen, I present you the *Elite Four of Blue Magikarps*!
 
-![*Elite Four of Blue Magikarps*](/image/pokemon-4xkarp.JPG)
-
+<center>
+![*Elite Four of Blue Magikarps.*](/image/pokemon-4xkarp.JPG)
+<p class="caption"><i>Elite Four of Blue Magikarps.</i></p>
 ![*And four mediocore red worms. Meh!*](/image/pokemon-4xgyara.JPG)
+<p class="caption"><i>And four mediocore red worms. Meh!</i></p>
+</center>
 
 As I mentioned above, the head swapping process cannot be fulfilled with this scale of data. The least I can do is to implement the color swapping. You can find my codes in the repo below. Have fun playing with it!
 
