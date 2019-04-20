@@ -1,0 +1,300 @@
+---
+title: Mining and Predictions on Australian Stock Prices
+author: Qiu Rui
+date: '2018-05-13'
+slug: australian-stock-price-prediction
+categories: []
+tags:
+  - data-mining
+  - rattle
+---
+
+
+
+<div id="introduction" class="section level2">
+<h2>1. Introduction</h2>
+<p>One of the features of stock market prices is its unpredictability and volatility. Burton Malkiel, argues in his 1973 book, “A Random Walk Down Wall Street”, that if the market is genuinely efficient and a share price reflects all factors immediately as soon as they’re made public, a blindfolded monkey throwing darts at a newspaper stock listing should do as well as any investment professional <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>. However, things are not always extreme. If we treat the stock prices as a non-stochastic process then at least we can model the data. Even though our potential model wouldn’t be exact, it still makes capturing the trend of rise and fall, and forecasting the short-term price accordingly possible.</p>
+<p>In the matter of “learning something interesting about the data”, one could start in two opposite ways: <em>retrospective</em> and <em>prospective</em>. On the one hand, we could investigate the patterns within; on the other hand, we could use learned outcome to predict the future. Therefore, we list the following questions as our goal of this data mining project:</p>
+<ol style="list-style-type: decimal">
+<li>Are there any frequent patterns among different stocks?</li>
+<li>Are there any methods to predict future stock price changes? If the answer is yes, can we find other ways based on different prior knowledge?</li>
+</ol>
+</div>
+<div id="data-description" class="section level2">
+<h2>2. Data Description</h2>
+<ul>
+<li>Source: The data is collected from the Wall Street Journal <a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>.</li>
+<li>Attributes: Stored in a CSV file as column names (in R, we also call them variables). The attributes of each entry consist of:
+<ul>
+<li><code>Code</code>: the stock code of a company.</li>
+<li><code>Sector</code> and <code>SubSector</code>: the particular field of a company. We have 5 main categories and 10 subcategories.</li>
+<li><code>Date</code>, <code>Weekday</code>, <code>DayofMonth</code>, <code>Month</code>, <code>Year</code>, <code>WeekofYear</code> and <code>DayofYear</code>: time-related attributes of a data entry.</li>
+<li><code>Open</code>, <code>High</code>, <code>Low</code>, <code>Close</code>: four basic prices information within one day.</li>
+<li><code>Volume</code>: the trading volume on the same day.</li>
+<li><code>Close.Open</code>, <code>Change</code>, <code>High.Low</code>, <code>HMLOL</code>: four advanced price information which reflect the relationship among the basics. <code>Close.Open</code> and <code>High.Low</code> are the differences, <code>HMLOL</code> is the ratio between <code>High.Low</code> and <code>Low</code>. <code>Change</code> indicates whether <code>Close.Open</code> is positive or not.</li>
+<li><code>PriorClose</code>: the close price on the previous day.</li>
+</ul></li>
+<li>Components: The data set includes 61 selected Australian stocks and their daily prices ranging from 1 January 2017 to 12 April 2018. These companies involve some big names like <em>Woolworths</em>, <em>Commonwealth Bank</em>, <em>ANZ</em>, etc.</li>
+<li>Data quality: the data is tidy already with no missing data inside.</li>
+<li>Summary: the basic summary statistics of numeric attributes is shown below. Two results stand out:
+<ul>
+<li>Four basic price attributes are highly right-skewed, that means the majority of data has rather low values less than 1. Specifically, the first quartile of these four attributes stay low, but after exceeding median (50% quantile), the values of these increase fast.</li>
+<li>“Up” are almost twice of “down”s. So the general trend of stock prices in our period of interest is increasing. In some ways, we can consider it as the sign of booming economy.</li>
+</ul></li>
+</ul>
+<pre><output>
+Open Min. : 0.001 1st Qu.: 0.115 Median : 0.900 Mean : 5.921 3rd Qu.: 4.890 Max. :87.660
+High Min. : 0.001 1st Qu.: 0.115 Median : 0.910 Mean : 5.965 3rd Qu.: 4.940 Max. :87.720
+Low Min. : 0.001 1st Qu.: 0.110 Median : 0.890 Mean : 5.875 3rd Qu.: 4.850 Max. :87.020
+Volume Min. : 0 1st Qu.: 16300 Median : 185000 Mean : 1177051 3rd Qu.: 1280000 Max. :117230000
+HMLOL Min. :0.00000 1st Qu.:0.00000 Median :0.01538 Mean :0.02780 3rd Qu.:0.03448 Max. :1.00000
+Close.Open Min. :-1.9800000 1st Qu.:-0.0100000 Median : 0.0000000 Mean : 0.0003684 3rd Qu.: 0.0050000 Max. : 1.8400000
+Change down: 6338 up :12498
+Close Min. : 0.001 1st Qu.: 0.115 Median : 0.900 Mean : 5.921 3rd Qu.: 4.890 Max. :87.660
+High.Low Min. :0.00000 1st Qu.:0.00000 Median :0.01950 Mean :0.09076 3rd Qu.:0.10000 Max. :3.03000
+PriorClose Min. : 0.001 1st Qu.: 0.115 Median : 0.900 Mean : 5.921 3rd Qu.: 4.890 Max. :87.660
+</output></pre>
+</div>
+<div id="mining-methods" class="section level2">
+<h2>3. Mining Methods</h2>
+<div id="associate-mining" class="section level3">
+<h3>3.1 Associate Mining</h3>
+<p>As we mentioned before, we would like to discover some pattern in stock prices. In details, what factors are responsible for the increase or decrease in stock prices? To achieve this goal, we are going to make some changes to the original data set and use <code>Rattle</code> <a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> to unearth the hidden gems inside.</p>
+<p>Because we are only interested in the qualitative change, instead of the quantitative difference in this part, we select the following variables as inputs: <code>Change</code>, <code>Sector</code>, <code>SubSector</code>, <code>Weekday</code>, <code>Month</code>, <code>Year</code>. Naturally, we ignore the rest. Then we set the minimum support threshold to be <code>0.1</code> and minimum confidence threshold to be <code>0.5</code>. In other words, a rule will only be selected under the circumstance that it quite “frequent”, taking about 10% occurrences. Additionally, it has to be “truth”, that the proportion of the transaction that contains LHS also contain RHS.</p>
+<p>After that, we need to hand-pick some rules, because the results from <code>Rattle</code> are flawed, thus not as interesting as we expected, and they should be filtered out.</p>
+<ul>
+<li>Some rules have <code>Sector/Subsector</code> on the left hand side and <code>SubSector/Sector</code> on the right hand side. These are not very informative. A stock under <code>Software</code> subsector is automatically under <code>Technology</code> sector as the data source has already pre-defined the classification.</li>
+<li>Some rules exceed minimum confidence threshold but have lift values smaller than 1, which indicate negative correlations.</li>
+</ul>
+<p>Meanwhile, we use <span class="math inline">\(\chi^2&gt;1\)</span> as a rule-of-thumb critical value to ensure that the correlation is interesting. <a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a></p>
+</div>
+<div id="general-stock-price-predictions" class="section level3">
+<h3>3.2 General Stock Price Predictions</h3>
+<p>After answering the question about what patterns we could see from the data, the next one followed is if we could use some known information to predict the stock price quantitatively.</p>
+<p>In the following paragraphs, we are going to use two numeric methods, neural network (non-deterministic) and logistic regression (deterministic) to formulate a mathematical expression of stock prices. Moreover, we will use daily <code>Close</code> prices as a target. This is more like a personal preference, but indeed it is the best conclusion of a stock price after one day. We could also use the average price of <code>Close</code> and <code>Open</code> as the target.</p>
+<div id="neural-network" class="section level4">
+<h4>3.2.1 Neural Network</h4>
+<p>One highlighted advantage of a neural network is its tolerance of noise so that it is handy to deal with untrained real-world data. In our case, we aim to randomly separate the data into one training set and one testing set with a ratio <span class="math inline">\(3:1\)</span>. The input layer will include some basic numeric attributes <code>High</code>, <code>Low</code>, <code>Open</code>, two other numeric attributes <code>Volume</code> and <code>PriorClose</code> and some categorical attributes <code>Sector</code>, <code>Weekday</code>, <code>Month</code> and <code>Year</code>.</p>
+<p>The reason why we exclude relational attributes like <code>HMLOL</code> and <code>Close.Open</code> is because we believe they provide no more additional information than its corresponding basic attributes. Especially in the later method we are going to use, linear regression is pretty good at capturing linear relation between quantities. What is more, we turn <code>Sector</code>, <code>Weekday</code> and <code>Month</code> into factors so that they could be handled by neural networks.</p>
+<p>Note that we have known that the price data are highly skewed, which means they concentrate on small values. Hence the step of normalisation is necessary before we proceed to train the neural network.</p>
+<p>Regarding the selections of the numbers of hidden layers and neurons on each layer, we referenced some empirical choices <a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a>. That is, to choose 1 or 2 hidden layers with the number of neurons fewer than that of input neurons. After several trials, we decide to use a 2-hidden-layer neural network with 8 neurons on the first layer and 4 on the second. The whole process is implemented by the <code>neuralnet</code> package in R <a href="#fn6" class="footnoteRef" id="fnref6"><sup>6</sup></a>.</p>
+</div>
+<div id="linear-regression" class="section level4">
+<h4>3.2.2 Linear Regression</h4>
+<p>To use the linear regression model for prediction is straightforward. The core step is to assume a linear relation between the target <code>Close</code> and inputs. At the same time, we should also suppose the error terms are independent and identically normally distributed <a href="#fn7" class="footnoteRef" id="fnref7"><sup>7</sup></a>. In this case:</p>
+<p><span class="math display">\[
+\begin{split}
+\text{Close} &amp;\sim \text{Open}+\text{High}+\text{Low}+\text{Volume}\\
+&amp;\  \  \ \  \ \ \ \ \ \ \ +\text{PriorClose}+\text{factor(Sector)} +\text{factor(Weekday)}\\
+&amp;\  \  \ \  \ \ \ \ \ \ \ +\text{factor(Month)}+\text{Year}+\epsilon\\
+&amp;\text{where }\epsilon\sim N(\mu,\sigma^2)\text{ for some }\mu, \sigma\\
+\end{split}
+\]</span></p>
+</div>
+<div id="remark" class="section level4">
+<h4>3.2.3 Remark</h4>
+<p>Now, let us review what we have done so far. We have utilised two different methods to construct models and train them with some data. Then we have used trained model to predict testing data. These are accomplished based on unbalanced “general knowledge”, that is to say, we are ignoring the fact that in our data, more stocks tend to have comparatively low prices. Now consider an extreme case that a well-trained model for stock prices between <span class="math inline">\(0.01\)</span> and <span class="math inline">\(1.00\)</span>, it might not handle high price stock well, because it has never studied any background knowledge about high price stock so far. So here comes an alternative approach, which is to do time series analysis on just one stock, then predict its future trend.</p>
+</div>
+</div>
+<div id="time-series-analysis" class="section level3">
+<h3>3.3 Time Series Analysis</h3>
+<p>Time series analysis is the most common and fundamental method used to forecast stock prices <a href="#fn8" class="footnoteRef" id="fnref8"><sup>8</sup></a>. It only requires historical information on the subject of interest itself; then the model won’t be distracted by noise from other unrelated stocks.</p>
+<p>Note that one precondition of performing time series analysis is that values should be measured at equal time intervals. After that, during the data cleaning procedure, we need to extract one stock from the whole dataset and do imputations by adding “fake” closing price on non-trading days such as holidays and weekends. Brutally setting the closing prices as zero is problematic, it will add unnecessary fluctuations and messes up the data. What we choose to perform here is to set the close prices on non-trading days as the last close price on trading days. For example, let the close prices on Saturday and Sunday be that of the previous Friday’s.</p>
+<p>Another change we have made towards the data is, we take data in the year 2017 as training data. When the model is fixed, we would like to check how our model predicts the stock prices change in the year 2018.</p>
+<p>In this experiment, we choose the stock prices of Woolworths Ltd (Code: <code>WOW</code>) and apply a basic ARIMA model on the daily close price. In this way, we could model close price as:</p>
+<p><span class="math display">\[\text{Close}_t=S_t+T_t+E_t,\]</span></p>
+<p>where <span class="math inline">\(S_t\)</span> is the seasonal component, <span class="math inline">\(T_t\)</span> is the trend component and <span class="math inline">\(E_t\)</span> is the random noise. A seasonal ARIMA model can be expressed as <span class="math inline">\(ARIMA(p,d,q)(P,D,Q)_m\)</span> where <span class="math inline">\((p,d,q)\)</span> is the non-seasonal part of the model and <span class="math inline">\((P,D,Q)_m\)</span> is the seasonal part. <span class="math inline">\(m\)</span> is the number of periods per season.</p>
+<div class="figure">
+<img src="/image/stock/wow-price.png" alt="Figure 1: Woolworths stock price" />
+<p class="caption">Figure 1: Woolworths stock price</p>
+</div>
+<p>From the stock price line plot, we cannot directly confirm the size of a cycle. But recall that we have found some frequent patterns that stock prices tend to be increasing on Thursdays and Fridays, so we would like to give 7-day-cycle a try, letting <span class="math inline">\(m=7\)</span>. Then we use the built-in <code>auto.arima()</code> function in <code>forecast</code> package <a href="#fn9" class="footnoteRef" id="fnref9"><sup>9</sup></a> to automatically determine the model parameter by finding the model with the least AIC (Akaike information criterion) <a href="#fn10" class="footnoteRef" id="fnref10"><sup>10</sup></a>. Note that <code>auto.arima()</code> speeds up by taking shortcuts in the algorithm, but we can set <code>stepwise=F</code> and <code>approximation=F</code> to avoid it. In such a way, we have the following model.</p>
+<pre><output>
+Series: wow.train
+ARIMA(0,1,0)(2,0,2)[7]
+
+Coefficients:
+    sar1     sar2    sma1    sma2
+-0.5589  -0.8341  0.3741  0.8643
+s.e.   0.0592   0.0797  0.0646  0.0894
+
+sigma^2 estimated as 0.03044:  log likelihood=115.83
+AIC=-221.67   AICc=-221.49   BIC=-202.29
+</output></pre>
+<p>Then our candidate model is <span class="math inline">\(ARIMA(0,1,0)(2,0,2)_7\)</span>. Detailed scripts are in found in Appendix.</p>
+</div>
+</div>
+<div id="presentation" class="section level2">
+<h2>4. Presentation</h2>
+<div id="frequent-patterns" class="section level3">
+<h3>4.1 Frequent Patterns</h3>
+<p>For this experiment, <code>Rattle</code> <a href="#fn11" class="footnoteRef" id="fnref11"><sup>11</sup></a> is used, and a total of 26 rules are generated. Based on some manual criteria we mentioned above, not all strong rules are selected because some of them are meaningless. The hand-picked rules are listed below:</p>
+<pre><output>
+[8]  {SubSector=Mining_&_Metals}          => {Change=up}
+[11] {SubSector=Software}                 => {Change=up}
+[14] {Weekday=Friday}                     => {Change=up}
+[15] {Sector=Basic_Materials/Resources}   => {Change=up}
+[17] {Weekday=Thursday}                   => {Change=up}
+[20] {Sector=Technology}                  => {Change=up}
+[21] {Sector=Basic_Materials/Resources, SubSector=Mining_&_Metals} => {Change=up}
+[24] {Sector=Technology, SubSector=Software} => {Change=up} 
+</output></pre>
+<p>The barplot in Figure 2 indicates the support count and confidence of rules of our selection.</p>
+<div class="figure">
+<img src="/image/stock/rules.png" alt="Figure 2: Barplot of frequent rules" />
+<p class="caption">Figure 2: Barplot of frequent rules</p>
+</div>
+<p>An interpretation of these interesting rules can be: during the whole year of 2017 and the first quarter of 2018, the Australian stock prices (according to the selection of 61 stocks) tend to be increasing on Thursday and Friday. Among all industries, the technology industry and basic materials industry are prosperous. Two types of sub-industries, the mining and metals (under resources) and software (under technology) are typical examples.</p>
+<p>The Appendix includes a copy of the complete output.</p>
+</div>
+<div id="general-stock-price-predictions-1" class="section level3">
+<h3>4.2 General Stock Price Predictions</h3>
+<div class="figure">
+<img src="/image/stock/original.png" alt="Figure 3: Trained Neural Network" />
+<p class="caption">Figure 3: Trained Neural Network</p>
+</div>
+<p><span class="math display">\[MAE=\frac{\sum^N_{i=1}|x^*_i-x_i|}{N},\]</span></p>
+<p>where <span class="math inline">\(x^*_i\)</span> is the predicted value of <span class="math inline">\(i\)</span>th observation and <span class="math inline">\(x_i\)</span> is the true value, and <span class="math inline">\(N\)</span> is the total number of observations.</p>
+<p>And we repeat the evaluation process on linear regression result, and then we could have a general idea about how precise these predictions are by comparing them side by side.</p>
+<p>We use R to calculate the corresponding <span class="math inline">\(MAE\)</span>s, and we have:</p>
+<p><span class="math display">\[
+MAE_{NN}=0.0725,\ MAE_{LM}=0.0223
+\]</span></p>
+<p>This means, on average, the neural network’s prediction deviates about <span class="math inline">\(\pm 0.0725\)</span> around the actual values, and linear regression’s prediction deviates about <span class="math inline">\(\pm 0.0223\)</span>. It seems that linear regression performs better in predicting <code>Close</code> prices. We look back into the basic summary statistics of numeric inputs in part 1.</p>
+<div class="figure">
+<img src="/image/stock/original-vs.png" alt="Figure 4: Real value vs predicted values" />
+<p class="caption">Figure 4: Real value vs predicted values</p>
+</div>
+<pre><output>
+## Min. 1st Qu. Median  Mean 3rd Qu.    Max.
+# 0.001   0.115  0.900 5.921   4.890  87.660
+</output></pre>
+<p>The data is skewed, though the <span class="math inline">\(MAE\)</span>s are not very ideal for the first quantile data, it still provides consistent estimation in general. The real value vs prediction plot (Figure 4) has shown us the predictions are better on a large scale. Though due to the cardinality of observations, thousands of observations might stack together, we still can see when real close price is high, its predicted value by neural network oscillates more than linear model’s prediction.</p>
+<p>Another procedure we would like to conduct is to check the summary information of the linear model.</p>
+<pre><output>
+Call:
+glm(formula = f, data = train)
+
+Deviance Residuals: 
+     Min        1Q    Median        3Q       Max  
+-0.63529  -0.15119  -0.00271   0.16717   0.62842  
+
+Coefficients:
+              Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  1.571e+02  8.275e+01   1.898   0.0589 .  
+Open        -6.347e-01  5.661e-02 -11.210   <2e-16 ***
+High         7.182e-01  6.046e-02  11.880   <2e-16 ***
+Low          8.821e-01  5.266e-02  16.750   <2e-16 ***
+Volume       1.128e-08  1.368e-08   0.824   0.4105    
+PriorClose   3.533e-02  3.133e-02   1.128   0.2607    
+Year        -7.786e-02  4.092e-02  -1.903   0.0583 .  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for gaussian family taken to be 0.05444812)
+
+    Null deviance: 3068.540  on 237  degrees of freedom
+Residual deviance:   12.578  on 231  degrees of freedom
+AIC: -8.3909
+
+Number of Fisher Scoring iterations: 2
+</output></pre>
+<p>The summary statistics reflect the insignificance of input variables <code>Sector</code>, <code>Weekday</code> and <code>Month</code>. They do not provide very information in prediction. Consequently, a potential operation is to simplify the model by removing them. Additionally, by looking at Figure 4, we notice the existence of 4 “clusters”. Then we can stratify the data, repeat training separate neural networks and linear regression models.</p>
+<p>Afterwards, we have this table of <span class="math inline">\(MAE\)</span>s from different models.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="center">NN</th>
+<th align="center">LM</th>
+<th align="center">num of observations</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">original</td>
+<td align="center">0.0725</td>
+<td align="center">0.0223</td>
+<td align="center">18836</td>
+</tr>
+<tr class="even">
+<td align="left">reduced (<span class="math inline">\(Close \leq 20\)</span>)</td>
+<td align="center">0.0190</td>
+<td align="center">0.0133</td>
+<td align="center">16934</td>
+</tr>
+<tr class="odd">
+<td align="left">reduced (<span class="math inline">\(20 &lt; Close \leq 40\)</span>)</td>
+<td align="center">0.0972</td>
+<td align="center">0.0674</td>
+<td align="center">1268</td>
+</tr>
+<tr class="even">
+<td align="left">reduced (<span class="math inline">\(40 &lt; Close \leq 60\)</span>)</td>
+<td align="center">0.1090</td>
+<td align="center">0.1106</td>
+<td align="center">317</td>
+</tr>
+<tr class="odd">
+<td align="left">reduced (<span class="math inline">\(Close &gt; 60\)</span>)</td>
+<td align="center">0.3403</td>
+<td align="center">0.1977</td>
+<td align="center">317</td>
+</tr>
+</tbody>
+</table>
+<p>It is not hard to find out that, the more observations we have, the more accurate our neural network and linear regression model are. The models are the most accurate when predicting small value stock prices. Besides, linear models are generally more reliable than neural networks. The neural network only outperforms linear model in the <span class="math inline">\((40,60]\)</span> price range. And this could cause overfitting since no cross-validation is applied.</p>
+<p>Another thing we need to notice is that we should always be careful with the temptation of overfitting. In this part, we simplify the problem by taking only one pair of training and testing data for each model.</p>
+</div>
+<div id="time-series-analysis-1" class="section level3">
+<h3>4.3 Time Series Analysis</h3>
+<p>After finding the seasonal ARIMA model, we are interested in its predicting power.</p>
+<div class="figure">
+<img src="/image/stock/wow-forecast.png" alt="Figure 5: Predicted Woolworths stock price" />
+<p class="caption">Figure 5: Predicted Woolworths stock price</p>
+</div>
+<p>As we can see, the red curve indicates the real stock price of Woolworths in the year 2018, while the blue curve is the original prediction by ARIMA. Meanwhile, the outer shaded area stands for 80% confidence interval, and the inner is 95%. In other words, there is 80% or 95% chance the future stock prices fall in these areas. In fact, the real stock prices in 2018 are inside the 95% confidence interval region. However, the real fluctuation is larger, and the prediction does not capture a downward trend on a large scale. But if we zoom in, consider different segments of data, it is clear that the prediction is correct about up and down in most of the cases, only the magnitudes are underestimated to some extent. For this reason, but generally we have a solid prediction.</p>
+<p>Therefore, we have confirmed the possibility of picking out one stock and predict its future price by solely studying its historical prices. The third goal of our experiment is fulfilled.</p>
+</div>
+</div>
+<div id="conclusions-and-extensions" class="section level2">
+<h2>5. Conclusions and Extensions</h2>
+<p>From our previous three mining method experiments, we can draw some direct conclusions, which can answer the questions we had at the very beginning.</p>
+<p><strong>Conclusions:</strong></p>
+<ol style="list-style-type: decimal">
+<li><p>Are there any frequent patterns among different stocks? Yes. We notice that stock prices tend to be increasing on Thursday and Friday. Besides, the resource industry and the technology industry are thriving during this period.</p></li>
+<li><p>Are there any methods to predict future stock price changes? Yes, we can build mathematical models, either as explicit as linear regressions or implicit as neural networks, to predict the future stock price with some given input. An extra approach is to use data of a single stock, to build a time series model. And in this way, the same goal can be achieved as well. For the former method, once we finish training, we are bold enough to use it to predict any other stock prices in the data set. However, the latter needs to be carried out toward the target stock we would like to predict.</p></li>
+</ol>
+<p>But before celebrating the discovery of these conclusions, we would also like to state some limitations and possible improvements we can make.</p>
+<p><strong>Limitations:</strong></p>
+<ol style="list-style-type: decimal">
+<li><p>Since our data only covers 61 manually selected Australian stocks, the data might be biased, thus cannot serve as a good sample of the Australian economy. That is to say, even if we have a well-developed model, it is still a toy to play with these 61 stocks, and will not be as powerful as expected to predict any other stocks.</p></li>
+<li><p>The limitation of data not only appears as the number of stocks but also as not enough observed history. Traditionally in time series analysis, we need to have at least two cycles (periods) of data <a href="#fn12" class="footnoteRef" id="fnref12"><sup>12</sup></a>. Some stock prices, in fact, have yearly seasonality. For example, the sales amount of an agriculture company might be at its peak in a certain season. However, our data only contains around 16 months of data which restricts our choices.</p></li>
+<li><p>Due to the restriction of computing power, we cannot conduct more complex neural network training. Although we believe any further improvement in mean absolute difference is questionable, we still would like to mention this.</p></li>
+</ol>
+<p><strong>Improvements:</strong></p>
+<ol style="list-style-type: decimal">
+<li><p>Expanding the dimensions of our data is our top priority. It is possible for us to crawl more stocks data and more past price changes. The more information our algorithm learns, more accurate they could be in predicting future prices. For example, 500 stocks with daily prices from the past 5 years would improve our results in general.</p></li>
+<li><p>In time series analysis, we used a seasonal ARIMA model. We can try some other models like Box-Cox forecast and exponential smoothing forecast <a href="#fn13" class="footnoteRef" id="fnref13"><sup>13</sup></a>.</p></li>
+<li><p>High-dimensional time series analysis is worth trying as well. It is suitable for comparing different stocks prices at the same time.</p></li>
+</ol>
+<p>At last, we would like to emphasise that the ultimate goal of data mining is to find the patterns in the history and use them properly, to serve us better in the future. Put it into this context, finding and studying the patterns from a large chunk of data is never the end of data mining, applying it to prediction is. Although the prediction of stock prices is troublesome and uninterpretable sometimes, it is still the right track we should stay on and keep on trying.</p>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>T. Ganegedara, “LSTM in Python: Stock Market Predictions”, <em>DataCamp Community</em>, 2018. [Online]. Available: <a href="https://www.datacamp.com/community/tutorials/lstm-python-stock-market" class="uri">https://www.datacamp.com/community/tutorials/lstm-python-stock-market</a>. [Accessed: 13-May-2018].<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>“Company List - Wall Street Journal”, <em>The Wall Street Journal</em>, 2018. [Online]. Available: <a href="https://quotes.wsj.com" class="uri">https://quotes.wsj.com</a>. [Accessed: 13- May- 2018].<a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>G. Williams, <em>Rattle</em>. Togaware, 2017.<a href="#fnref3">↩</a></p></li>
+<li id="fn4"><p>J. Rice, <em>Mathematical statistics and data analysis (with cd data sets)</em>, 3rd ed. Cengage Learning/Brooks/Cole, 2007, p. 520.<a href="#fnref4">↩</a></p></li>
+<li id="fn5"><p>“How to choose the number of hidden layers and nodes in a feedforward neural network?”, <em>Cross Validated</em>. [Online]. Available: <a href="https://stats.stackexchange.com/questions/181/how-to-choose-the-number-of-hidden" class="uri">https://stats.stackexchange.com/questions/181/how-to-choose-the-number-of-hidden</a> -layers-and-nodes-in-a-feedforward-neural-netw. [Accessed: 13-May-2018].<a href="#fnref5">↩</a></p></li>
+<li id="fn6"><p>S. Fritsch and F. Guenther, <em>neuralnet: Training of Neural Networks</em>. 2016.<a href="#fnref6">↩</a></p></li>
+<li id="fn7"><p>J. Faraway, <em>Linear models with R</em>, 2nd ed. Boca Raton: Chapman &amp; Hall/CRC, 2014, p. 28.<a href="#fnref7">↩</a></p></li>
+<li id="fn8"><p>R. Hyndman, G. Athanasopoulos and C. Bergmeir, <em>forecast: Forecasting Functions for Time Series and Linear Models</em>. 2018.<a href="#fnref8">↩</a></p></li>
+<li id="fn9"><p>R. Hyndman and G. Athanasopoulos, “Forecasting: principles and practice”, <em>OTexts</em>, 2012. [Online]. Available: <a href="https://www.otexts.org/fpp" class="uri">https://www.otexts.org/fpp</a>. [Accessed: 13-May-2018].<a href="#fnref9">↩</a></p></li>
+<li id="fn10"><p>H. Akaike, “Information Theory and an Extension of the Maximum Likelihood Principle,” in <em>Selected Papers of Hirotugu Akaike</em>, E. Parzen, K. Tanabe and G. Kitagawa. Springer, New York, NY, 1998, pp-199-213.<a href="#fnref10">↩</a></p></li>
+<li id="fn11"><p>G. Williams, <em>Rattle</em>. Togaware, 2017.<a href="#fnref11">↩</a></p></li>
+<li id="fn12"><p>R. Hyndman and G. Athanasopoulos, “Forecasting: principles and practice”, <em>OTexts</em>, 2012. [Online]. Available: <a href="https://www.otexts.org/fpp" class="uri">https://www.otexts.org/fpp</a>. [Accessed: 13-May-2018].<a href="#fnref12">↩</a></p></li>
+<li id="fn13"><p>R. Hyndman and G. Athanasopoulos, “Forecasting: principles and practice”, <em>OTexts</em>, 2012. [Online]. Available: <a href="https://www.otexts.org/fpp" class="uri">https://www.otexts.org/fpp</a>. [Accessed: 13-May-2018].<a href="#fnref13">↩</a></p></li>
+</ol>
+</div>

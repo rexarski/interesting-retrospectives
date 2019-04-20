@@ -56,6 +56,18 @@
                     </a>
                     {{ end }}
 
+                    {{ if .Site.Params.vsco }}
+                    <a href="https://vsco.co/{{ .Site.Params.vsco }}/" target="_blank">
+                        <img class="icon" src="{{ .Site.BaseURL }}img/vsco.svg" alt="VSCO" />
+                    </a>
+                    {{ end }}
+
+                    {{ if .Site.Params.unsplash }}
+                    <a href="https://unsplash.com/@{{ .Site.Params.unsplash }}/" target="_blank">
+                        <img class="icon" src="{{ .Site.BaseURL }}img/unsplash.svg" alt="Unsplash" />
+                    </a>
+                    {{ end }}
+
                     {{ if .Site.Params._500px }}
                     <a href="https://500px.com/{{ .Site.Params._500px }}" target="_blank">
                         <img class="icon" src="{{ .Site.BaseURL }}img/500px.svg" alt="500px" />

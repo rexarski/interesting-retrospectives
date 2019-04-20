@@ -1,0 +1,165 @@
+---
+title: Big Data Theoretical Recap
+author: 'Qiu Rui'
+date: '2018-10-29'
+slug: big-data-theoretical-recap
+categories: []
+tags:
+  - big-data
+---
+
+
+
+<p>This project is the major part of my final project in <a href="https://programsandcourses.anu.edu.au/course/STAT7017">STAT7017: Big Data Statistics</a>. The goal is trying to reproduce and verify various stages in the development of big data theory.</p>
+<p>This blog post mainly covers the questions and reading materials part. For details of my solutions and codings, please check my <a href="/pdf/big-data-theory.pdf">pdf file</a>.</p>
+<div id="part-i-testing-covariance-matrices" class="section level2">
+<h2>Part I: Testing Covariance Matrices</h2>
+<div id="question-1" class="section level3">
+<h3>Question 1</h3>
+<p>Read Section 6.6 in <strong>[C]</strong> and reproduce the calculations of Example 6.12 in R. In this example, Box’s M-test is used to study nursing home data from Wisconsin (data found in Example 6.10). If you have slightly different results to the book, briefly explain why.</p>
+</div>
+<div id="question-2" class="section level3">
+<h3>Question 2</h3>
+<p>Box’s M-test (aka. Box’s <span class="math inline">\(\chi^2\)</span> approximation) is a classic result that is based on a <em>likelihood ratio</em> test (LRT). The general philosophy behind a LRT is to maximise the likelihood under the null hypothesis <span class="math inline">\(H_0\)</span> and also maximise the likelihood under the alternative hypothesis <span class="math inline">\(H_1\)</span>.</p>
+<p><strong>Definition 1.</strong> If the distribution of the random sample <span class="math inline">\(\mathbb{X}=(\mathbb{x}_1,\dots,\mathbb{x}_n)&#39;\)</span> depends upon a parameter vector <span class="math inline">\(\theta\)</span>, and if <span class="math inline">\(H_0:\theta\in\Omega_0\)</span> and <span class="math inline">\(H_1:\theta\in\Omega_1\)</span> are any two hypotheses, then the likelihood ratio statistic for testing <span class="math inline">\(H_0\)</span> against <span class="math inline">\(H_1\)</span> is defined as</p>
+<p><span class="math display">\[\lambda_1=\frac{\mathcal{L}_0^*}{\mathcal{L}_1^*}\]</span></p>
+<p>where <span class="math inline">\(\mathcal{L}_i^*\)</span> is the largest value which the likelihood function takes in the region <span class="math inline">\(\Omega_i, i=0,1.\)</span></p>
+<p>At this point it is good to remember that a multivariate Normal distribution is completely characterised by the parameter vector <span class="math inline">\(\theta=(\mu,\Sigma)\)</span>, i.e., only the mean vector and the covariance matrix are needed to know the distribution.</p>
+<p>The LRT has the following important asymptotic property as <span class="math inline">\(n\to\infty\)</span> that Box leverages to obtain his <span class="math inline">\(\chi^2\)</span> approximation.</p>
+<p><strong>Theorem 1.</strong> If <span class="math inline">\(\Omega_1\subset\mathbb{R}^q\)</span> and if <span class="math inline">\(\Omega_0\)</span> is an <span class="math inline">\(r\)</span>-dimensional subregion of <span class="math inline">\(\Omega_1\)</span> then (under some technical assumptions) for each <span class="math inline">\(\omega\in\Omega_0, -2\log(\lambda_1)\)</span> has an asymptotic <span class="math inline">\(\chi_{q-r}^2\)</span> distribution as <span class="math inline">\(n\to \infty\)</span>.</p>
+<p>The explanantion why Theorem 1 is true starts in Section 10.2 of <strong>[B]</strong> where the LRT is derived, culminating in critical region for <span class="math inline">\(\lambda_1\)</span> given by eq. (9). At this point, no assumptions are made about the distribution of the population covariance matrices <span class="math inline">\(\Sigma_1,\dots,\Sigma_q\)</span> (so we don’t know how <span class="math inline">\(\lambda_1\)</span> is distributed). Assumptions are made in Section 10.4: covariances are assumed Wishart distributed which occurs when the random samples <span class="math inline">\(\mathbb{x}_1,\dots,\mathbb{x}_n\)</span> are multivariate Normal. Box’s <span class="math inline">\(\chi^2\)</span> asymptotic approximation is obtained in Section 10.5 thanks to a formula for the <span class="math inline">\(h\)</span>-moment of <span class="math inline">\(\lambda_1\)</span>. As <span class="math inline">\(\mathbb{E}[\lambda_1^h]\)</span> has a specific form (given in terms of ratios of Gamma functions), Theorem 8.5.1 of <strong>[B]</strong> can be applied to get an approximation of <span class="math inline">\(\mathbb{P}(-2\rho\log(\lambda_1)\leq z)\)</span> in terms of the <span class="math inline">\(\chi^2\)</span> distribution.</p>
+<p>Now that you understand some of the theory, study the classic “<code>iris</code>” dataset. The populations are <em>Iris versicoor</em> (1), <em>Iris setosa</em> (2), and <em>Iris virginica</em> (3); each sample consists of 50 observations. Use Box’s M-test (or otherwise) to:</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>Test the hypothesis <span class="math inline">\(\Sigma_1=\Sigma_2\)</span> at the 5% significance level.</p></li>
+<li><ol style="list-style-type: lower-alpha">
+<li>Test the hypothesis <span class="math inline">\(\Sigma_1=\Sigma_2=\Sigma_3\)</span> at the 5% significance level.</li>
+</ol></li>
+</ol>
+</div>
+<div id="question-3" class="section level3">
+<h3>Question 3</h3>
+<p>On page 311 in <strong>[C]</strong>, just above Example 6.12, the authors make the comment that “<em>Box’s <span class="math inline">\(\chi^2\)</span> approximation works well if each <span class="math inline">\(n_l\)</span> exceeds 20 and if <span class="math inline">\(p\)</span> and <span class="math inline">\(g\)</span> do not exceed 5</em>”. Your task is to perform a simulation study (see <strong>[J]</strong>) to show what happens to Box’s <span class="math inline">\(\chi^2\)</span> approximation when <span class="math inline">\(p\)</span> exceeds 5 while holding <span class="math inline">\(g\)</span> fixed, e.g., <span class="math inline">\(g=2\)</span>. This means you have to design an experiment to show how badly Box’s test performs for large <span class="math inline">\(p\)</span> by choosing appropriate <span class="math inline">\(\Sigma_1\)</span> and <span class="math inline">\(\Sigma_2\)</span>, simulating sample data, etc. Present your results in a clear manner (see <strong>[J]</strong> for presentation tips).</p>
+</div>
+<div id="question-4" class="section level3">
+<h3>Question 4</h3>
+<p>We are now going to look at the problem of testing that a covariance matrix is equal to a given matrix. If observations <span class="math inline">\(\mathbb{y}_1,\dots, \mathbb{y}_n\)</span> are multivariate Normal <span class="math inline">\(N_p(\nu,\Psi)\)</span>, we wish to test the hypothesis <span class="math inline">\(H_0:\Psi=\Psi_0\)</span> where <span class="math inline">\(\Psi_0\)</span> is a given positive definite matrix. Let <span class="math inline">\(Q\)</span> be the matrix such that</p>
+<p><span class="math display">\[Q\Psi_0Q&#39;=I\]</span></p>
+<p>then set <span class="math inline">\(\mu:=Q\nu\)</span> and <span class="math inline">\(\Sigma:=Q\Psi Q&#39;\)</span>. If we defined <span class="math inline">\(\mathbb{x}_i:=Q\mathbb{y}_i\)</span> it follows that <span class="math inline">\(\mathbb{x}_1,\dots,\mathbb{x}_n\)</span> are observations from <span class="math inline">\(N_p(\mu,\Sigma)\)</span> and the hypothesis <span class="math inline">\(H_0\)</span> is transformed to <span class="math inline">\(H_0:\Sigma=I\)</span>. Using the LRT approach, we can find the test statistic</p>
+<p><span class="math display">\[\lambda_1=\left(\frac{e}{n}\right)^{\frac12 pn}\lvert\mathbb{A}\rvert^{\frac12 n}e^{-\frac12 \text{tr}{\mathbb{A}}}\]</span></p>
+<p>where</p>
+<p><span class="math display">\[\mathbb{A}:=\sum^n_{k=1}(\mathbb{x}_k-\bar{\mathbb{x}})(\mathbb{x}_k-\bar{\mathbb{x}})&#39;\]</span></p>
+<p>Unfortunately <span class="math inline">\(\lambda_1\)</span> is a biased statistic. The following unbiased estimator was proposed in <strong>[A]</strong>:</p>
+<p><span class="math display">\[\lambda_1^*:=e^{\frac12 pN}(\lvert\mathbb{S}\rvert e^{-\text{tr}\mathbb{S}})^{\frac12 N}\]</span></p>
+<p>where <span class="math inline">\(N:=n-1\)</span> and <span class="math inline">\(\mathbb{S}:=\mathbb{A}/n\)</span>. The distribution of <span class="math inline">\(\lambda_1^*\)</span> has the following <span class="math inline">\(\chi^2\)</span> approximation</p>
+<p><span class="math display">\[\mathbb{P}(-2\rho\log\lambda_1^*\leq z)=\mathbb{P}(C_f\leq z)+\frac{\gamma_2}{\rho^2(n-1)^2}(\mathbb{P}(C_{f+4}\leq z)-\mathbb{P}(C_f\leq z))+O(n^{-3})\ \ \ \ \ (1)\]</span></p>
+<p>where <span class="math inline">\(C_k\sim\chi_k^2\)</span> (i.e., <span class="math inline">\(\chi^2\)</span> distributed with <span class="math inline">\(k\)</span> degrees of freedom), <span class="math inline">\(f:=\frac12 p(p+1), \rho:=1-(2p^2+3p-1)/[6(n-1)(p+1)]\)</span>, and <span class="math inline">\(\gamma_2:=p(2p^4+6p^3+p^2-12p-13)/[288(p+1)].\)</span> All the details can be found in <strong>[B]</strong> Section 10.8.1, <strong>[B]</strong> around Eq. (19) on p.441, and <strong>[A]</strong>.</p>
+<p>Perform a simulation study to understand the performance (type I error and power) of (1) for <span class="math inline">\(n=500\)</span> and <span class="math inline">\(p=5,10,50,100,300\)</span>; see <strong>[K]</strong>.</p>
+</div>
+<div id="question-5" class="section level3">
+<h3>Question 5</h3>
+<p>Continuing the previous question (and its notation), notice that</p>
+<p><span class="math display">\[-\frac{2}{N}\log\lambda_1^*=\text{tr}\mathbb{S}-\log\lvert\mathbb{S}\rvert-p.\]</span></p>
+<p>Setting <span class="math inline">\(T_1:=\text{tr}\mathbb{S}-\log\lvert\mathbb{S}\rvert-p\)</span>, prove the following theorem.</p>
+<p><strong>Theorem 2.</strong> Assume that <span class="math inline">\(n\to\infty,p\to\infty\)</span>, and <span class="math inline">\(p/n\to y\in(0,1)\)</span>. Then</p>
+<p><span class="math display">\[T_1-p d_1(y_N)\to N(\mu,\sigma_1^2)\]</span></p>
+<p>where <span class="math inline">\(N:=n-1,Y_N:=p/N\)</span> and</p>
+<p><span class="math display">\[
+\begin{align*}
+d_1(y)&amp;:=1+\frac{1-y}y\log(1-y),\\
+\mu_1&amp;:=-\frac12\log(1-y),\\
+\sigma_1^2&amp;:=-2\log(1-y)-2y.
+\end{align*}
+\]</span></p>
+<p>Hint: Apply Theorem in Lecture 6 on page 7 with <span class="math inline">\(\frac1p T_1:=F^{\mathbb{S}}(f)\)</span> with <span class="math inline">\(f(x)=x-\log x-1\)</span>. Also see <strong>[D]</strong>.</p>
+</div>
+<div id="question-6" class="section level3">
+<h3>Question 6</h3>
+<p>Continuing the previous question notation, use the Theorem to construct an algorithm that tests <span class="math inline">\(H_1: \Sigma\not= I\)</span> and perform a simulation study to understand its performance (type I error and power) for <span class="math inline">\(p=5,10,50,100,300\)</span>. Comment on how it performs compared to (1).</p>
+</div>
+</div>
+<div id="part-ii-multivariate-time-series" class="section level2">
+<h2>Part II: Multivariate Time Series</h2>
+<p>Let <span class="math inline">\(\mathbb{Z}\)</span> denote the set of integers. A sequence of random vector observations (<span class="math inline">\(\mathbb{X}_t: t=1,\dots,T\)</span>) with values in <span class="math inline">\(\mathbb{R}^p\)</span> is called a <span class="math inline">\(p\)</span>-dimensional (vector) time series. We denote the sample mean and sample covariance matrix by</p>
+<p><span class="math display">\[\overline{\mathbb{X}}:=\frac1T\sum^T_{t=1}\mathbb{X}_t,\]</span></p>
+<p><span class="math display">\[\mathbb{S}_0:=\frac{1}{T-1}\sum^T_{t=1}(\mathbb{X}_t-\overline{\mathbb{X}}_t)(\mathbb{X}_t-\overline{\mathbb{X}}_t)&#39;.\]</span></p>
+<p>The lag-<span class="math inline">\(\tau\)</span> sample cross-covariance (aka. autocovariance) matrix is defined as</p>
+<p><span class="math display">\[\mathbb{S}_\tau:=\frac{1}{T-1}\sum^T_{t=\tau+1}(\mathbb{X}_t-\overline{\mathbb{X}}_t)(\mathbb{X}_{t-\tau}-\overline{\mathbb{X}}_t)&#39;\]</span> The lag-<span class="math inline">\(\tau\)</span> cross-correlation is given by</p>
+<p><span class="math display">\[\rho_\tau=D\mathbb{S}_\tau D\]</span></p>
+<p>where <span class="math inline">\(D=\text{diag}(1/\sqrt{s_{11}},1/\sqrt{s_{22}},\dots,1/\sqrt{s_{pp}})\)</span> and the values come from <span class="math inline">\(\mathbb{S}_0=[s_{ij}].\)</span> Assuming <span class="math inline">\(\mathbb{E[X_t]}=0\)</span>, some authors (e.g., <strong>[H], [I]</strong>) omit <span class="math inline">\(\overline{\mathbb{X}}_t\)</span> and consider the <em>symmetrised</em> lag-<span class="math inline">\(\tau\)</span> sample cross-covariance given by</p>
+<p><span class="math display">\[\mathbb{C}_\tau:=\frac1{2T}\sum^{T-\tau}{t=1}(\mathbb{X}_t\mathbb{X}_{t+\tau}&#39;+\mathbb{X}_{t+\tau}\mathbb{X}_t&#39;).\]</span></p>
+<div id="question-7" class="section level3">
+<h3>Question 7</h3>
+<p>Simulation is a helpful way to learn about vector time series. Define the matrices</p>
+<p><span class="math display">\[\mathbf{A}=\begin{pmatrix}0.8&amp;0.4\\-0.3&amp;0.6\end{pmatrix},\Sigma=\begin{pmatrix}2.0&amp;0.5\\0.5&amp;1.0\end{pmatrix}.\]</span> Generate 300 observations from the “vectro autoregressive” VAR(1) model</p>
+<p><span class="math display">\[\mathbb{X}_t=\mathbf{A}\mathbb{X}_{t-1}+\epsilon_t\ \ \ \ \ (2)\]</span></p>
+<p>where <span class="math inline">\(\epsilon_t\sim N_2(0,\Sigma)\)</span>, i.e., they are i.i.d. bivariate normal random variables with mean zero and covariance <span class="math inline">\(\Sigma\)</span>. Note that when simulating is it customary omit the first 100 or more observations and you can start with <span class="math inline">\(\mathbb{X}_0=(0,0)&#39;\)</span>.</p>
+<p>Also generate 300 observations from the “vector moving average” VMA(1) model</p>
+<p><span class="math display">\[\mathbb{X}_t=\epsilon_t+\mathbf{A}\epsilon_{t-1}.\ \ \ \ \ (3)\]</span></p>
+<ol style="list-style-type: lower-alpha">
+<li><p>Plot the time series <span class="math inline">\(\mathbb{X}_t\)</span> for the VAR(1) model given by (2).</p></li>
+<li><p>Obtain the first five lags of sample cross-correlations of <span class="math inline">\(\mathbb{X}_t\)</span> for the VAR(1) model, i.e., <span class="math inline">\(\rho_1,\dots,\rho_5\)</span>.</p></li>
+<li><p>Plot the time series <span class="math inline">\(\mathbb{X}_t\)</span> for the MA(1) model given by (3).</p></li>
+<li><p>Obtain the first two lags of sample cross-correlations of <span class="math inline">\(\mathbb{X}_t\)</span> for the MA(1) model.</p></li>
+<li><p>Implement the test from <strong>[F]</strong> and reproduce the simulation experiment given in Section 5. This means you need to generate Table 1 from <strong>[F]</strong>.</p></li>
+<li><p>The file <code>q-fdebt.txt</code> contains the U.S. quarterly federal debts held by (i) foreign and international investors, (ii) federal reserve banks, and (iii) the public. The data are from the Federal Reserve Bank of St. Louis, from 1970 to 2012 for 171 observations, and not seasonally adjusted. The debts are in billions of dollars. Take the log transformation and the first difference for each time series. Let <span class="math inline">\((\mathbb{X}_t)\)</span> be the differenced log series.</p></li>
+</ol>
+<p>Test <span class="math inline">\(H_0:\rho_1=\cdots=\rho_{10}=0\)</span> vs <span class="math inline">\(H_a:\rho_\tau\not=0\)</span> for some <span class="math inline">\(\tau\in\{1,\dots,10\}\)</span> using the test from <strong>[F]</strong>. Draw the conclusion using the 5% significance level.</p>
+</div>
+<div id="question-8" class="section level3">
+<h3>Question 8</h3>
+<p>More generally, a <span class="math inline">\(p\)</span>-dimensional time series <span class="math inline">\(\mathbb{X}_t\)</span> follows a VAR model of order <span class="math inline">\(l\)</span>, VAR(<span class="math inline">\(l\)</span>), if</p>
+<p><span class="math display">\[\mathbb{X}_t=\mathbf{a}_0+\sum^l_{i=1}\mathbf{A}_i\mathbb{X}_{t-i}+\epsilon_t\ \ \ \ \ (4)\]</span></p>
+<p>where <span class="math inline">\(\mathbf{a}_0\)</span> is a <span class="math inline">\(p\)</span>-dimensional constant vector and <span class="math inline">\(\mathbf{A}_i\)</span> are <span class="math inline">\(p\times p\)</span> (non-zero) matrices for <span class="math inline">\(i&gt;0\)</span>, and i.i.d. <span class="math inline">\(\epsilon_t\sim N_p(0,\Sigma)\)</span> for all <span class="math inline">\(t\)</span> with <span class="math inline">\(p\times p\)</span> covariance matrix <span class="math inline">\(\Sigma\)</span>.</p>
+<p>One day you might want to “build a model” using the VAR(<span class="math inline">\(l\)</span>) framework. One of the first things you need to do is to determine the optimal order <span class="math inline">\(l\)</span>. Tiao and Box (1981) suggest using sequential likelihood ratio tests; see Section 4 in <strong>[G]</strong>. Their approach is to compare a VAR(<span class="math inline">\(l\)</span>) model with a VAR(<span class="math inline">\(l-1\)</span>) model and amounts to considering the hypothesis testing problem</p>
+<p><span class="math display">\[H_0: \mathbf{A}_l=0\text{ vs. }H_1:\mathbf{A}_l\not=0.\]</span></p>
+<p>We can do this by determining model parameters using a least-squares approach. We rewrite (4) as</p>
+<p><span class="math display">\[\mathbb{X}_t&#39;=\mathbb{X}_t&#39;\mathbb{A}+\epsilon_t&#39;\]</span></p>
+<p>where <span class="math inline">\(X_t=(1,\mathbb{X}_{t-1}&#39;,\dots,\mathbb{X}_{t-l}&#39;)&#39;\)</span> is a <span class="math inline">\((pl+1)\)</span>-dimensional vector and <span class="math inline">\(\mathbb{A}=[\mathbf{a}_0,\mathbf{A}_1,\dots,\mathbf{A}_l]\)</span> is a <span class="math inline">\(p\times 1+l\times(p\times p)=p\times(pl+1)\)</span> matrix. With observations at times <span class="math inline">\(t=l+1,\dots,T\)</span>, we write the data as</p>
+<p><span class="math display">\[\mathbf{X}=X\mathbb{A}+E\ \ \ \ \ (5)\]</span></p>
+<p>where <span class="math inline">\(\mathbf{X}\)</span> is a <span class="math inline">\((T-l)\times p\)</span> matrix with the <span class="math inline">\(i\)</span>th row being <span class="math inline">\(\mathbb{X}_{l+i}&#39;\)</span>, <span class="math inline">\(X\)</span> is a <span class="math inline">\((T-l)\times(pl+1)\)</span> design matrix with the <span class="math inline">\(i\)</span>th row being <span class="math inline">\(X&#39;_{l+i}\)</span>, and <span class="math inline">\(E\)</span> is a <span class="math inline">\((T-l)\times p\)</span> matrix with the <span class="math inline">\(i\)</span>th row being <span class="math inline">\(\epsilon_{l+i}&#39;\)</span>.</p>
+<p>The matrix <span class="math inline">\(\mathbb{A}\)</span> contains the coefficient parameters of the VAR(<span class="math inline">\(l\)</span>) model and let <span class="math inline">\(\Sigma_{\epsilon,l}\)</span> be the corresponding innovation covariance matrix. Under a normality assumption, the likelihood ratio for the testing problem is</p>
+<p><span class="math display">\[\lambda_1=\left(\frac{\lvert\hat{\Sigma}_{\epsilon,l}\rvert}{\lvert\hat{\Sigma}_{\epsilon,l-1}\rvert}\right)^{(T-l)/2}\]</span></p>
+<p>The likelihood ratio test of <span class="math inline">\(H_0\)</span> is equivalent to rejecting <span class="math inline">\(H_0\)</span> for large values of</p>
+<p><span class="math display">\[-2\log(\lambda_1)=-(T-l)\log\left(\frac{\lvert\hat{\Sigma}_{\epsilon,l}\rvert}{\lvert\hat{\Sigma}_{\epsilon,l-1}\rvert}\right).\]</span></p>
+<p>A commonly used statistic is Bartlett’s approximation given by</p>
+<p><span class="math display">\[M(l)=-(T-l-1.5-pl)\log\left(\frac{\lvert\hat{\Sigma}_{\epsilon,l}\rvert}{\lvert\hat{\Sigma}_{\epsilon,l-1}\rvert}\right),\]</span></p>
+<p>which follows asymptotically (as <span class="math inline">\(n\to\infty\)</span> and <span class="math inline">\(p\)</span> fixed) a <span class="math inline">\(\chi^2\)</span> distribution with <span class="math inline">\(p^2\)</span> degrees of freedom. The following methodology is suggested for selecting the order <span class="math inline">\(l\)</span>:</p>
+<ol style="list-style-type: decimal">
+<li>Select a positive integer <span class="math inline">\(P\)</span>, which is the maximum VAR order that we would like to consider.</li>
+<li>Setup the regression framework (5) for the VAR(<span class="math inline">\(P\)</span>) model. That is, there are <span class="math inline">\(T-P\)</span> observations (i.e., rows) in the <span class="math inline">\(\mathbf{X}\)</span> matrix.</li>
+<li>For <span class="math inline">\(l=0,\dots, P\)</span> compute the least-squares estimate of the AR coefficient matrix <span class="math inline">\(\mathbb{A}\)</span>. For <span class="math inline">\(l=0\)</span>, we have <span class="math inline">\(\mathbb{A}=\mathbf{a}_0\)</span>. Then compute the ML estimate for <span class="math inline">\(\Sigma_{\epsilon,l}\)</span> given by</li>
+</ol>
+<p><span class="math display">\[\hat{\Sigma}_{\epsilon, l}:=(1/T-P)\mathbf{R}_l&#39;\mathbf{R}_l\]</span></p>
+<p>where <span class="math inline">\(\mathbf{R}_l=\mathbb{X}-X\mathbb{A}\)</span> is the residual matrix of the fitted VAR(<span class="math inline">\(l\)</span>) model.</p>
+<ol start="4" style="list-style-type: decimal">
+<li><p>For <span class="math inline">\(l=1,\dots,P\)</span>, compute test statistic <span class="math inline">\(M(l)\)</span> and its <span class="math inline">\(p\)</span>-value, which is based on the asymptotic <span class="math inline">\(\chi_p^2\)</span> distribution.</p></li>
+<li><p>Examine the test statistics sequentially starting with <span class="math inline">\(l=1\)</span>. If all the <span class="math inline">\(p\)</span>-values of the <span class="math inline">\(M(l)\)</span> test statistics are greater than the specified type I error for <span class="math inline">\(l&gt;m\)</span>, then a VAR(<span class="math inline">\(m\)</span>) model is specified. This is so because the test rejects the null hypothesis <span class="math inline">\(\mathbf{A}_l=0\)</span>, but fails to reject <span class="math inline">\(\mathbf{A}_l=0\)</span> for <span class="math inline">\(l&gt;m\)</span>.</p></li>
+</ol>
+<p>Consider a bivariate time series <span class="math inline">\(\mathbb{X}_t=(\mathbb{x}_t^{TB},\mathbb{x}_t^{CPI})\)</span> where <span class="math inline">\(\mathbb{x}_t^{TB}\)</span> is the change in monthly US treasury bills with maturity 3 months and <span class="math inline">\(\mathbb{x}_t^{CPI}\)</span> is the inflation rate, in percentage, of the U.S. monthly consumer price index (CPI). This data from the Fedral Reserve Bank of St. Louis. The CPI rate is 100 times the difference of the log CPI index. The sample period is from January 1947 to December 2012. The data are in the file <code>m-cpib3m.txt</code>.</p>
+<ol style="list-style-type: lower-alpha">
+<li>Plot the time series <span class="math inline">\(\mathbb{X}_t\)</span>.</li>
+<li>Select a VAR order for <span class="math inline">\(\mathbb{X}_t\)</span> using the methodology (described above).</li>
+<li>Drawing on your results obtained in this project and the theory discussed in class, explain and demonstrate (e.g., simulation study) what might happen with this methodology if the dimensionality <span class="math inline">\(p\)</span> of the time series becomes large.</li>
+</ol>
+</div>
+<div id="question-9" class="section level3">
+<h3>Question 9</h3>
+<p>The recent paper <strong>[H]</strong> is concerned with extensions of the classical Marchenko-Pastur to the time series case. Reproduce their simulation study which is found in Section 5 and Figure 1.</p>
+</div>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<ul>
+<li><strong>[A]</strong> Sugiura, Nagao (1968). Unbiasedness of some test criteria for the equality of one or two covariance matrices. Annals of Mathematical Statistics Vol. 39, No. 5, 1686-1692.</li>
+<li><strong>[B]</strong> Anderson (2003). An introduction to Multivariate Statitical Analysis. Wiley.</li>
+<li><strong>[C]</strong> Johnson, Wichern (2007). Applied Multivariate Statistical Analysis. Pearson Prentice Hall.</li>
+<li><strong>[D]</strong> Bai, Jiang, Yao, Zheng (2009). Corrections to LRT on large-dimensional covariance matrix by RMT. Annals of Statistics Vol 37, No. 6B, 3822-3840.</li>
+<li><strong>[E]</strong> Zheng, Bai, Yao (2017). CLT for eigenvalue statistics of large-dimensional general Fisher matrices with applications. Bernouilli 23(2), 1130-1178.</li>
+<li><strong>[F]</strong> Li, McLeod (1981). Distribution of the Residual Autocorrelations in Multivariate ARMA Time Series Models, J.R. Stat. Soc. B 43, No. 2, 231-239.</li>
+<li><strong>[G]</strong> Tiao and Box (1981). Modelling multiple time series with applications. Journal of the American Statistical Association, 76. 802-816.</li>
+<li><strong>[H]</strong> Liu, Aue, Paul (2015). On the Marchenko-Pastur Law for Linear Time Series. Annals of Statistics Vol. 43, No. 2, 675-712.</li>
+<li><strong>[I]</strong> Liu, Aue, Paul (2017). Spectral analysis of sample autocovariance matrices of a class of linear time series in moderately high dimensions. Bernouilli 23(4A), 2181-2209.</li>
+<li><strong>[J]</strong> <a href="http://www4.stat.ncsu.edu/~davidian/st810a/simulation_handout.pdf" class="uri">http://www4.stat.ncsu.edu/~davidian/st810a/simulation_handout.pdf</a></li>
+<li><strong>[K]</strong> <a href="https://stats.stackexchange.com/a/40874" class="uri">https://stats.stackexchange.com/a/40874</a></li>
+</ul>
+</div>
