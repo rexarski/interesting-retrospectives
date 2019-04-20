@@ -44,7 +44,7 @@ doi: 10.1101/065524.
 In this project we considered how to test hypotheses about **covariance matrices** and, since everything “eighties” is trendy again, we looked at some **multivariate time series** papers from that epoch and make them fresh again. There are interesting connections between these two topics. The aim of the project is to take the modern viewpoint and understand what happens in both situations when the
 dimensionality `p` of the observations becomes large. 
 
-<a href="/project/big-data-theoretical-recap/" class="btn btn-outline-primary">Problems</a>
+<a href="/blog/post/big-data-theoretical-recap/" class="btn btn-outline-primary">Problems</a>
 <a href="/pdf/big-data-theory.pdf" class="btn btn-outline-primary">PDF</a>
 <a href="https://github.com/rexarski/" class="btn btn-outline-primary">GitHub repo (coming soon)</a>
 
@@ -54,7 +54,7 @@ dimensionality `p` of the observations becomes large.
 
 Applied **associate mining** on Australian stock data within R package `rattle` to discover frequent patterns. At the same time constructed models using regression, neural network and time series to predict the future stock price change.
 
-<a href="/project/australian-stock-price-prediction/" class="btn btn-outline-primary">Blog</a>
+<a href="/blog/post/australian-stock-price-prediction/" class="btn btn-outline-primary">Blog</a>
 <a href="/pdf/australian-stock.pdf" class="btn btn-outline-primary">PDF</a>
 <a href="https://github.com/rexarski/" class="btn btn-outline-primary">GitHub repo (coming soon)</a>
 
