@@ -46,7 +46,7 @@ dimensionality `p` of the observations becomes large.
 
 <a href="/blog/post/big-data-theoretical-recap/" class="btn btn-outline-primary">Problems</a>
 <a href="/pdf/big-data-theory.pdf" class="btn btn-outline-primary">PDF</a>
-<a href="https://github.com/rexarski/" class="btn btn-outline-primary">GitHub repo (coming soon)</a>
+<a href="https://github.com/rexarski/stat7017-big-data/" class="btn btn-outline-primary">GitHub</a>
 
 ***
 
@@ -56,7 +56,7 @@ Applied **associate mining** on Australian stock data within R package `rattle` 
 
 <a href="/blog/post/australian-stock-price-prediction/" class="btn btn-outline-primary">Blog</a>
 <a href="/pdf/australian-stock.pdf" class="btn btn-outline-primary">PDF</a>
-<a href="https://github.com/rexarski/" class="btn btn-outline-primary">GitHub repo (coming soon)</a>
+<a href="https://github.com/rexarski/australian-stock-prediction" class="btn btn-outline-primary">GitHub</a>
 
 ***
 
@@ -78,7 +78,7 @@ Using Bayesian approach to extract the vital factors that determine a character'
 
 <a href="/blog/post/the-westerosi-survival-status-report/" class="btn btn-outline-primary">Blog</a>
 <a href="/pdf/westerosi-report.pdf" class="btn btn-outline-primary">PDF</a>
-<a href="https://github.com/rexarski/" class="btn btn-outline-primary">GitHub (coming soon)</a>
+<a href="https://github.com/rexarski/westerosi-survival" class="btn btn-outline-primary">GitHub</a>
 
 ***
 
