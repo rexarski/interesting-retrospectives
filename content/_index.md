@@ -12,4 +12,4 @@ This blog basically serves as my learning notebook. (Yes, gotta keep on learning
 
 Please forgive me for any hilarious typo or grammatical error as English is my second language. Cheers.
 
-My skill set: ![](https://img.shields.io/badge/-Python-blue.svg)![](https://img.shields.io/badge/-R-9cf.svg)
+<!--My skill set: ![](https://img.shields.io/badge/-Python-blue.svg)![](https://img.shields.io/badge/-R-9cf.svg)-->
