@@ -1,0 +1,507 @@
+---
+title: LeetCode Database Notes (42 Problems)
+author: Qiū Ruì
+date: '2019-04-22'
+slug: leetcode-database-notes-42-problems
+categories: []
+tags:
+  - SQL
+  - LeetCode
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 2
+meta_img: image/image.png
+description: Description for the page.
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#combine-two-tables">175. Combine Two Tables</a></li>
+<li><a href="#second-highest-salary">176. Second Highest Salary</a></li>
+<li><a href="#nth-highest-salary">177. Nth Highest Salary</a></li>
+<li><a href="#rank-scores">178. Rank Scores</a></li>
+<li><a href="#consecutive-numbers">180. Consecutive Numbers</a></li>
+<li><a href="#employees-earning-more-than-their-managers">181. Employees Earning More Than Their Managers</a></li>
+<li><a href="#duplicate-emails">182. Duplicate Emails</a></li>
+<li><a href="#customers-who-never-order">183. Customers Who Never Order</a></li>
+<li><a href="#department-highest-salary">184. Department Highest Salary</a></li>
+<li><a href="#department-top-three-salaries">185. Department Top Three Salaries</a></li>
+<li><a href="#delete-duplicate-emails">196. Delete Duplicate Emails</a></li>
+<li><a href="#rising-temperature">197. Rising Temperature</a></li>
+<li><a href="#to-be-continued">To be continued…</a></li>
+</ul>
+</div>
+
+<p><strong><em>Updated on 2019-04-23.</em></strong></p>
+<p>✅ #175 ✅ #176 ✅ #177 ✅ #178 ✅ #180 ✅ #181 ✅ #182 ✅ #183 ✅ #184 ✅ #185 ✅ #196 ✅ #197 ❌ #262 ❌ #569 ❌ #570 ❌ #571 ❌ #574 ❌ #577 ❌ #578 ❌ #579 ❌ #580 ❌ #584 ❌ #585 ❌ #586 ❌ #595 ❌ #596 ❌ #597 ❌ #601 ❌ #602 ❌ #603 ❌ #607 ❌ #608 ❌ #610 ❌ #612 ❌ #613 ❌ #614 ❌ #615 ❌ #618 ❌ #619 ❌ #620 ❌ #626 ❌ #627</p>
+<div id="combine-two-tables" class="section level2">
+<h2>175. Combine Two Tables</h2>
+<p>Table: <code>Person</code></p>
+<pre><output>
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| PersonId    | int     |
+| FirstName   | varchar |
+| LastName    | varchar |
++-------------+---------+
+</output></pre>
+<p><code>PersonId</code> is the primary key column for this table.</p>
+<p>Table: <code>Address</code></p>
+<pre>
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| AddressId   | int     |
+| PersonId    | int     |
+| City        | varchar |
+| State       | varchar |
++-------------+---------+
+</pre>
+<p><code>AddressId</code> is the primary key column for this table.</p>
+<p>Write a SQL query for a report that provides the following information for each person in the Person table, regardless if there is an address for each of those people:</p>
+<pre><code>FirstName, LastName, City, State</code></pre>
+<div id="solution" class="section level3">
+<h3>Solution</h3>
+<pre class="mysql"><code>SELECT FirstName, LastName, City, State
+FROM Person 
+LEFT JOIN Address ON Person.PersonId = Address.PersonId;</code></pre>
+<p>Note: There is no <code>FULL JOIN</code> in MySQL.</p>
+</div>
+</div>
+<div id="second-highest-salary" class="section level2">
+<h2>176. Second Highest Salary</h2>
+<p>Write a SQL query to get the second highest salary from the <code>Employee</code> table.</p>
+<pre>
++----+--------+
+| Id | Salary |
++----+--------+
+| 1  | 100    |
+| 2  | 200    |
+| 3  | 300    |
++----+--------+
+</pre>
+<p>For example, given the above Employee table, the query should return <code>200</code> as the second highest salary. If there is no second highest salary, then the query should return <code>null</code>.</p>
+<pre>
++---------------------+
+| SecondHighestSalary |
++---------------------+
+| 200                 |
++---------------------+
+</pre>
+<div id="solution-1" class="section level3">
+<h3>Solution</h3>
+<pre class="mysql"><code>SELECT MAX(Salary) as SecondHighestSalary
+FROM Employee
+WHERE Salary &lt; (SELECT MAX(Salary) FROM Employee);</code></pre>
+</div>
+</div>
+<div id="nth-highest-salary" class="section level2">
+<h2>177. Nth Highest Salary</h2>
+<p>Write a SQL query to get the nth highest salary from the <code>Employee</code> table.</p>
+<pre>
++----+--------+
+| Id | Salary |
++----+--------+
+| 1  | 100    |
+| 2  | 200    |
+| 3  | 300    |
++----+--------+
+</pre>
+<p>For example, given the above Employee table, the nth highest salary where n = 2 is <code>200</code>. If there is no nth highest salary, then the query should return <code>null</code>.</p>
+<pre>
++------------------------+
+| getNthHighestSalary(2) |
++------------------------+
+| 200                    |
++------------------------+
+</pre>
+<div id="solution-2" class="section level3">
+<h3>Solution</h3>
+<pre class="mysql"><code>CREATE FUNCTION getNthHighestSalary(N INT) RETURNS INT
+BEGIN
+  SET N = N-1;
+  RETURN (
+      SELECT DISTINCT Salary FROM Employee ORDER BY Salary DESC LIMIT 1 OFFSET N 
+  );
+END</code></pre>
+<p>The idea is to use <code>LIMIT</code> and <code>OFFSET</code> in MySQL to skip those first <code>N-1</code> higher salaries than the nth one you really need to pick out.</p>
+</div>
+</div>
+<div id="rank-scores" class="section level2">
+<h2>178. Rank Scores</h2>
+<p>Write a SQL query to rank scores. If there is a tie between two scores, both should have the same ranking. Note that after a tie, the next ranking number should be the next consecutive integer value. In other words, there should be no “holes” between ranks.</p>
+<pre>
++----+-------+
+| Id | Score |
++----+-------+
+| 1  | 3.50  |
+| 2  | 3.65  |
+| 3  | 4.00  |
+| 4  | 3.85  |
+| 5  | 4.00  |
+| 6  | 3.65  |
++----+-------+
+</pre>
+<p>For example, given the above <code>Scores</code> table, your query should generate the following report (order by highest score):</p>
+<pre>
++-------+------+
+| Score | Rank |
++-------+------+
+| 4.00  | 1    |
+| 4.00  | 1    |
+| 3.85  | 2    |
+| 3.65  | 3    |
+| 3.65  | 3    |
+| 3.50  | 4    |
++-------+------+
+</pre>
+<div id="solution-3" class="section level3">
+<h3>Solution</h3>
+<pre class="mysql"><code>SELECT s.Score, COUNT(t.Score) as Rank FROM
+(SELECT DISTINCT Score from Scores) AS t, Scores as s
+WHERE s.Score &lt;= t.Score
+GROUP BY s.Id, s.Score
+ORDER BY s.Score DESC;</code></pre>
+<p>The idea here is to use two <code>Scores</code> tables side-by-side, one used to keep track of scores, and one used to calculate the rank of them. Note that the rank is decided by <strong>how many other distinct scores you are higher than.</strong> After that, all you need to do is to group them by <code>Id</code> and <code>Score</code>, then order the scores by descending order.</p>
+</div>
+</div>
+<div id="consecutive-numbers" class="section level2">
+<h2>180. Consecutive Numbers</h2>
+<p>Write a SQL query to find all numbers that appear at least three times consecutively.</p>
+<pre>
++----+-----+
+| Id | Num |
++----+-----+
+| 1  |  1  |
+| 2  |  1  |
+| 3  |  1  |
+| 4  |  2  |
+| 5  |  1  |
+| 6  |  2  |
+| 7  |  2  |
++----+-----+
+</pre>
+<p>For example, given the above <code>Logs</code> table, <code>1</code> is the only number that appears consecutively for at least three times.</p>
+<pre>
++-----------------+
+| ConsecutiveNums |
++-----------------+
+| 1               |
++-----------------+
+</pre>
+<div id="solution-4" class="section level3">
+<h3>Solution</h3>
+<pre class="mysql"><code>SELECT DISTINCT
+    l1.Num AS ConsecutiveNums
+FROM
+    Logs l1,
+    Logs l2,
+    Logs l3
+WHERE
+    l1.Id = l2.Id - 1
+    AND l2.Id = l3.Id - 1
+    AND l1.Num = l2.Num
+    AND l2.Num = l3.Num
+;</code></pre>
+<p>Just keep in your mind that what constitutes a record of 3 consecutive numbers?</p>
+<ol style="list-style-type: decimal">
+<li>Consecutive <code>Id</code>s.</li>
+<li>The same <code>Num</code>.</li>
+</ol>
+</div>
+</div>
+<div id="employees-earning-more-than-their-managers" class="section level2">
+<h2>181. Employees Earning More Than Their Managers</h2>
+<p>The <code>Employee</code> table holds all employees including their managers. Every employee has an Id, and there is also a column for the manager Id.</p>
+<pre>
++----+-------+--------+-----------+
+| Id | Name  | Salary | ManagerId |
++----+-------+--------+-----------+
+| 1  | Joe   | 70000  | 3         |
+| 2  | Henry | 80000  | 4         |
+| 3  | Sam   | 60000  | NULL      |
+| 4  | Max   | 90000  | NULL      |
++----+-------+--------+-----------+
+</pre>
+<p>Given the <code>Employee</code> table, write a SQL query that finds out employees who earn more than their managers. For the above table, Joe is the only employee who earns more than his manager.</p>
+<pre>
++----------+
+| Employee |
++----------+
+| Joe      |
++----------+
+</pre>
+<div id="solution-5" class="section level3">
+<h3>Solution</h3>
+<pre class="mysql"><code>SELECT e1.Name as Employee
+FROM Employee as e1
+JOIN Employee as e2 on e1.ManagerId = e2.Id
+WHERE e1.Salary &gt; e2.Salary;</code></pre>
+</div>
+</div>
+<div id="duplicate-emails" class="section level2">
+<h2>182. Duplicate Emails</h2>
+<p>Write a SQL query to find all duplicate emails in a table named <code>Person</code>.</p>
+<pre>
++----+---------+
+| Id | Email   |
++----+---------+
+| 1  | a@b.com |
+| 2  | c@d.com |
+| 3  | a@b.com |
++----+---------+
+</pre>
+<p>For example, your query should return the following for the above table:</p>
+<pre>
++---------+
+| Email   |
++---------+
+| a@b.com |
++---------+
+</pre>
+<div id="solution-6" class="section level3">
+<h3>Solution</h3>
+<pre class="mysql"><code>SELECT Email
+FROM Person
+GROUP BY EMAIL
+HAVING COUNT(*)&gt;1;</code></pre>
+</div>
+</div>
+<div id="customers-who-never-order" class="section level2">
+<h2>183. Customers Who Never Order</h2>
+<p>Suppose that a website contains two tables, the <code>Customers</code> table and the <code>Orders</code> table. Write a SQL query to find all customers who never order anything.</p>
+<p>Table: <code>Customers</code>.</p>
+<pre>
++----+-------+
+| Id | Name  |
++----+-------+
+| 1  | Joe   |
+| 2  | Henry |
+| 3  | Sam   |
+| 4  | Max   |
++----+-------+
+</pre>
+<p>Table: <code>Orders</code>.</p>
+<pre>
++----+------------+
+| Id | CustomerId |
++----+------------+
+| 1  | 3          |
+| 2  | 1          |
++----+------------+
+</pre>
+<p>Using the above tables as example, return the following:</p>
+<pre>
++-----------+
+| Customers |
++-----------+
+| Henry     |
+| Max       |
++-----------+
+</pre>
+<div id="solution-7" class="section level3">
+<h3>Solution</h3>
+<pre class="mysql"><code>SELECT Name AS Customers
+FROM Customers
+LEFT JOIN Orders
+ON Customers.Id = Orders.CustomerId
+WHERE Orders.Id IS NULL;</code></pre>
+</div>
+</div>
+<div id="department-highest-salary" class="section level2">
+<h2>184. Department Highest Salary</h2>
+<p>The <code>Employee</code> table holds all employees. Every employee has an Id, a salary, and there is also a column for the department Id.</p>
+<pre>
++----+-------+--------+--------------+
+| Id | Name  | Salary | DepartmentId |
++----+-------+--------+--------------+
+| 1  | Joe   | 70000  | 1            |
+| 2  | Jim   | 90000  | 1            |
+| 3  | Henry | 80000  | 2            |
+| 4  | Sam   | 60000  | 2            |
+| 5  | Max   | 90000  | 1            |
++----+-------+--------+--------------+
+</pre>
+<p>The <code>Department</code> table holds all departments of the company.</p>
+<pre>
++----+----------+
+| Id | Name     |
++----+----------+
+| 1  | IT       |
+| 2  | Sales    |
++----+----------+
+</pre>
+<p>Write a SQL query to find employees who have the highest salary in each of the departments. For the above tables, your SQL query should return the following rows (order of rows does not matter).</p>
+<pre>
++------------+----------+--------+
+| Department | Employee | Salary |
++------------+----------+--------+
+| IT         | Max      | 90000  |
+| IT         | Jim      | 90000  |
+| Sales      | Henry    | 80000  |
++------------+----------+--------+
+</pre>
+<p>Explanation:</p>
+<p>Max and Jim both have the highest salary in the IT department and Henry has the highest salary in the Sales department.</p>
+<div id="solution-8" class="section level3">
+<h3>Solution</h3>
+<pre class="mysql"><code># inner join without a join
+SELECT Department.Name as Department, Employee.Name as Employee, Employee.Salary
+FROM Employee, Department
+WHERE Employee.DepartmentId = Department.Id
+    AND Employee.Salary = (
+        SELECT MAX(Salary) FROM Employee AS temp WHERE temp.DepartmentId=Employee.DepartmentId
+    );</code></pre>
+</div>
+</div>
+<div id="department-top-three-salaries" class="section level2">
+<h2>185. Department Top Three Salaries</h2>
+<p>The <code>Employee</code> table holds all employees. Every employee has an Id, and there is also a column for the department Id.</p>
+<table style="width:51%;">
+<colgroup>
+<col width="6%" />
+<col width="11%" />
+<col width="12%" />
+<col width="20%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><p>Id</p></td>
+<td><p>Name</p></td>
+<td><p>Salary</p></td>
+<td><p>DepartmentId</p></td>
+</tr>
+<tr class="even">
+<td><p>1 2 3 4 5 6 7</p></td>
+<td><p>Joe Henry Sam Max Janet Randy Will</p></td>
+<td><p>85000 80000 60000 90000 69000 85000 70000</p></td>
+<td><p>1 2 2 1 1 1 1</p></td>
+</tr>
+</tbody>
+</table>
+<p>The <code>Department</code> table holds all departments of the company.</p>
+<table style="width:22%;">
+<colgroup>
+<col width="6%" />
+<col width="15%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><p>Id</p></td>
+<td><p>Name</p></td>
+</tr>
+<tr class="even">
+<td><p>1 2</p></td>
+<td><p>IT Sales</p></td>
+</tr>
+</tbody>
+</table>
+<p>Write a SQL query to find employees who earn the top three salaries in each of the department. For the above tables, your SQL query should return the following rows (order of rows does not matter).</p>
+<pre>
++------------+----------+--------+
+| Department | Employee | Salary |
++------------+----------+--------+
+| IT         | Max      | 90000  |
+| IT         | Randy    | 85000  |
+| IT         | Joe      | 85000  |
+| IT         | Will     | 70000  |
+| Sales      | Henry    | 80000  |
+| Sales      | Sam      | 60000  |
++------------+----------+--------+
+</pre>
+<p>Explanation:</p>
+<p>In IT department, Max earns the highest salary, both Randy and Joe earn the second highest salary, and Will earns the third highest salary. There are only two employees in the Sales department, Henry earns the highest salary while Sam earns the second highest salary.</p>
+<div id="solution-9" class="section level3">
+<h3>Solution</h3>
+<p><strong>Note:</strong> Top 3 highest (without order) means there are less than 3 people having higher salaries than him or her.</p>
+<pre class="mysql"><code>SELECT
+    d.Name AS &#39;Department&#39;, e1.Name AS &#39;Employee&#39;, e1.Salary
+FROM
+    Employee e1
+        JOIN
+    Department d ON e1.DepartmentId = d.Id
+WHERE
+    3 &gt; (SELECT
+            COUNT(DISTINCT e2.Salary)
+         FROM
+            Employee e2
+         WHERE
+            e2.Salary &gt; e1.Salary
+                AND e1.DepartmentId = e2.DepartmentID
+        )
+;</code></pre>
+</div>
+</div>
+<div id="delete-duplicate-emails" class="section level2">
+<h2>196. Delete Duplicate Emails</h2>
+<p>Write a SQL query to delete all duplicate email entries in a table named <code>Person</code>, keeping only unique emails based on its smallest <code>Id</code>.</p>
+<pre>
++----+------------------+
+| Id | Email            |
++----+------------------+
+| 1  | john@example.com |
+| 2  | bob@example.com  |
+| 3  | john@example.com |
++----+------------------+
+</pre>
+<p><code>Id</code> is the primary key column for this table.</p>
+<p>For example, after running your query, the above <code>Person</code> table should have the following rows:</p>
+<pre>
++----+------------------+
+| Id | Email            |
++----+------------------+
+| 1  | john@example.com |
+| 2  | bob@example.com  |
++----+------------------+
+</pre>
+<p><strong>Note:</strong> Your output is the whole <code>Person</code> table after executing your sql. Use <code>delete</code> statement.</p>
+<div id="solution-10" class="section level3">
+<h3>Solution</h3>
+<pre class="mysql"><code>DELETE p1 FROM Person AS p1
+JOIN Person AS p2 ON p1.Email=p2.Email AND p1.Id&gt;p2.Id;</code></pre>
+</div>
+</div>
+<div id="rising-temperature" class="section level2">
+<h2>197. Rising Temperature</h2>
+<p>Given a <code>Weather</code> table, write a SQL query to find all dates’ Ids with higher temperature compared to its previous (yesterday’s) dates.</p>
+<pre>
++---------+------------------+------------------+
+| Id(INT) | RecordDate(DATE) | Temperature(INT) |
++---------+------------------+------------------+
+|       1 |       2015-01-01 |               10 |
+|       2 |       2015-01-02 |               25 |
+|       3 |       2015-01-03 |               20 |
+|       4 |       2015-01-04 |               30 |
++---------+------------------+------------------+
+</pre>
+<p>For example, return the following Ids for the above <code>Weather</code> table:</p>
+<pre>
++----+
+| Id |
++----+
+|  2 |
+|  4 |
++----+
+</pre>
+<div id="solution-11" class="section level3">
+<h3>Solution</h3>
+<pre class="mysql"><code>SELECT w1.Id
+FROM Weather AS w1, Weather AS w2
+WHERE DATEDIFF(w1.RecordDate,w2.RecordDate)=1 AND w1.Temperature&gt;w2.Temperature;</code></pre>
+<p><strong>Note:</strong> I first tried with <code>w1.RecordDate=w2.RecordDate+1</code>. It worked with some test cases, but failed in some. Seems that I need to take a look at datetime arithmetic in SQL later.</p>
+</div>
+</div>
+<div id="to-be-continued" class="section level2">
+<h2>To be continued…</h2>
+<hr />
+<p>I also practiced adding table of contents in a blogdown post by setting the <code>output</code> parameter.</p>
+<p>As Yihui mentions in this <a href="https://github.com/yihui/hugo-xmin/pull/7">pull request</a>, all you need to do is add this in YAML:</p>
+<pre class="yaml"><code>output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 2</code></pre>
+<p><code>toc_depth: 2</code> means it will show up to 2 levels of headers.</p>
+</div>

@@ -1,0 +1,599 @@
+---
+title: LeetCode Database Notes (42 Problems)
+author: Qiū Ruì
+date: '2019-04-22'
+slug: leetcode-database-notes-42-problems
+categories: []
+tags:
+  - SQL
+  - LeetCode
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 2
+meta_img: image/image.png
+description: Description for the page.
+---
+
+***Updated on 2019-04-23.***
+
+
+✅ #175
+✅ #176
+✅ #177
+✅ #178
+✅ #180
+✅ #181
+✅ #182
+✅ #183
+✅ #184
+✅ #185
+✅ #196
+✅ #197
+❌ #262
+❌ #569
+❌ #570
+❌ #571
+❌ #574
+❌ #577
+❌ #578
+❌ #579
+❌ #580
+❌ #584
+❌ #585
+❌ #586
+❌ #595
+❌ #596
+❌ #597
+❌ #601
+❌ #602
+❌ #603
+❌ #607
+❌ #608
+❌ #610
+❌ #612
+❌ #613
+❌ #614
+❌ #615
+❌ #618
+❌ #619
+❌ #620
+❌ #626
+❌ #627
+
+## 175. Combine Two Tables
+
+Table: `Person`
+
+<pre><output>
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| PersonId    | int     |
+| FirstName   | varchar |
+| LastName    | varchar |
++-------------+---------+
+</output></pre>
+
+`PersonId` is the primary key column for this table.
+
+Table: `Address`
+
+<pre>
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| AddressId   | int     |
+| PersonId    | int     |
+| City        | varchar |
+| State       | varchar |
++-------------+---------+
+</pre>
+
+`AddressId` is the primary key column for this table.
+
+Write a SQL query for a report that provides the following information for each person in the Person table, regardless if there is an address for each of those people:
+
+    FirstName, LastName, City, State
+
+### Solution
+
+```mysql
+SELECT FirstName, LastName, City, State
+FROM Person 
+LEFT JOIN Address ON Person.PersonId = Address.PersonId;
+```
+
+Note: There is no `FULL JOIN` in MySQL.
+
+## 176. Second Highest Salary
+
+Write a SQL query to get the second highest salary from the `Employee` table.
+
+<pre>
++----+--------+
+| Id | Salary |
++----+--------+
+| 1  | 100    |
+| 2  | 200    |
+| 3  | 300    |
++----+--------+
+</pre>
+
+For example, given the above Employee table, the query should return `200` as the second highest salary. If there is no second highest salary, then the query should return `null`.
+
+<pre>
++---------------------+
+| SecondHighestSalary |
++---------------------+
+| 200                 |
++---------------------+
+</pre>
+
+### Solution
+
+```MySQL
+SELECT MAX(Salary) as SecondHighestSalary
+FROM Employee
+WHERE Salary < (SELECT MAX(Salary) FROM Employee);
+```
+
+## 177. Nth Highest Salary
+
+Write a SQL query to get the nth highest salary from the `Employee` table.
+
+<pre>
++----+--------+
+| Id | Salary |
++----+--------+
+| 1  | 100    |
+| 2  | 200    |
+| 3  | 300    |
++----+--------+
+</pre>
+
+For example, given the above Employee table, the nth highest salary where n = 2 is `200`. If there is no nth highest salary, then the query should return `null`.
+
+<pre>
++------------------------+
+| getNthHighestSalary(2) |
++------------------------+
+| 200                    |
++------------------------+
+</pre>
+
+### Solution
+
+```mysql
+CREATE FUNCTION getNthHighestSalary(N INT) RETURNS INT
+BEGIN
+  SET N = N-1;
+  RETURN (
+      SELECT DISTINCT Salary FROM Employee ORDER BY Salary DESC LIMIT 1 OFFSET N 
+  );
+END
+```
+
+The idea is to use `LIMIT` and `OFFSET` in MySQL to skip those first `N-1` higher salaries than the nth one you really need to pick out.
+
+## 178. Rank Scores
+
+Write a SQL query to rank scores. If there is a tie between two scores, both should have the same ranking. Note that after a tie, the next ranking number should be the next consecutive integer value. In other words, there should be no "holes" between ranks.
+
+<pre>
++----+-------+
+| Id | Score |
++----+-------+
+| 1  | 3.50  |
+| 2  | 3.65  |
+| 3  | 4.00  |
+| 4  | 3.85  |
+| 5  | 4.00  |
+| 6  | 3.65  |
++----+-------+
+</pre>
+
+For example, given the above `Scores` table, your query should generate the following report (order by highest score):
+
+<pre>
++-------+------+
+| Score | Rank |
++-------+------+
+| 4.00  | 1    |
+| 4.00  | 1    |
+| 3.85  | 2    |
+| 3.65  | 3    |
+| 3.65  | 3    |
+| 3.50  | 4    |
++-------+------+
+</pre>
+
+### Solution
+
+```mysql
+SELECT s.Score, COUNT(t.Score) as Rank FROM
+(SELECT DISTINCT Score from Scores) AS t, Scores as s
+WHERE s.Score <= t.Score
+GROUP BY s.Id, s.Score
+ORDER BY s.Score DESC;
+```
+
+The idea here is to use two `Scores` tables side-by-side, one used to keep track of scores, and one used to calculate the rank of them. Note that the rank is decided by **how many other distinct scores you are higher than.** After that, all you need to do is to group them by `Id` and `Score`, then order the scores by descending order.
+
+## 180. Consecutive Numbers
+
+Write a SQL query to find all numbers that appear at least three times consecutively.
+
+<pre>
++----+-----+
+| Id | Num |
++----+-----+
+| 1  |  1  |
+| 2  |  1  |
+| 3  |  1  |
+| 4  |  2  |
+| 5  |  1  |
+| 6  |  2  |
+| 7  |  2  |
++----+-----+
+</pre>
+
+For example, given the above `Logs` table, `1` is the only number that appears consecutively for at least three times.
+
+<pre>
++-----------------+
+| ConsecutiveNums |
++-----------------+
+| 1               |
++-----------------+
+</pre>
+
+### Solution
+
+```mysql
+SELECT DISTINCT
+    l1.Num AS ConsecutiveNums
+FROM
+    Logs l1,
+    Logs l2,
+    Logs l3
+WHERE
+    l1.Id = l2.Id - 1
+    AND l2.Id = l3.Id - 1
+    AND l1.Num = l2.Num
+    AND l2.Num = l3.Num
+;
+```
+
+Just keep in your mind that what constitutes a record of 3 consecutive numbers?
+
+1. Consecutive `Id`s.
+2. The same `Num`.
+
+## 181. Employees Earning More Than Their Managers
+
+The `Employee` table holds all employees including their managers. Every employee has an Id, and there is also a column for the manager Id.
+
+<pre>
++----+-------+--------+-----------+
+| Id | Name  | Salary | ManagerId |
++----+-------+--------+-----------+
+| 1  | Joe   | 70000  | 3         |
+| 2  | Henry | 80000  | 4         |
+| 3  | Sam   | 60000  | NULL      |
+| 4  | Max   | 90000  | NULL      |
++----+-------+--------+-----------+
+</pre>
+
+Given the `Employee` table, write a SQL query that finds out employees who earn more than their managers. For the above table, Joe is the only employee who earns more than his manager.
+
+<pre>
++----------+
+| Employee |
++----------+
+| Joe      |
++----------+
+</pre>
+
+### Solution
+
+```mysql
+SELECT e1.Name as Employee
+FROM Employee as e1
+JOIN Employee as e2 on e1.ManagerId = e2.Id
+WHERE e1.Salary > e2.Salary;
+```
+
+## 182. Duplicate Emails
+
+Write a SQL query to find all duplicate emails in a table named `Person`.
+
+<pre>
++----+---------+
+| Id | Email   |
++----+---------+
+| 1  | a@b.com |
+| 2  | c@d.com |
+| 3  | a@b.com |
++----+---------+
+</pre>
+
+For example, your query should return the following for the above table:
+
+<pre>
++---------+
+| Email   |
++---------+
+| a@b.com |
++---------+
+</pre>
+
+### Solution
+
+```mysql
+SELECT Email
+FROM Person
+GROUP BY EMAIL
+HAVING COUNT(*)>1;
+```
+
+## 183. Customers Who Never Order
+
+Suppose that a website contains two tables, the `Customers` table and the `Orders` table. Write a SQL query to find all customers who never order anything.
+
+Table: `Customers`.
+
+<pre>
++----+-------+
+| Id | Name  |
++----+-------+
+| 1  | Joe   |
+| 2  | Henry |
+| 3  | Sam   |
+| 4  | Max   |
++----+-------+
+</pre>
+
+Table: `Orders`.
+
+<pre>
++----+------------+
+| Id | CustomerId |
++----+------------+
+| 1  | 3          |
+| 2  | 1          |
++----+------------+
+</pre>
+
+Using the above tables as example, return the following:
+
+<pre>
++-----------+
+| Customers |
++-----------+
+| Henry     |
+| Max       |
++-----------+
+</pre>
+
+### Solution
+
+```mysql
+SELECT Name AS Customers
+FROM Customers
+LEFT JOIN Orders
+ON Customers.Id = Orders.CustomerId
+WHERE Orders.Id IS NULL;
+```
+
+## 184. Department Highest Salary
+
+The `Employee` table holds all employees. Every employee has an Id, a salary, and there is also a column for the department Id.
+
+<pre>
++----+-------+--------+--------------+
+| Id | Name  | Salary | DepartmentId |
++----+-------+--------+--------------+
+| 1  | Joe   | 70000  | 1            |
+| 2  | Jim   | 90000  | 1            |
+| 3  | Henry | 80000  | 2            |
+| 4  | Sam   | 60000  | 2            |
+| 5  | Max   | 90000  | 1            |
++----+-------+--------+--------------+
+</pre>
+
+The `Department` table holds all departments of the company.
+
+<pre>
++----+----------+
+| Id | Name     |
++----+----------+
+| 1  | IT       |
+| 2  | Sales    |
++----+----------+
+</pre>
+
+Write a SQL query to find employees who have the highest salary in each of the departments. For the above tables, your SQL query should return the following rows (order of rows does not matter).
+
+<pre>
++------------+----------+--------+
+| Department | Employee | Salary |
++------------+----------+--------+
+| IT         | Max      | 90000  |
+| IT         | Jim      | 90000  |
+| Sales      | Henry    | 80000  |
++------------+----------+--------+
+</pre>
+
+Explanation:
+
+Max and Jim both have the highest salary in the IT department and Henry has the highest salary in the Sales department.
+
+### Solution
+
+```mysql
+# inner join without a join
+SELECT Department.Name as Department, Employee.Name as Employee, Employee.Salary
+FROM Employee, Department
+WHERE Employee.DepartmentId = Department.Id
+    AND Employee.Salary = (
+        SELECT MAX(Salary) FROM Employee AS temp WHERE temp.DepartmentId=Employee.DepartmentId
+    );
+```
+
+## 185. Department Top Three Salaries
+
+The `Employee` table holds all employees. Every employee has an Id, and there is also a column for the department Id.
+
++----+-------+--------+--------------+
+| Id | Name  | Salary | DepartmentId |
++----+-------+--------+--------------+
+| 1  | Joe   | 85000  | 1            |
+| 2  | Henry | 80000  | 2            |
+| 3  | Sam   | 60000  | 2            |
+| 4  | Max   | 90000  | 1            |
+| 5  | Janet | 69000  | 1            |
+| 6  | Randy | 85000  | 1            |
+| 7  | Will  | 70000  | 1            |
++----+-------+--------+--------------+
+
+The `Department` table holds all departments of the company.
+
++----+----------+
+| Id | Name     |
++----+----------+
+| 1  | IT       |
+| 2  | Sales    |
++----+----------+
+
+Write a SQL query to find employees who earn the top three salaries in each of the department. For the above tables, your SQL query should return the following rows (order of rows does not matter).
+
+<pre>
++------------+----------+--------+
+| Department | Employee | Salary |
++------------+----------+--------+
+| IT         | Max      | 90000  |
+| IT         | Randy    | 85000  |
+| IT         | Joe      | 85000  |
+| IT         | Will     | 70000  |
+| Sales      | Henry    | 80000  |
+| Sales      | Sam      | 60000  |
++------------+----------+--------+
+</pre>
+
+Explanation:
+
+In IT department, Max earns the highest salary, both Randy and Joe earn the second highest salary, and Will earns the third highest salary. There are only two employees in the Sales department, Henry earns the highest salary while Sam earns the second highest salary.
+
+### Solution
+
+**Note:** Top 3 highest (without order) means there are less than 3 people having higher salaries than him or her.
+
+```mysql
+SELECT
+    d.Name AS 'Department', e1.Name AS 'Employee', e1.Salary
+FROM
+    Employee e1
+        JOIN
+    Department d ON e1.DepartmentId = d.Id
+WHERE
+    3 > (SELECT
+            COUNT(DISTINCT e2.Salary)
+         FROM
+            Employee e2
+         WHERE
+            e2.Salary > e1.Salary
+                AND e1.DepartmentId = e2.DepartmentID
+        )
+;
+```
+
+## 196. Delete Duplicate Emails
+
+Write a SQL query to delete all duplicate email entries in a table named `Person`, keeping only unique emails based on its smallest `Id`.
+
+<pre>
++----+------------------+
+| Id | Email            |
++----+------------------+
+| 1  | john@example.com |
+| 2  | bob@example.com  |
+| 3  | john@example.com |
++----+------------------+
+</pre>
+
+`Id` is the primary key column for this table.
+
+For example, after running your query, the above `Person` table should have the following rows:
+
+<pre>
++----+------------------+
+| Id | Email            |
++----+------------------+
+| 1  | john@example.com |
+| 2  | bob@example.com  |
++----+------------------+
+</pre>
+
+**Note:** Your output is the whole `Person` table after executing your sql. Use `delete` statement.
+
+### Solution
+
+```mysql
+DELETE p1 FROM Person AS p1
+JOIN Person AS p2 ON p1.Email=p2.Email AND p1.Id>p2.Id;
+```
+
+## 197. Rising Temperature
+
+Given a `Weather` table, write a SQL query to find all dates' Ids with higher temperature compared to its previous (yesterday's) dates.
+
+<pre>
++---------+------------------+------------------+
+| Id(INT) | RecordDate(DATE) | Temperature(INT) |
++---------+------------------+------------------+
+|       1 |       2015-01-01 |               10 |
+|       2 |       2015-01-02 |               25 |
+|       3 |       2015-01-03 |               20 |
+|       4 |       2015-01-04 |               30 |
++---------+------------------+------------------+
+</pre>
+
+For example, return the following Ids for the above `Weather` table:
+
+<pre>
++----+
+| Id |
++----+
+|  2 |
+|  4 |
++----+
+</pre>
+
+
+### Solution
+
+```mysql
+SELECT w1.Id
+FROM Weather AS w1, Weather AS w2
+WHERE DATEDIFF(w1.RecordDate,w2.RecordDate)=1 AND w1.Temperature>w2.Temperature;
+```
+
+**Note:** I first tried with `w1.RecordDate=w2.RecordDate+1`. It worked with some test cases, but failed in some. Seems that I need to take a look at datetime arithmetic in SQL later.
+
+## To be continued...
+
+***
+
+I also practiced adding table of contents in a blogdown post by setting the `output` parameter.
+
+As Yihui mentions in this [pull request](https://github.com/yihui/hugo-xmin/pull/7), all you need to do is add this in YAML:
+
+```yaml
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 2
+```
+
+`toc_depth: 2` means it will show up to 2 levels of headers.
