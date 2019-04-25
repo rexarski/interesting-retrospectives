@@ -15,7 +15,7 @@ meta_img: image/image.png
 description: Description for the page.
 ---
 
-***Updated on 2019-04-23.***
+***Updated on 2019-04-26.***
 
 
 ✅ #175
@@ -30,7 +30,7 @@ description: Description for the page.
 ✅ #185
 ✅ #196
 ✅ #197
-❌ #262
+✅ #262
 ❌ #569
 ❌ #570
 ❌ #571
@@ -42,10 +42,10 @@ description: Description for the page.
 ❌ #584
 ❌ #585
 ❌ #586
-❌ #595
-❌ #596
+✅ #595
+✅ #596
 ❌ #597
-❌ #601
+✅ #601
 ❌ #602
 ❌ #603
 ❌ #607
@@ -57,9 +57,9 @@ description: Description for the page.
 ❌ #615
 ❌ #618
 ❌ #619
-❌ #620
-❌ #626
-❌ #627
+✅ #620
+✅ #626
+✅ #627
 
 ## 175. Combine Two Tables
 
@@ -581,7 +581,392 @@ WHERE DATEDIFF(w1.RecordDate,w2.RecordDate)=1 AND w1.Temperature>w2.Temperature;
 
 **Note:** I first tried with `w1.RecordDate=w2.RecordDate+1`. It worked with some test cases, but failed in some. Seems that I need to take a look at datetime arithmetic in SQL later.
 
-## To be continued...
+## 262. Trips and Users
+
+The `Trips` table holds all taxi trips. Each trip has a unique Id, while Client_Id and Driver_Id are both foreign keys to the `Users_Id` at the Users table. Status is an ENUM type of (‘completed’, ‘cancelled_by_driver’, ‘cancelled_by_client’).
+
+<pre>
++----+-----------+-----------+---------+--------------------+----------+
+| Id | Client_Id | Driver_Id | City_Id |        Status      |Request_at|
++----+-----------+-----------+---------+--------------------+----------+
+| 1  |     1     |    10     |    1    |     completed      |2013-10-01|
+| 2  |     2     |    11     |    1    | cancelled_by_driver|2013-10-01|
+| 3  |     3     |    12     |    6    |     completed      |2013-10-01|
+| 4  |     4     |    13     |    6    | cancelled_by_client|2013-10-01|
+| 5  |     1     |    10     |    1    |     completed      |2013-10-02|
+| 6  |     2     |    11     |    6    |     completed      |2013-10-02|
+| 7  |     3     |    12     |    6    |     completed      |2013-10-02|
+| 8  |     2     |    12     |    12   |     completed      |2013-10-03|
+| 9  |     3     |    10     |    12   |     completed      |2013-10-03| 
+| 10 |     4     |    13     |    12   | cancelled_by_driver|2013-10-03|
++----+-----------+-----------+---------+--------------------+----------+
+</pre>
+
+The `Users` table holds all users. Each user has an unique Users_Id, and Role is an ENUM type of (‘client’, ‘driver’, ‘partner’).
+
+<pre>
++----------+--------+--------+
+| Users_Id | Banned |  Role  |
++----------+--------+--------+
+|    1     |   No   | client |
+|    2     |   Yes  | client |
+|    3     |   No   | client |
+|    4     |   No   | client |
+|    10    |   No   | driver |
+|    11    |   No   | driver |
+|    12    |   No   | driver |
+|    13    |   No   | driver |
++----------+--------+--------+
+</pre>
+
+Write a SQL query to find the cancellation rate of requests made by unbanned users between **Oct 1, 2013** and **Oct 3, 2013**. For the above tables, your SQL query should return the following rows with the cancellation rate being rounded to two decimal places.
+
+<pre>
++------------+-------------------+
+|     Day    | Cancellation Rate |
++------------+-------------------+
+| 2013-10-01 |       0.33        |
+| 2013-10-02 |       0.00        |
+| 2013-10-03 |       0.50        |
++------------+-------------------+
+</pre>
+
+### Solution
+
+```mysql
+SELECT
+    Trips.Request_at As Day,
+    round(sum(if(status != 'completed', 1, 0)) / sum(1), 2) AS 'Cancellation Rate' 
+FROM
+    Trips 
+JOIN
+    Users ON Trips.Client_Id = Users.Users_Id
+WHERE
+    Users.Banned = "No"
+    AND Trips.Request_at BETWEEN "2013-10-01" AND "2013-10-03"
+GROUP BY
+    Day;
+```
+
+## 569. Median Employee Salary
+
+## 570. Managers with at Least 5 Direct Reports
+
+## 571. Find Median Given Frequency of Numbers
+
+## 574. Winning Candidates
+
+## 577. Employee Bonus
+
+## 578. Get Highest Answer Rate Question
+
+## 579. Find Cumulative Salary of an Employee
+
+## 580. Count Student Number in Departments
+
+## 584. Find Customer Referee
+
+## 585. Investments in 2016
+
+## 586. Customer Placing the Largest Number of Orders
+
+## 595. Big Countries
+
+There is a table `World`
+
+<pre>
++-----------------+------------+------------+--------------+---------------+
+| name            | continent  | area       | population   | gdp           |
++-----------------+------------+------------+--------------+---------------+
+| Afghanistan     | Asia       | 652230     | 25500100     | 20343000      |
+| Albania         | Europe     | 28748      | 2831741      | 12960000      |
+| Algeria         | Africa     | 2381741    | 37100000     | 188681000     |
+| Andorra         | Europe     | 468        | 78115        | 3712000       |
+| Angola          | Africa     | 1246700    | 20609294     | 100990000     |
++-----------------+------------+------------+--------------+---------------+
+</pre>
+
+A country is big if it has an area of bigger than 3 million square km or a population of more than 25 million.
+
+Write a SQL solution to output big countries' name, population and area.
+
+For example, according to the above table, we should output:
+
+<pre>
++--------------+-------------+--------------+
+| name         | population  | area         |
++--------------+-------------+--------------+
+| Afghanistan  | 25500100    | 652230       |
+| Algeria      | 37100000    | 2381741      |
++--------------+-------------+--------------+
+</pre>
+
+### Solution
+
+```mysql
+select name, population, area
+from World
+where area > 3000000 or population > 25000000;
+```
+
+## 596. Classes More Than 5 Students
+
+There is a table `courses` with columns: **student** and **class**
+
+Please list out all classes which have more than or equal to 5 students.
+
+For example, the table:
+
+<pre>
++---------+------------+
+| student | class      |
++---------+------------+
+| A       | Math       |
+| B       | English    |
+| C       | Math       |
+| D       | Biology    |
+| E       | Math       |
+| F       | Computer   |
+| G       | Math       |
+| H       | Math       |
+| I       | Math       |
++---------+------------+
+</pre>
+
+Should output:
+
+<pre>
++---------+
+| class   |
++---------+
+| Math    |
++---------+
+</pre>
+
+**Note:** The students should not be counted duplicate in each course.
+
+### Solution
+
+```mysql
+select class
+from (select
+      class, count(DISTINCT student) as num
+      from
+      courses
+      group by class) as temp_table
+where num >= 5;
+```
+
+## 597. Friend Requests I: Overall Acceptance Rate
+
+## 601. Human Trafic of Stadium
+
+X city built a new stadium, each day many people visit it and the stats are saved as these columns: **id, visit_date, people**
+
+Please write a query to display the records which have 3 or more consecutive rows and the amount of people more than 100(inclusive).
+
+For example, the table `stadium`: 
+
+<pre>
++------+------------+-----------+
+| id   | visit_date | people    |
++------+------------+-----------+
+| 1    | 2017-01-01 | 10        |
+| 2    | 2017-01-02 | 109       |
+| 3    | 2017-01-03 | 150       |
+| 4    | 2017-01-04 | 99        |
+| 5    | 2017-01-05 | 145       |
+| 6    | 2017-01-06 | 1455      |
+| 7    | 2017-01-07 | 199       |
+| 8    | 2017-01-08 | 188       |
++------+------------+-----------+
+</pre>
+
+For the sample data above, the output is:
+
+<pre>
++------+------------+-----------+
+| id   | visit_date | people    |
++------+------------+-----------+
+| 5    | 2017-01-05 | 145       |
+| 6    | 2017-01-06 | 1455      |
+| 7    | 2017-01-07 | 199       |
+| 8    | 2017-01-08 | 188       |
++------+------------+-----------+
+</pre>
+
+**Note:** Each day only have one row record, and the dates are increasing with id increasing.
+
+### Solution
+
+```mysql
+select distinct t1.*
+from stadium t1, stadium t2, stadium t3
+where t1.people>=100 and t2.people>=100 and t3.people>=100 and
+(
+(t1.id-t2.id=1 and t1.id-t3.id=2 and t2.id-t3.id=1)
+or
+(t2.id-t1.id=1 and t2.id-t3.id=2 and t1.id-t3.id=1)
+or
+(t3.id-t2.id=1 and t2.id-t1.id=1 and t3.id-t1.id=2)
+)
+order by t1.id;
+```
+
+## 602. Friend Requests II: Who Has the Most Friends
+
+## 603. Consecutive Available Seats
+
+## 607. Sales Person
+
+## 608. Tree Node
+
+## 610. Triangle Judgement
+
+## 612. Shortest Distance in a Plane
+
+## 613. Shortest Distance in a Line
+
+## 614. Second Degree Follower
+
+## 615. Average Salary: Departments VS Company
+
+## 618. Students Report By Geography
+
+## 619. Biggest Single Number
+
+## 620. Not Boring Movies
+
+X city opened a new cinema, many people would like to go to this cinema. The cinema also gives out a poster indicating the movies’ ratings and descriptions.
+
+Please write a SQL query to output movies with an odd numbered ID and a description that is not 'boring'. Order the result by rating.
+
+For example, table `cinema`:
+
+<pre>
++---------+-----------+--------------+-----------+
+|   id    | movie     |  description |  rating   |
++---------+-----------+--------------+-----------+
+|   1     | War       |   great 3D   |   8.9     |
+|   2     | Science   |   fiction    |   8.5     |
+|   3     | irish     |   boring     |   6.2     |
+|   4     | Ice song  |   Fantacy    |   8.6     |
+|   5     | House card|   Interesting|   9.1     |
++---------+-----------+--------------+-----------+
+</pre>
+
+For the example above, the output should be: 
+
+<pre>
++---------+-----------+--------------+-----------+
+|   id    | movie     |  description |  rating   |
++---------+-----------+--------------+-----------+
+|   5     | House card|   Interesting|   9.1     |
+|   1     | War       |   great 3D   |   8.9     |
++---------+-----------+--------------+-----------+
+</pre>
+
+### Solution
+
+```mysql
+select *
+from cinema
+where description != "boring" and id % 2 = 1
+order by rating desc;
+```
+
+## 626. Exchange Seats
+
+Mary is a teacher in a middle school and she has a table `seat` storing students' names and their corresponding seat ids.
+The column **id** is continuous increment.
+
+Mary wants to change seats for the adjacent students.
+
+Can you write a SQL query to output the result for Mary?
+
+<pre>
++---------+---------+
+|    id   | student |
++---------+---------+
+|    1    | Abbot   |
+|    2    | Doris   |
+|    3    | Emerson |
+|    4    | Green   |
+|    5    | Jeames  |
++---------+---------+
+</pre>
+
+For the sample input, the output is: 
+
+<pre>
++---------+---------+
+|    id   | student |
++---------+---------+
+|    1    | Doris   |
+|    2    | Abbot   |
+|    3    | Green   |
+|    4    | Emerson |
+|    5    | Jeames  |
++---------+---------+
+</pre>
+
+**Note:** If the number of students is odd, there is no need to change the last one's seat.
+
+### Solution
+
+```mysql
+SELECT
+    (CASE
+        WHEN id%2!= 0 AND counts != id THEN id + 1
+        WHEN id%2!= 0 AND counts = id THEN id
+        ELSE id - 1
+    END) AS id,
+    student
+FROM
+    seat,
+    (SELECT
+        COUNT(*) AS counts
+    FROM
+        seat) AS seat_counts
+ORDER BY id ASC;
+```
+
+## 627. Swap Salary
+
+Given a table `salary`, such as the one below, that has m=male and f=female values. Swap all f and m values (i.e., change all f values to m and vice versa) with a **single update statement** and no intermediate temp table.
+
+Note that you must write a single update statement, **DO NOT** write any select statement for this problem.
+
+**Example:**
+
+<pre>
+| id | name | sex | salary |
+|----|------|-----|--------|
+| 1  | A    | m   | 2500   |
+| 2  | B    | f   | 1500   |
+| 3  | C    | m   | 5500   |
+| 4  | D    | f   | 500    |
+</pre>
+
+After running your update statement, the above salary table should have the following rows:
+
+<pre>
+| id | name | sex | salary |
+|----|------|-----|--------|
+| 1  | A    | f   | 2500   |
+| 2  | B    | m   | 1500   |
+| 3  | C    | f   | 5500   |
+| 4  | D    | m   | 500    |
+</pre>
+
+### Solution
+
+```mysql
+update salary
+set sex = case when sex = "f" then "m"
+               when sex = "m" then "f"
+               end
+```
 
 ***
 
@@ -597,3 +982,5 @@ output:
 ```
 
 `toc_depth: 2` means it will show up to 2 levels of headers.
+
+
