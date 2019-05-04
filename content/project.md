@@ -73,7 +73,7 @@ Bayesian hierachical model for Premier League prediction. We introduced both bas
 
 <a href="/pdf/bayes-football-prediction" class="btn btn-outline-primary">Slides (PDF)</a>
 <a href="https://youtu.be/N84D06Sfa-s" class="btn btn-outline-primary">Video</a>
-<a href="https://gist.github.com/rexarski/ae8de96de8f9fa1ccf8677e4f71d662a" class="btn btn-outline-primary">Codes</a>
+<a href="https://gist.github.com/rexarski/ae8de96de8f9fa1ccf8677e4f71d662a" class="btn btn-outline-primary">GitHub</a>
 
 ***
 

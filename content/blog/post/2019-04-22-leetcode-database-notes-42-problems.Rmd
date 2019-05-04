@@ -15,7 +15,9 @@ meta_img: image/image.png
 description: Description for the page.
 ---
 
-***Updated on 2019-04-26.***
+***Updated on 2019-05-04.***
+
+Currently I only solved problems available to a free LeetCode account, which means the rest of them are open to Premium users only. I'll give it a try definitely sometime later.
 
 
 ✅ #175
