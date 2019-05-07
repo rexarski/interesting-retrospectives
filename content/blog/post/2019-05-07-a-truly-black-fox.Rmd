@@ -1,0 +1,29 @@
+---
+title: A Truly Black Fox
+author: Qiu Rui
+date: '2019-05-07'
+slug: a-truly-black-fox
+categories: []
+tags:
+  - Firefox
+---
+
+As a Firefox user at night, I find [Dark Reader][Dark Reader](https://darkreader.org/) and [Shadowfox](https://overdodactyl.github.io/ShadowFox/) real MVPs of the game.
+
+The former is pretty smart at turning websites into dark mode after dynamically analyzing the web-site colors and background images. You can also use shortcut like Option/Alt⌥ + Shift⇧ + D to toggle the extension.
+
+<center>
+![However, it cannot handle black svgs.](/image/dark-reader.png)
+</center>
+
+The latter does what Firefox should have included in its so-called dark mode: global dark mode. In this way, the user interface and other "protected" web pages will also be darkened.
+
+Why dark mode? Here are two articles talking about the reasons behind:
+
+- [The Benefits of Dark Mode](https://www.keepproductive.com/blog/benefits-of-dark-mode)
+- [Reddit: Why do people want dark mode so badly?](https://www.reddit.com/r/apple/comments/4odg6w/why_do_people_want_dark_mode_so_badly/)
+
+I love the top comment in that reddit post:
+
+    Night is dark. Screen is bright. Eyes hurt.
+    Night is dark. Screen is dark. Eyes not hurt.
