@@ -10,7 +10,7 @@ tags:
 
 
 <p>Though Reddit’s comment sorting system has been in use for almost a decade, the fact is that I wasn’t so exposed to western internet community till 2013, it is still, a rather new thing to me.</p>
-<p>Randall, the author of <a href="https://xkcd.com">xkcd</a>, also my favourite internet comics, wrote a blog<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> explaining what the algorithm is. Meanwhile, a detailed version is introduced by Evan Miller<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>.</p>
+<p>Randall, the author of <a href="https://xkcd.com">xkcd</a>, also my favourite internet comics, wrote a blog<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> explaining what the algorithm is. Meanwhile, a detailed version is introduced by Evan Miller<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>.</p>
 <p>In the latter, Evan gave two examples of two “wrong” ranking methods:</p>
 <ol style="list-style-type: decimal">
 <li>Score = positive - negative;</li>
@@ -28,7 +28,7 @@ tags:
 <div>
 <p><span class="math display">\[ \left(\hat{p}+\frac{z^2_{\alpha/2}}{2n} \pm z_{\alpha/2}\sqrt{[\hat{p}(1-\hat{p})+z^2_{\alpha/2}/4n]/n}\right)/(1+z^2_{\alpha/2}/n) \]</span></p>
 </div>
-<p>In 1928, mathematician Edwin Bidwell Wilson<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> developed this score interval above to estimate the successful (or positive, in our case) probability <code>$ \hat{p} $</code>.</p>
+<p>In 1928, mathematician Edwin Bidwell Wilson<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a> developed this score interval above to estimate the successful (or positive, in our case) probability <code>$ \hat{p} $</code>.</p>
 <p>Here’s my R script to simulate a comment ranking situation possibly happening every day on Reddit.</p>
 <pre class="r"><code>library(dplyr)
 
@@ -68,8 +68,8 @@ votes %&gt;%
 <div class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p><a href="https://redditblog.com/2009/10/15/reddits-new-comment-sorting-system/">reddit’s new comment sorting system</a>.<a href="#fnref1">↩</a></p></li>
-<li id="fn2"><p><a href="http://www.evanmiller.org/how-not-to-sort-by-average-rating.html">How Not To Sort By Average Rating</a>.<a href="#fnref2">↩</a></p></li>
-<li id="fn3"><p><a href="https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Wilson_score_interval">Binomial proportion confidence interval</a>.<a href="#fnref3">↩</a></p></li>
+<li id="fn1"><p><a href="https://redditblog.com/2009/10/15/reddits-new-comment-sorting-system/">reddit’s new comment sorting system</a>.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn2"><p><a href="http://www.evanmiller.org/how-not-to-sort-by-average-rating.html">How Not To Sort By Average Rating</a>.<a href="#fnref2" class="footnote-back">↩</a></p></li>
+<li id="fn3"><p><a href="https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Wilson_score_interval">Binomial proportion confidence interval</a>.<a href="#fnref3" class="footnote-back">↩</a></p></li>
 </ol>
 </div>

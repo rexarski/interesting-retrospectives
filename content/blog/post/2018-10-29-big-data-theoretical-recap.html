@@ -83,14 +83,16 @@ d_1(y)&amp;:=1+\frac{1-y}y\log(1-y),\\
 <p><span class="math display">\[\overline{\mathbb{X}}:=\frac1T\sum^T_{t=1}\mathbb{X}_t,\]</span></p>
 <p><span class="math display">\[\mathbb{S}_0:=\frac{1}{T-1}\sum^T_{t=1}(\mathbb{X}_t-\overline{\mathbb{X}}_t)(\mathbb{X}_t-\overline{\mathbb{X}}_t)&#39;.\]</span></p>
 <p>The lag-<span class="math inline">\(\tau\)</span> sample cross-covariance (aka. autocovariance) matrix is defined as</p>
-<p><span class="math display">\[\mathbb{S}_\tau:=\frac{1}{T-1}\sum^T_{t=\tau+1}(\mathbb{X}_t-\overline{\mathbb{X}}_t)(\mathbb{X}_{t-\tau}-\overline{\mathbb{X}}_t)&#39;\]</span> The lag-<span class="math inline">\(\tau\)</span> cross-correlation is given by</p>
+<p><span class="math display">\[\mathbb{S}_\tau:=\frac{1}{T-1}\sum^T_{t=\tau+1}(\mathbb{X}_t-\overline{\mathbb{X}}_t)(\mathbb{X}_{t-\tau}-\overline{\mathbb{X}}_t)&#39;\]</span>
+The lag-<span class="math inline">\(\tau\)</span> cross-correlation is given by</p>
 <p><span class="math display">\[\rho_\tau=D\mathbb{S}_\tau D\]</span></p>
 <p>where <span class="math inline">\(D=\text{diag}(1/\sqrt{s_{11}},1/\sqrt{s_{22}},\dots,1/\sqrt{s_{pp}})\)</span> and the values come from <span class="math inline">\(\mathbb{S}_0=[s_{ij}].\)</span> Assuming <span class="math inline">\(\mathbb{E[X_t]}=0\)</span>, some authors (e.g., <strong>[H], [I]</strong>) omit <span class="math inline">\(\overline{\mathbb{X}}_t\)</span> and consider the <em>symmetrised</em> lag-<span class="math inline">\(\tau\)</span> sample cross-covariance given by</p>
 <p><span class="math display">\[\mathbb{C}_\tau:=\frac1{2T}\sum^{T-\tau}{t=1}(\mathbb{X}_t\mathbb{X}_{t+\tau}&#39;+\mathbb{X}_{t+\tau}\mathbb{X}_t&#39;).\]</span></p>
 <div id="question-7" class="section level3">
 <h3>Question 7</h3>
 <p>Simulation is a helpful way to learn about vector time series. Define the matrices</p>
-<p><span class="math display">\[\mathbf{A}=\begin{pmatrix}0.8&amp;0.4\\-0.3&amp;0.6\end{pmatrix},\Sigma=\begin{pmatrix}2.0&amp;0.5\\0.5&amp;1.0\end{pmatrix}.\]</span> Generate 300 observations from the “vectro autoregressive” VAR(1) model</p>
+<p><span class="math display">\[\mathbf{A}=\begin{pmatrix}0.8&amp;0.4\\-0.3&amp;0.6\end{pmatrix},\Sigma=\begin{pmatrix}2.0&amp;0.5\\0.5&amp;1.0\end{pmatrix}.\]</span>
+Generate 300 observations from the “vectro autoregressive” VAR(1) model</p>
 <p><span class="math display">\[\mathbb{X}_t=\mathbf{A}\mathbb{X}_{t-1}+\epsilon_t\ \ \ \ \ (2)\]</span></p>
 <p>where <span class="math inline">\(\epsilon_t\sim N_2(0,\Sigma)\)</span>, i.e., they are i.i.d. bivariate normal random variables with mean zero and covariance <span class="math inline">\(\Sigma\)</span>. Note that when simulating is it customary omit the first 100 or more observations and you can start with <span class="math inline">\(\mathbb{X}_0=(0,0)&#39;\)</span>.</p>
 <p>Also generate 300 observations from the “vector moving average” VMA(1) model</p>
@@ -150,14 +152,14 @@ d_1(y)&amp;:=1+\frac{1-y}y\log(1-y),\\
 <div id="references" class="section level2">
 <h2>References</h2>
 <ul>
-<li><strong>[A]</strong> Sugiura, Nagao (1968). Unbiasedness of some test criteria for the equality of one or two covariance matrices. Annals of Mathematical Statistics Vol. 39, No. 5, 1686-1692.</li>
+<li><strong>[A]</strong> Sugiura, Nagao (1968). Unbiasedness of some test criteria for the equality of one or two covariance matrices. Annals of Mathematical Statistics Vol. 39, No. 5, 1686-1692.</li>
 <li><strong>[B]</strong> Anderson (2003). An introduction to Multivariate Statitical Analysis. Wiley.</li>
 <li><strong>[C]</strong> Johnson, Wichern (2007). Applied Multivariate Statistical Analysis. Pearson Prentice Hall.</li>
-<li><strong>[D]</strong> Bai, Jiang, Yao, Zheng (2009). Corrections to LRT on large-dimensional covariance matrix by RMT. Annals of Statistics Vol 37, No. 6B, 3822-3840.</li>
+<li><strong>[D]</strong> Bai, Jiang, Yao, Zheng (2009). Corrections to LRT on large-dimensional covariance matrix by RMT. Annals of Statistics Vol 37, No. 6B, 3822-3840.</li>
 <li><strong>[E]</strong> Zheng, Bai, Yao (2017). CLT for eigenvalue statistics of large-dimensional general Fisher matrices with applications. Bernouilli 23(2), 1130-1178.</li>
-<li><strong>[F]</strong> Li, McLeod (1981). Distribution of the Residual Autocorrelations in Multivariate ARMA Time Series Models, J.R. Stat. Soc. B 43, No. 2, 231-239.</li>
+<li><strong>[F]</strong> Li, McLeod (1981). Distribution of the Residual Autocorrelations in Multivariate ARMA Time Series Models, J.R. Stat. Soc. B 43, No. 2, 231-239.</li>
 <li><strong>[G]</strong> Tiao and Box (1981). Modelling multiple time series with applications. Journal of the American Statistical Association, 76. 802-816.</li>
-<li><strong>[H]</strong> Liu, Aue, Paul (2015). On the Marchenko-Pastur Law for Linear Time Series. Annals of Statistics Vol. 43, No. 2, 675-712.</li>
+<li><strong>[H]</strong> Liu, Aue, Paul (2015). On the Marchenko-Pastur Law for Linear Time Series. Annals of Statistics Vol. 43, No. 2, 675-712.</li>
 <li><strong>[I]</strong> Liu, Aue, Paul (2017). Spectral analysis of sample autocovariance matrices of a class of linear time series in moderately high dimensions. Bernouilli 23(4A), 2181-2209.</li>
 <li><strong>[J]</strong> <a href="http://www4.stat.ncsu.edu/~davidian/st810a/simulation_handout.pdf" class="uri">http://www4.stat.ncsu.edu/~davidian/st810a/simulation_handout.pdf</a></li>
 <li><strong>[K]</strong> <a href="https://stats.stackexchange.com/a/40874" class="uri">https://stats.stackexchange.com/a/40874</a></li>

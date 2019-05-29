@@ -28,7 +28,7 @@ tags:
 <pre><code>![This is a [logo](https://www.r-project.org/Rlogo.png) of R project.](https://www.r-project.org/Rlogo.png)</code></pre>
 <p><strong>Update on 2019-04-17:</strong> You might also want to <em><a href="https://stackoverflow.com/questions/24677642/centering-image-and-text-in-r-markdown-for-a-pdf-report">center images</a></em> in the post. This can be done with a pair of <code>&lt;center&gt;&lt;/center&gt;</code> tags.</p>
 <center>
-<img src="https://www.r-project.org/Rlogo.png" alt="This is a logo of R project." />
+<img src="https://www.r-project.org/Rlogo.png" title="fig:" alt="This is a logo of R project." />
 </center>
 <p>
 </p>
@@ -38,7 +38,7 @@ tags:
 &lt;p class=&quot;caption&quot;&gt;&quot;Logo here!&quot;&lt;/p&gt;
 &lt;/center&gt;</code></pre>
 <center>
-<img src="https://www.r-project.org/Rlogo.png" alt="This is a logo of R project." />
+<img src="https://www.r-project.org/Rlogo.png" title="fig:" alt="This is a logo of R project." />
 <p class="caption">
 “Logo here!”
 </p>
@@ -56,7 +56,7 @@ tags:
 <p>
 </p>
 <p>Note that in the code blog, we need to flag the argument <code>eval=TRUE</code>.</p>
-<p>Additionally, I guess one line of HTML as caption <code>&lt;p class=&quot;caption&quot;&gt;&quot;How could this happen?&quot;&lt;/p&gt;</code> will increase the “stylelishness” of an embedded media by all means.</p>
+<p>Additionally, I guess one line of HTML as caption <code>&lt;p class="caption"&gt;"How could this happen?"&lt;/p&gt;</code> will increase the “stylelishness” of an embedded media by all means.</p>
 <pre class="html"><code>&lt;p class=&quot;caption&quot;&gt;&quot;How could this happen?&quot;&lt;/p&gt;</code></pre>
 </div>
 <div id="pre-formatted-table" class="section level3">
@@ -105,6 +105,6 @@ total_time: 60.0s
 <li><strong>Command + Shift + 5:</strong> Bring out the screenshot tool bar. If a screenshot is taken to capture the selected window, it will generate some shadow below.</li>
 </ul>
 <center>
-<img src="/image/shadow.png" alt="Shadow!" />
+<img src="/image/shadow.png" title="fig:" alt="Shadow!" />
 </center>
 </div>

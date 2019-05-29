@@ -11,7 +11,7 @@ tags:
 
 
 <p>OpenStreetMap’s <a href="http://project-osrm.org/">OSRM (Open Source Routing Machine)</a> provides not only routing service, but a feature that enables drawing multiple routes to form a time-based polygon range as well. This is also called an isochrone.</p>
-<p>An isochrone, according to Wikipedia, is defined as “”a line drawn on a map connecting points at which something occurs or arrives at the same time“. In other words, it is just like contour lines measuring travel time in urban design.</p>
+<p>An isochrone, according to Wikipedia, is defined as "“a line drawn on a map connecting points at which something occurs or arrives at the same time”. In other words, it is just like contour lines measuring travel time in urban design.</p>
 <p><a href="https://github.com/rCarto">Timothée Giraud</a> has a repo <a href="https://github.com/rCarto/osrm">osrm</a> that connects OpenStreetMap’s service and R.</p>
 <p>In the README file of this repo, there is also a vanilla example of how to draw <code>osrmIsochrone</code>.</p>
 <pre class="r"><code>library(osrm)
@@ -34,10 +34,7 @@ choroLayer(spdf = iso,
            legend.title.txt = &quot;Isochrones\n(min)&quot;,
            add = TRUE)
 plot(apotheke.sp[10,], add=TRUE, col =&quot;red&quot;, pch = 20)</code></pre>
-<div class="figure">
-<img src="/image/canberra-osrm.png" />
-
-</div>
+<p><img src="/image/canberra-osrm.png" /></p>
 <p>However, the processing time of this plot is not very satisfying. What about drawing the polygons with <code>leaflet</code>?</p>
 <pre class="r"><code># Map as leaflet
 iso@data$drive_times &lt;- factor(paste(iso@data$min, &quot;to&quot;, iso@data$max, &quot;min&quot;))
@@ -53,10 +50,7 @@ leaflet() %&gt;%
                 data = iso, popup = iso@data$drive_times,
                 group = &quot;Drive Time&quot;) %&gt;% 
     addLegend(&quot;bottomright&quot;, pal = factpal, values = iso@data$drive_time,   title = &quot;Drive Time&quot;)</code></pre>
-<div class="figure">
-<img src="/image/canberra-leaflet.png" />
-
-</div>
+<p><img src="/image/canberra-leaflet.png" /></p>
 <p>An interactive map is not a bad idea. And can use <code>proc.time()</code> to track the processing time of both methods.</p>
 <pre class="r"><code>ptm &lt;- proc.time()
 # plotting method

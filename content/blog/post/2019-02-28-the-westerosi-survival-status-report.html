@@ -16,7 +16,7 @@ tags:
 <div id="introduction" class="section level1">
 <h1>1. Introduction</h1>
 <p>The TV series <em>Game of Thrones</em> has been a great success since released. The adaptation is based on the fantasy novel <em>A Song of Ice and Fire</em>, written by George R. R. Martin. As we know, one of the reasons people love to read such a story is its magnificent view, not only chronically, but geologically as well. Consequently, thousands of characters emerged on the continent of Westeros. Due to the fame of killing his own characters in story, Mr. Martin leaves one of the most popular and long-lasting question in fan community: who will be killed next?</p>
-<p>Awoiaf Wiki (Felipe Bini, Scafloc, Rhaenys Targaryen et al. 2017) is a fan-made community website which provides detailed information related to the novel. A complete list of characters appeared in the story so far is scraped from this site and uploaded to Kaggle (Myles O’Neill 2016). Our goal is to explore the data set and try to find how long these characters can live “on stage” and what factors have influences on the life span.</p>
+<p>Awoiaf Wiki (Felipe Bini, Scafloc, Rhaenys Targaryen et al. 2017) is a fan-made community website which provides detailed information related to the novel. A complete list of characters appeared in the story so far is scraped from this site and uploaded to Kaggle (Myles O’Neill 2016). Our goal is to explore the data set and try to find how long these characters can live “on stage” and what factors have influences on the life span.</p>
 </div>
 <div id="methodology" class="section level1">
 <h1>2. Methodology</h1>
@@ -28,7 +28,7 @@ tags:
 <li>Eliminate all characters not formally introduced in the book, who are just mentioned. For these characters, they have <code>NA</code> as <code>Book.Intro.Chapter</code>.</li>
 <li>Use attributes <code>Book.of.Death</code>, <code>Death.Chapter</code>, <code>Book.Intro.Chapter</code>, appearances in <code>GoT</code>, <code>CoK</code>, <code>SoS</code>, <code>FfC</code>, <code>DwD</code> (five books respectively), plus the numbers of chapters of each book to calculate an overall “lifetime” of a character. Specifically, for some characters with a <code>Book.of.Death</code> but no <code>Death.Chapter</code>, we assume the his/her living chapter numbers is the half of the chapter number of that book.</li>
 <li>Remove characters with negative life span. This is caused by some inconsistency when scraping data from the internet.</li>
-<li>Add a new variable <code>POV</code> to each character based on the number of <em>Point of View</em> (POV) chapters (Kirt, Nittanian, Rhaenys Targaryen et al. 2017).</li>
+<li>Add a new variable <code>POV</code> to each character based on the number of <em>Point of View</em> (POV) chapters (Kirt, Nittanian, Rhaenys Targaryen et al. 2017).</li>
 <li>Make some modifications on <code>Allegiances</code> by clustering all 12 factions into 3 major groups, we call them <code>first</code>, <code>second</code> and <code>third</code> respectively. The <code>first</code> allegiance group contains <em>Lannister</em>, <em>Stark</em> and <em>Targaryen</em>. The <code>second</code> allegiance group contains <em>Arryn</em>, <em>Baratheon</em>, <em>Greyjoy</em>, <em>Martell</em>, <em>Tully</em> and <em>Tyrell</em>. The <code>third</code> allegiance group contains some lower class factions such as <em>Night’s Watch</em>, <em>Wildling</em> and people with no allegiance (<em>None</em>).</li>
 <li>Include one interaction term between <code>Gender</code> and <code>Nobility</code>.</li>
 </ol>
@@ -177,7 +177,7 @@ G:N         0.0654  0.33171054   0.000000 10.672953</code></pre>
 <h1>3. Results</h1>
 <div id="mcmc-diagnostics" class="section level2">
 <h2>3.1 MCMC Diagnostics</h2>
-<p>The traceplot<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> of <code>$ \beta_1,\cdots,\beta_8 $</code> shows that the Gibbs sampled values are generally stable in trend. For intercept, <code>Nobility</code>, <code>POV</code>, <code>first</code> whose effects are significant, the sampled values are fluctuating around their estimated values. While <code>Gender</code>, <code>second</code> and the only interaction term <code>Gender:Nobility</code> stay as zero for most of the time.</p>
+<p>The traceplot<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> of <code>$ \beta_1,\cdots,\beta_8 $</code> shows that the Gibbs sampled values are generally stable in trend. For intercept, <code>Nobility</code>, <code>POV</code>, <code>first</code> whose effects are significant, the sampled values are fluctuating around their estimated values. While <code>Gender</code>, <code>second</code> and the only interaction term <code>Gender:Nobility</code> stay as zero for most of the time.</p>
 <div class="figure">
 <img src="/image/westerosi/trace1.png" alt="trace1" />
 <p class="caption">trace1</p>
@@ -659,6 +659,6 @@ lpy.X&lt;-function(y,X,
 <div class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p>Here we used a R package still under development called <code>fitR</code>.<a href="#fnref1">↩</a></p></li>
+<li id="fn1"><p>Here we used a R package still under development called <code>fitR</code>.<a href="#fnref1" class="footnote-back">↩</a></p></li>
 </ol>
 </div>

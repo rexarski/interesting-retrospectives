@@ -12,10 +12,7 @@ tags:
 
 <p>I’ve always been wondering if Apple could utilize its collected health data in a more elegant way. The Activity app is decent, especially the achievements inside are definitely highlights in an <em>iPhone x Apple Watch</em> dynamic duo. On the other hand, the Health app serves nothing but a centralized information hub for various types data collected by either the sensor in your iPhone or your Apple Watch.</p>
 <p>Well, that’s basically my perspective and I don’t have any constructive suggestions yet. But one thing that always interests me is that if I can play some magic around those hidden data. The answer is an absolute yes. The data export from iPhone is quite easy, and kudos to Apple. The problem is, the data comes in JSON format. <a href="http://www.ryanpraski.com/apple-health-data-how-to-export-analyze-visualize-guide/#2">Ryan Praskievicz</a> provided a Python script to convert those extracted JSON to csv, but also he attached a link to an online converter <a href="http://ericwolter.com/projects/health-export.html">here</a>.</p>
-<div class="figure">
-<img src="/image/apple-health-to-csv.png" />
-
-</div>
+<p><img src="/image/apple-health-to-csv.png" /></p>
 <p>I initially had the very first model of Apple Watch, aka the “Apple Watch before Series 1”, aka “Series 0”, which should be considered as a crappy smart watch even back in a scenario 4 years ago. The battery life could hardly power through one day, and launching a third-party app could literally take half a minute. So the only two functions I used were time keeping and activaity monitoring. Unfortunately, the watch encountered a serious this May and I still haven’t figured out what happened to it. But in short, the watch stopped syncing with my iPhone and did not track any movements either. I had to perform a hard reset and thus lost all data prior to that day. So far, the data sitting on my MacBook is my Apple Watch health data collected from early this May to October.</p>
 <p>The size of the data is around 90 mb and it wouldn’t take too long to convert them to csv. But this really depends. I mean if you have a load of several years’ data, I strongly suggest you make yourself a cup of tea during this time. I haven’t checked the data structure inside at that moment, but a vague goal is to mimic the “major three” on Apple Watch: the activities, the exercise time and the standing hours. Surprisingly, the exported data has no standing hours, so that I have to use daily steps as a substitute.</p>
 <pre class="r"><code>library(tidyverse)
@@ -81,10 +78,7 @@ full_data &lt;- active %&gt;%
          caption=&quot;Source: my retired Apple Watch (1st gen)&quot;, 
          y=&quot;Complete 100%&quot;, 
          color=NULL)</code></pre>
-<div class="figure">
-<img src="/image/apple-health-1.png" />
-
-</div>
+<p><img src="/image/apple-health-1.png" /></p>
 <p>But I’m not satisfied with theme somehow, so I decide to experiment a little bit on a <a href="https://github.com/jrnold/ggthemes/blob/master/R/fivethirtyeight.R">FiveThirtyEight-style theme</a>. It is a more furnished theme, but does not match the Activity app palette. Well, I just cannot reject the magic of minimalism.</p>
 <pre class="r"><code>ggplot(full_data, aes(x=day, y=value)) +
     geom_line(aes(color=type),size=1) +
@@ -95,9 +89,6 @@ full_data &lt;- active %&gt;%
          caption=&quot;Source: my retired Apple Watch (1st gen)&quot;, 
          y=&quot;Complete 100%&quot;, 
          color=NULL)</code></pre>
-<div class="figure">
-<img src="/image/apple-health-2.png" />
-
-</div>
+<p><img src="/image/apple-health-2.png" /></p>
 <p>But even now I’m not so sure about what I can really do with these data, except for probably plotting them with lines and dots. Meanwhile, I’m not okay with the variable on y-axis as well. I tried to combine them in one plot at the very beginning, but it turned out that the three types of data were not on the same scale. So I made them the percentages of the completeness of daily goals by setting activity to 400, exercise time to 30 minutes and steps to 10,000. But still, the y-axis should better be “the ratio to the goal” instead of a bunch of misleading integers (1%? 2%?)</p>
 <p>Well, at least I can conclude that all these match the title which says “a sneak peek”, not a thorough digging.</p>

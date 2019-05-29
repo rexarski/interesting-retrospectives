@@ -1,0 +1,40 @@
+---
+title: How to Connect to AWS Instance in Practice?
+author: Qiu Rui
+date: '2019-05-29'
+slug: how-to-connect-to-aws-instance-in-practice
+categories: []
+tags:
+  - AWS
+---
+
+1. When creating an instance in AWS, make sure you download the key pair as a `.pem` file. Otherwise, if you are like me, I got the private key from my colleague. It reads as:
+
+```
+-----BEGIN RSA PRIVATE KEY-----
+SOMETHINGLIKETHISHERE…
+-----END RSA PRIVATE KEY-----
+```
+
+2. Copy and paste from wherever you get it, save as a `.pem` file, e.g. `aws-key.pem`.
+
+3. While looking for solutions online, I found a quite useful suggestion to create a specific directory called `.pem` under your root directory in order to save all your certificates. So it’s kind of optional to do:
+
+```bash
+mkdir .pem
+# then cd to the directory of aws-key.pem
+mv aws-key.pem ~/.pem
+cd ~/.pem
+```
+
+4.  `chmod 400 aws-key.pem`
+
+5.  Find and copy the Public DNS of your instance in the AWS console and
+
+```bash
+ssh -i ~/.pem/aws-key.pem root@insert-your-public-dns-here.com
+```
+
+6. Lastly, you might get a prompt telling you that you should login as the user “centos” rather than “root”, under the circumstance that you are playing around with CentOS.
+
+7. Jobs done.
