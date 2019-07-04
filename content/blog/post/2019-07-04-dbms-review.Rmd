@@ -1,0 +1,800 @@
+---
+title: DBMS Review
+author: Qiu Rui
+date: '2019-07-04'
+slug: dbms-review
+categories: []
+tags:
+  - SQL
+---
+
+- 3-level ANSI/SPARC architecture
+	- external level (views) ->
+	- conceptual/logical level (entities, relationships, constraints)
+	- internal level (physical files, blocks, pointers)
+
+- A **relation** is a subset of a Cartesian product of sets.
+
+## Relational Data Model
+
+- Schema and State
+	- correspondence of terms
+		- table <=> relation
+		- column <=> attribute
+		- data type <=> domain
+		- row <=> tuple
+		- table definition <=> relation schema
+- A **relation schema** has a **relation name** and a list of **attributes**.
+- Each attribute is associated with a **domain**
+- A **tuple** in relation $R$ is a list $t$ of values.
+- A **relation** $r(R)$ is a set of tuples.
+- A **relational database schema** $S$ is
+	- a set of relation schemas $S=\{R_1,\dots,R_m\}$ and
+	- a set of integrity constraints $IC$
+- A **relational database state** of $S$ is a set of relations such that
+	- there is just one relation for each relation schema in $S$ and
+	- all the relations satisfy the integrity constraints $IC$
+- Integrity Constraints
+	- main types of constraints
+		- domain constraints
+			- every value in a tuple must be from the **domain of its attribute**
+			- possible domains:
+				- `INT`
+				- `VARCHAR`
+				- `DATE`
+				- `SMALLINT`
+				- `NOT NULL`
+		- key constraints
+			- A **superkey** $SK$ of $R$ is a subset of attributes of $R$ such that _no two distinct tuples in $r(R)$ can have the same value for $SK$_.
+			- A superkey $SK$ is **minimal** if there is no other superkey $SK'\subset SK$ held on $R$, it is also known as a **candidate key**.
+			- A **primary key** $PK$ of $R$ is a minimal superkey of $R$.
+		- entity integrity constraints
+			- **no primary key value can be `NULL`**
+		- referential integrity constraints
+			- A **referential integrity constraint** specifies a reference between two relations, while the previous constraints involve only one relation.
+			- A **foreign key** on $R_1$ is a statement $[A_1,\dots, A_n]\subseteq R_2[B_1,\dots, B_n]$ restricting states of $S$ to satisfy the following property:
+				- for each tuple $t\in r(R_1)$ there exists a tuple $t'\in r(R_2)$ with $t[A_i]=t'[B_i]$ for $i=1,\dots, n$.
+				- $R_1$ is called the **referencing relation** and $R_2$ is called the **referenced relation**
+
+## SQL
+
+- SQL = **S**tructured **Q**uery **L**anguage
+- SQL provides an interface to relational database systems including:
+	- Data Definition Language (DDL)
+	- Data Manipulation Language (DML)
+	- Data Control Language (DCL)
+	- Transaction Control Language (TCL)
+
+### DDL
+
+#### `CREATE TABLE`
+
+```sql
+CREATE TABLE table_name
+    (attribute_name data_type) [attribute constraints],
+     ...,
+     attribute_name data_type) [attribute constraints],
+    [table constraints]);
+```
+
+- **Attribute Data Type**
+	- numeric types
+		- `INT` and `SMALLINT` -> integers of various sizes
+		- `FLOAT` or `REAL`, and `DOUBLE PRECISION` -> floating point numbers of various precision
+		- `NUMERIC(i,j)` or `DECIMAL(i,j)` -> fixed point numbers with _precision $i$_ and _scale $j$_, where:
+			- **precision** = total number of digits;
+			- **scale** = the number of digits following the decimal point
+	- string types
+		- `CHAR(n)` -> character strings of fixed length $n$
+		- `VARCHAR(n)` -> character strings of varying length no longer than $n$
+		- `BIT(n)` -> bit strings of fixed length $n$
+		- `BIT VARYING(n)` -> ...
+	- data and time types
+		- `DATE` -> date values
+		- `TIME` -> time values
+		- `TIMESTAMP` -> `DATE` and `TIME` fields, plus a minimum of six positions for seconds and an optional `WITH TIME ZONE` quanlifier
+		- `INTERVAL` -> ...
+	- booleantype: `TRUE` or `FALSE`
+
+```sql
+CREATE DOMAIN domain_name AS data_type
+    [default expression] [constraint, ..., constraint];
+```
+
+- `CREATE DOMAIN` statement is used to create a domain that is essentially a specific data type.
+
+- **Attribute Constraints**
+	- `NOT NULL`
+	- `DEFAULT`
+	- `CHECK (...)`
+	- `UNIQUE` -> automatically imply `NOT NULL`
+	- `PRIMARY KEY` -> automatically imply `NOT NULL`
+	- `FOREIGN KEY (...) REFERENCES ... (...)`
+	- `INDEX`: fast retrieval based on columns other than the primary key
+
+```sql
+CREATE INDEX index1 ON CUSTOMER (Name, DOB);
+CREATE UNIQUE INDEX index2 ON CUSTOMER (Phone);
+```
+
+#### `ALTER TABLE`
+
+- modify an existing relation schema
+	- changing the name of a table
+	- adding or dropping an attribute
+	- changing the definition of an attribute
+	- adding or dropping table constraints
+
+- Add a `NOT NULL` constraint
+	- `ALTER TABLE CUSTOMER ALTER COLUMN Address SET NOT NULL;`
+- Add a `UNIQUE` constraint
+	- `ALTER TABLE CUSTOMER ADD UNIQUE(Phone);`
+- Add a `CHECK()` constraint
+	- `ALTER TABLE CUSTOMER ADD CONSTRAINT positive_id CHECK (CustomerID > 0);`
+- Add a Foreign Key constraint
+	- `ALTER TABLE ENROL ADD FOREIGN KEY(StudentID) REFERENCES Student(StudentID);`
+- Add an attribute `Email` into the table `CUSTOMER`
+	- `ALTER TABLE CUSTOMER ADD Email VARCHAR(100);`
+- Drop the attribute
+	- `ALTER TABLE CUSTOMER DROP COLUMN Email;`
+
+#### `DROP TABLE`
+
+- remove an existing relation schema from a database schema
+
+- Drop the table
+	- `DROP TABLE ENROL;`
+- Drop the table (if exists)
+	- `DROP TABLE IF EXISTS CUSTOMER;`
+
+2018-10-04
+
+### DML
+
+#### `INSERT`
+
+- used to add tuples into a relation
+
+```sql
+INSERT INTO table_name
+        [(attributee_name,...,attribute_name)]
+    VALUES (value,...,value),...,(value,...,value);
+```
+
+- **Primary key violation:** DBMS will not allow two tuples with the same primary key value in a relation.
+- **Foreign key violation:**
+
+#### `UPDATE`
+
+- used to modify attribute values of one or more selected tuples
+
+```sql
+UPDATE table_name
+    SET attribute_name = value,...,attribute_name = value
+[WHERE selection_condition];
+```
+
+#### `DELETE`
+
+- used to remove tuples from a relation
+
+```sql
+DELETE FROM table_name
+    [WHERE selection_condition];
+```
+
+- `DELETE FROM STUDENT;` vs `DROP Table STUDENT;`
+	- the (empty) table exists after the first statement
+
+#### Update and Deletee - Referential Actions
+
+- in case of deleting or updating referenced tuples (via foreign key constraints)
+	- `NO ACTION` (default) -> will throw an error if one tries to delete a row (or update the primary key value) referenced
+	- `CASCADE` -> force the referencing tuples to be deleted (or updated with new primary key value)
+	- `SET NULL` -> force the corresponding values in the referencing tuples to be set to a null value
+	- `SET DEFAULT` -> ... specified default value
+
+```sql
+CREATE TABLE ENROL
+    (StudentID INT,
+     CourseNo VARCHAR(20),
+     Semester VARCHAR(50),
+     Status VARCHAR(50),
+     FOREIGN KEY(StudentID) REFERENCES STUDENT(StudentID)
+      ON DELETE NO ACTION,
+     FOREIGN KEY(CourseNo) REFERENCES COURSE(No));
+```
+
+#### Simple SQL Queries
+
+- The `SELECT` statement has the following basic form:
+
+```sql
+SELECT attribute_list
+FROM table_list
+[WHERE condition]
+[GROUP BY attribute_list [HAVING group_condition]]
+[ORDER BY attribute_list];
+```
+
+- only `SELECT` and `FROM` are mandatory
+- `*` means all the attributes
+- attribute names may be qualified with the table name
+- attribute and table names can be given an alias
+- `DISTINCT` is used for removing duplicate tuples in the query result
+
+- unspecified `WHERE`-clause means no condition
+- `BETWEEN ... AND ...;`
+- `is NOT NULL;`
+- `like '%@gmail.com';`
+
+- `GROUP BY attribute_list` groups tuples for each value combination in the attribute_list
+	- aggregate functions can be applied
+		- `COUNT`
+		- `AVG`
+		- `MIN`
+		- `MAX`
+		- `SUM`
+	- can use `HAVING` _condition_ to add the condition on the groups
+
+e.g.
+
+```sql
+SELECT COUNT(*), SUM(unit), MIN(unit)
+FROM COURSE;
+
+SELECT e.CourseNo, COUNT(*) AS NumberOfStudents
+FROM ENROL e
+WHERE e.Semester = '2016 S2'
+GROUP BY e.CourseNo
+HAVING COUNT(*) >= 120;
+ORDER BY NumberOfStudents DESC;
+```
+
+- the `ORDER BY` clause allows us to sort the tuples in a query result
+	- `ASC` asecending order (default)
+	- `DESC` descending order
+
+#### Advanced SQL Queries
+
+- set operations
+	- `UNION`, `INTERSECT`, `EXCEPT`
+	- set operations result in return of a relation of tuples (**no duplicates**)
+	- set operations apply to relations that **have the same attribute types appearing in the same order**
+
+- `JOIN` operations
+
+- `INNER JOIN`: tupples are inclueded in the result only if there is at least one matching in both relations.
+
+```sql
+SELECT DISTINCT c.Cname
+FROM COURSE c INNER JOIN ENROL e ON c.No=e.CourseNo;
+```
+
+- `OUTER JOIN`: `LEFT JOIN` and `RIGHT JOIN`
+	- all tuples of the left/right table are included in the result, even if there are no matches in the relations
+
+```sql
+SELECT s.*, e.CourseNo, e.Semester
+FROM STUDENT s LEFT JOIN ENROL1 e ON s.StudentID=e.StudentID;
+
+SELECT s.*, e.CourseNo, e.Semester
+FROM ENROL1 e RIGHT JOIN STUDENT s ON e.STudentID=s.StudentID;
+```
+
+- **motivation:** an inner join retains all the data of the two tables for, with duplication (in columns)
+- `NATURAL JOIN`: a natural join retains **all the data of the two tables for only the matched rows, without duplication**
+	- it is one kind of inner join, in which two relations are joined implicitly by **comparing all attributes of the same names in both relations**
+
+```sql
+SELECT *
+FROM STUDENT s NATURAL JOIN ENROL1 e;
+```
+
+- **Subqueries** are just queries that are used where a relation is required
+	- within the `FROM`-clause to create _inline view_ (exists only for the query)
+	- within the `WHERE`-clause
+		- `IN` subquery tests if tuple occurs in the result of the subquery
+		- `EXISTS` subquery tests whether the subquery results in non-empty relation
+		- `ALL`, `SOME`, `ANY`
+		- `NOT`
+
+```sql
+SELECT s.*, e1.CourseNo
+FROM STUDENT s NATURAL JOIN ENROL e1
+WHERE e1.CourseNo IN 
+    (SELECT e2.CourseNo
+     FROM ENROL e2
+     GROUP BY e2.CourseNo
+     HAVING COUNT(*)<10);
+
+SELECT s.*
+FROM STUDENT s
+WHERE EXISTS (SELECT *
+              FROM ENROL e
+              WHERE s.StudentID=e.StudentID);
+
+SELECT s.*
+FROM STUDENT s
+WHERE NOT EXISTS (SELECT *
+                  FROM ENROL e
+                  WHERE s.StudentID=e.StudentID);
+```
+
+- A **view** in SQL is a **virtual table** that is derived from other tables in the same database or previously defined views
+
+```sql
+CREATE VIEW ENROL1
+AS SELECT s.StudentID, s.Name, e.CourseNo, e.EnrolDate
+FROM STUDENT s, ENROL e
+WHERE s.StudentID=e.StudentID;
+```
+
+- - - -
+
+## Entity-Relationship (ER) Model
+
+- a data model normally has 3 key aspects:
+	- **data structure**: data in the ER model is represented as **entities** and **relationships** with **attributes**
+	- **data integrity**: **keys** are for entity/relationship types, and **cardinality/participation constraints** for relationship types
+	- **data manipulation**: **no standard data manipulation operations** are associated with the ER model
+
+- ER diagrams:
+	- attributes -> ovals
+	- key attributes -> underlined
+	- entity types -> rectangles
+	- relationship types -> diamonds
+
+- **Entities**: "things"
+- **Relationships**: assocations between entities
+- **Attributes**: properties that describe entities and relationships
+- **Domains of attributes**: for each attribute, a domain is associated, i.e. a set of permitted values for an attribute.
+
+- An **entity type** defines a collection (or set) of entities that have the same attributes.
+	- described by its name and attributes
+- An **entity set** is a collection of all entities of a particular entity type inthe db at any point in time.
+- A **relationship type** is an association between two or more entity types and can have attributes as well,
+	- Employee works-for Department
+	- Employee registers a Customer at Branch office
+- **Degree of relationship type**: the number of participating entity types
+- A **relationship set** is the set of associations between entities of the entity types that participate in the relationship type
+
+- keys
+
+- constraints on relationships
+	- **cardinality ratios**: specifies the maximum number of relationships that an entity can participate in
+		- many-to-many
+		- one-to-many
+		- one-to-one
+	- **participation constraints** (total, partial): specifies whether the existence of any entity depends on its being related to another entity via the relationship type.
+		- total: e.g., each employee must work for a department and each department may or may not have employees.
+		- partial (default): e.g. an employee may or may not work for a department and each department may or may not have employees.
+	- **cardinality limits**: each entity type participating in a relationship type associates with a pair of integer numbers `(min, max)`
+
+- **recursive relationships**: some entity type can participate more than once in a relationship type in different roles.
+	- a **role name** specifies the role that a participating entity plays in each relationship.
+
+- A **weak entity type** is an entity that does not have sufficient attributes to form a primary key.
+	- identifying relationship
+
+## Enhanced Entity-Relationship (EER) Model
+
+### Subclass/superclass
+
+### Specialization/generalization
+
+### Constraints on specialization/generalization
+
+## Functional Dependencies
+
+- database design quality
+	- completeness: has all relevant info been captured?
+	- redundancy freeness: has the doubling of relevant info been avoided?
+	- consistent understanding: is the meaning of all relevant info consistent? is the meaning of `NULL` clear?
+		- counterexample: contradicting rows!
+	- performance
+
+- **Functional dependencies (FDs)** are developed to defined the goodness and badness of relational database design in a formal way.
+	- top down: start with a relation schema and FDs -> smaller relation schemas in certain normal form (normalization)
+	- bottom up: start with attributes and FDs -> relation schemas (not popular in practice)
+
+- `{StudentID} -> {Name, DoB}`, **functionally determines**
+- A **FD** says that within a relation, the values of some attributes determine the values of other attributes.
+- `{A,B,C} -> {D,E}`, A, B, C are the **determinant**, D, E are the **dependent**.
+- `{A,B,C} -> {A,B}` is **trivial**.
+
+- keys
+	- a subset of the attributes of a relation schema $R$ is a **superkey** if it uniquely determines all attributes of $R$.
+	- a superkey $K$ is called a **candidate key** if no proper subset of $K$ is a superkey.
+	- **candidate keys** are also called **keys**, and the **primary key** is chosen from them.
+
+- Given a set $\Sigma$ of FDs on a relation $R$, let $\Sigma*$ be all possible FDs **implied** by $\Sigma$.
+
+- A **prime attribute** is an attribute occuring in a key, and a **non-prime attribute** is an attribute that is not a prime attribute.
+
+e.g. $R=\{A,B,C,D\}, \Sigma=\{AB\rightarrow C, AC\rightarrow D\}$
+
+Solution:
+
+(A)+ = A, (B)+ = B, (C)+ = C, (D)+ = D.
+(AB)+ = ABCD, (AC)+ = ACD, (AD)+ = AD, (BC)+ = BC, (BD)+ = BD, (CD)+ = CD
+(ABC)+ = ABCD, (ABD)+ = ABCD, (ACD)+ = ACD, (BCD)+ = BCD
+
+hence, AB is the only key of $R$, AB, ABC, ABD and ABCD are the superkeys of $R$. A, B are the prime attributes of $R$.
+
+- Tricks:
+	- if an attribute never appears in the dependent of any FD, this attribute must be part of each key
+	- if an attribute never appears in the determinant of any FD but appears in the dependent of any FD, this attribute must not be part of each key
+	- if a proper subset of $X$ is a key, then $X$ must not be a key
+
+## Normalization
+
+- normal form: 1NF => 2NF => 3NF => BCNF (Test criteria from weak to strong)
+
+- decomposing a relation into **smaller relations in a certain normal form**
+	- each normal form reduces certain kind of data redundancy
+	- each normal form does not have certain types of dependencies
+
+### BCNF
+
+- **Boyce-Codd normal form (BCNF)**: A relation schema $R$ is in BCNF if whenever a non-trivial FD $X\rightarrow A$ holds in $R$, then $X$ is a superkey.
+	- when a relation schema is in BCNF, all data redundancy based on functional dependency are removed
+		- but not necessarily a good design
+
+- 2 things to consider when decomposing a relation:
+	- **lossless join** -- capture the same data
+	- **dependency preservation** -- capture the same meta-data
+- facts:
+	- an algorithm exists that can genrate a lossless decomposition into BCNF
+	- a BCNF decomposition that is both lossless and dependency-preserving does not always exist
+
+### 3NF
+
+- **Third normal form (3NF)**: less restrictive normal form
+	- A relation schema $R$ is in 3NF if whenever a non-trivial FD $X\rightarrow A$ holds in $R$, then $X$ is a superkey or $A$ is prime attribute.
+	- 3NF allows data redundancy but excludes relation schemas with certain kinds of FDs.
+
+- **Minimal Cover**
+	- $\Sigma$ is a set of FDs, a minimal cover $\Sigma_m$ of $\Sigma$ is a set of FDs s.t.
+		- $\Sigma_m$ is equivalent to $\Sigma$
+		- **Dependent**: each FD in $\Sigma_m$ has only **one single attribute on its right hand side**, replace each FD $X\rightarrow\{A_1,\dots,A_k\}$ in $\Sigma_m$ with $X\rightarrow A_1,\dots, X\rightarrow A_k$;
+		- **Determinant**: each FD as few attributes on the LHS as possible, for each FD $X\rightarrow A$ in $\Sigma_m$, check each attribute $B$ of $X$ to see if we can replace $X\rightarrow A$ with $(X-B)\rightarrow B$ in $\Sigma_m$;
+		- Remove a FD from $\Sigma_m$ if its is redundant.
+	- A minimal cover of a set of FD $\Sigma$ always exists but not necessarily unique.
+
+e.g. $\Sigma=\{A\to BC, B\to C, B\to A, C\to AB\}$ has two possible minimal covers
+
+- then, let $R_i$ be the i-th FD in the minimal cover, remove any omittable $R_i$'s if $R_i\subseteq R_j$.
+- Finally, the 3NF-decomposition is $\{R_i, \dots,\}$
+
+- normalziation process may degrade performance when data are frequentyl queried
+	- queries need to join many relations together, join is expensive
+- denormaliztion
+	- after normalziation process
+	- during the physical design stage
+	- reduces the number of relations that need to be joined for certain queries
+- unnormalized -- no systematic design
+- normalized -- redundancy is reduced after a systematic design
+- denormalized -- redundancy is introduced after analysing the normalized design
+
+- a trade-off
+
+## Relational Algebra
+
+- Relational algebra (RA)
+	- a query language for relational db
+	- not visible from user interface, but at the core of SQL
+	- used by relational DBMSs internally for representing and optimizing SQL queries
+
+- relational operators
+	- selection (rows)
+		- $\sigma_\phi (R)$ choose tuples that satisfy the condition $\phi$ from a relation $R$, e.g. $\sigma_\text{semester='2016 S2'}(\text{Course})$
+		- selection yields the same attributes as $R$
+		- selection is **commutative**
+	- projection (columns)
+		- $\pi_{A_1,\dots,A_n}(R)$
+		- projection has no duplicates (in SQL, we have `DISTINCT`)
+		- can be used to reorder attributes
+		- not commutative
+	- renaming (of attributes or the relations)
+		- $\rho_{R'(A_1,\dots,A_n)}(R)$
+		- $\rho_{R'}(R)$
+		- $\rho_{(A_1,\dots,A_n)}(R)$
+	- union, intersection, difference
+	- cartesian product and join
+		- $R_1\times R_2$
+		- $R_1\bowtie_\phi R_2=\sigma_\phi(R_1\times R_2)$
+
+- we call selection, projection, renaming, union, difference, cartesian product **a complete set**, since
+	- $R_1\bowtie_\phi R_2=\sigma_\phi(R_1\times R_2)$ and
+	- $R_1\cap R_2=R_1-(R_1-R_2)$
+
+### equivalence of RA and SQL queries:
+
+- Selection
+
+```sql
+SELECT DISTINCT * FROM R WHERE CONDITION;
+```
+
+- Projection
+
+```sql
+SELECT DISTINCT A1,...An FROM R;
+```
+
+- Renaming
+
+```sql
+SELECT A1 AS B1,...,An AS Bn FROM R AS S;
+```
+
+- Union
+
+```sql
+SELECT * FROM R1 UNION SELECT * FROM R2;
+```
+
+- Intersection
+
+```sql
+SELECT * FROM R1 INTERSECT SELEC * FROM R2;
+```
+
+- Difference
+
+```sql
+SELECT * FROM R1 EXCEPT SELECT * FROM R2;
+SELECT DISTINCT * FROM R1 WHERE NOT EXISTS (SELECT * FROM R2 WHERE R1.A1=R2.A1 AND ... AND R1.An=R2.An);
+```
+
+- Cartesian product
+
+```sql
+SELECT * FROM R1, R2;
+```
+
+- Join
+
+```sql
+SELECT DISTINCT * FROM R1 INNER JOIN R2 ON CONDITION;
+```
+
+- Natural join
+
+```sql
+SELECT DISTINCT * FROM R1 NATURAL JOIN R2;
+```
+
+- - - -
+
+2018-10-05
+
+## Query Processing and Optimization
+
+- example:
+	- High-level language (SQL) ->
+		- Low-level language (RA) ->
+			- Execution plan (Query tree) ->
+				- Query result
+
+### Query Processing
+
+- processing steps
+	- query parser and translator
+		- **parser** checks the syntax of the query
+			- validation of table names, attributes, data types, access permission ...
+			- either the query is executable or an error message is generated
+		- the **translator** translates queries into RA expressions
+			- a query is first decomposed into **query blocks**
+			- each query block is translated into an RA expression
+		- (1). check the syntax of SQL queries
+		- (2). verify the relations do exist
+		- (3). transform into RA expressions
+	- query optimizer
+		- one sql query -> many possible execution plans
+		- optimizer is responsible for identifying an efficient execution plan
+			- enumerating alternative plans
+			- choosing the one with the least estimated cost
+		- (1). transform into the best possible execution plan
+		- (2). specify the implementation of each operator in the execution plan
+	- evaluation engine
+		- (1). evaluate the query execution plan
+		- (2). return the result to the user
+
+### Query Optimization
+
+- optimizers incorporate elements of the following 3 op approaches:
+	- Semantic query optimization: Use application speciﬁc semantic knowledge to transform a query into the one with a lower cost (they return the same answer).
+	- Rule-based query optimisation: Use heuristic rules to transform a relational algebra expression into an equivalent one with a possibly lower cost.
+	- Cost-based query optimisation: Use a cost model to estimate the costs of plans, and then select the most cost-effective plan.
+  
+## DB Security
+
+- db security (against 2 cases):
+	- stop users without db access from having any access:
+	- stop users with db access from performing actions on the db which are not required to perform their duties
+
+db security = confidentiality + integrity + availability
+
+- control measures
+	- accesss control
+		- restrict access to database system
+			- e.g. user and pswds
+	- inference control
+		- ensure the data that users are not authorized to access cannot be inferred from statistical or summary data
+			- e.g. know the average salary of a department, but don’t know the salary of a particular person.
+	- flow control
+		- prevent data to ﬂow into unauthorized users,
+			- e.g. avoid covert channels
+	- data encryption
+		- protect sensitive data during storage and transmission,
+			- e.g. pswds and credit card info
+  
+### access control
+
+- access control: authentication + authorization + additional measures (such as IP-based restrictions)
+	- **authentication** is the process by which a system can identify users
+	- **authorization** is the process by which a system determines what level of access a user (who is already authenticated) has to secured resources.
+	- main approaches to access control
+		- **Discretionary access control (DAC)**
+			- Based on the concept of access privileges for giving users such privileges.
+			- SQL support DAC; most commercial DBMSs also support DAC.
+				- through `GRANT` and `REVOKE` commands
+					- `GRANT` gives privileges to users
+					- `REVOKE` takes away privileges from users
+		- **Mandatory access control (MAC)**
+			- Based on system-wide policies that cannot be changed by individual users.
+			- SQL doesn’t support MAC but some DBMSs support MAC.
+		- **Role-based access control (RBAC)**
+			- Based on roles (can be used with DAC and MAC).
+			- SQL support privileges on roles; many DBMSs support RBAC.
+
+### SQL injection
+
+- In SQL injection attacks, hackers inject a string input through the Web application which changes the SQL statement to their advantages.
+
+e.g.
+
+```sql
+SELECT * FROM users WHERE name=‘jake’ AND password=‘p’ OR ‘x’=‘x’;
+
+SELECT * FROM users WHERE name=‘jake’ AND password=‘p’; DROP TABLE users; --;’;
+```
+
+> Because the query here is constructed from strings, the use of quotes has turned the original WHERE condition into a condition that is always true.  
+
+- protection techniques
+	- Parameterized queries is used to improve security by preventing SQL injection (best solution).
+	- Input validation is used to remove or escape characters from input strings.
+  
+## DB Transactions
+
+DBMSs provide transaction support for solving this kind of problem.
+
+A transaction is a sequence of database operations grouped together for execution as a logic unit in a DBMS.
+
+Database applications often access a database by transactions rather than individual operations.
+
+They can enforce data integrity in the following situations:
+
+- multiple users may modify and share data at the same time;
+- transaction, system, and media failures may happen from time to time.
+
+- look like:
+	- `INSERT, SELECT, UPDATE, DELETE, BEGIN, COMMIT, ABORT (ROLLBACK)`, etc. from a high-level language perspective;
+	- `read, write, begin, commit, abort` at the internal process level.
+
+e.g.
+
+```sql
+BEGIN TRANSACTION
+SELECT balance FROM Account WHERE name = ‘Steve’;
+UPDATE Account
+SET balance = balance-500 WHERE name=‘Steve’;
+SELECT balance FROM Account WHERE name = ‘Bob’;
+UPDATE Account
+SET balance = balance+500 WHERE name = ‘Bob’;
+COMMIT
+```
+
+### ACID properties
+
+- DBMSs ensure the following properties of transactions.
+	- **Atomicity:**
+		- The execution of each transaction is atomic, i.e., **either all operations are completed or not done at all.**
+	- **Consistency:**
+		- The states of a database are consistent (w.r.t. deﬁned business rules) **before and after each transaction.**
+	- **Isolation:**
+		- Execution results of each transaction should be **unaffected by other concurrent executing transactions.**
+	- **Durability:**
+		- Once a transaction has been successfully completed, **its effects should persist in the database.**
+- Note: These properties are not independent from one another, but **atomicity is the central property.**
+
+### Concurrent Transactions
+
+- **interleaved processing**: transactions are interleaved in s single CPU.
+- **parallel processing**: transactions are executed in parallel in multiple CPUs.
+
+- Either way, executing transactions concurrently will **improve database performance**
+	- Increase throughput (average number of completed transactions)
+	- Reduce latency (average time to complete a transaction)
+- But the DBMS has to guarantee that the interleaving of transactions does not lead to inconsistencies, i.e., **concurrency control**.
+	- prevents:
+		- **lost update** problem: Occurs when two transactions update the same object, and one transaction could overwrite the value of the object which has already been updated by another transaction (write-write conﬂicts).
+		- **dirty read** problem: Occurs when one transaction could read the value of an object that has been updated by another transaction but has not yet committed (write-read conﬂicts).
+		- **unrepeated read** problem: A transaction could change the value of an object that has been read by another transaction but is still in progress (could issue two read for the object, or a write after reading the object) (read-write conﬂicts).
+		- **phantom read** problem: Occurs when tuples updated by a transaction T 1 satisfy the search conditions of another transaction so that, by the same search condition, the transaction obtains different results at different times.
+
+## NoSQL DB
+
+- why need NoSQL? Big data
+	- scale large
+	- nature of big data: 3Vs (volume, velocity, variety)
+
+- NoSQL
+	- flexibility of schemas:
+		- relational modeling is driven by the structure of available data
+		- NoSQL modeling is driven by application-specific operation patterns
+		- relational dbs are not good for managing hierarchical or graph-like data, but many NoSQLs are
+		- relational dbs require pre-defined schemas but NoSQL have no fixed schemas
+	- scalability:
+		- many NoSQL databases are driven by the need to scale
+			- **shared-nothing (SN)** vs **shared-everything (SE)**
+			- **scale up (vertically)** vs **scale out (horizontally)**
+		- relational databases can scale up by getting faster hardware, but cannot easily scale out at an acceptable cost and beyond certain point under ACID constraints.
+		- NoSQL databases often designed to scale out by leveraging commodity hardware, and free software, providing an inexpensive solution for scalability
+	- performance:
+		- Relational databases were invented in a way that implementation techniques are abstracted away from the user.
+		- NoSQL databases promote exposing the implementation techniques to the programmer
+		- Query performance is often one of the strengths of NoSQL databases, particularly when handling complex-valued data (because they de-normalise data and don’t use join).
+	- cost:
+		- NoSQL solutions are often less expensive than RDBMSs, especially when dealing with large-scale data sets.
+		- A scale out approach is usually cheaper than the scale up alternative.
+			- Many NoSQL databases are open source, while licensing costs of commercial RDBMSs can be quite expensive.
+			- NoSQL databases often leverage commodity servers to scale out, while RDBMs tends to rely on expensive proprietary servers and storage systems
+
+- RDBMSs support the ACID properties for database transactions.
+- NoSQL often uses a model weaker than ACID, called BASE.
+	- Basically available: The system may have partial failures. If a single node fails, part of the data won’t be available, but the entire data layer stays operational.
+	- Soft state: The state of the system could change over time (even during times without input), because there may be changes going on due to “eventual consistency”.
+	- Eventual consistency: Given a sufﬁciently long period of time, all updates can be expected to propagate eventually through the system and the replicas will be consistent.
+- There is a continuum between ACID and BASE in distributed database systems.
+
+- NoSQL databases are mainly categorized according to their data models:
+	- Key-value data stores
+	- Column-oriented data stores
+	- Document-oriented data stores
+	- Graph databases
+	- (size decreases, complexity increases)
+
+### Key-value Data Stores
+
+- The simplest type of NoSQL databases to use from an API perspective (the implementation may be complex) Look like a simple hash table (i.e., a unique key and a value), but not – it is a big, distributed, fault-tolerant, persistent hash table!
+- The schema of a key-value data store is: **Key** and **Value** (**Key** is a **string** and **Value** is a **blob**).
+
+
+|Key|Value|
+|-+-|
+|1|Peter, M, 03-07-1990, 34 Wattle St, ﬁshing|
+|2|Tom, M, 01-09-1995, 3 Arnold St, swimming|
+
+
+- Highly scalable, and there are two major options for scaling
+	- **Partitioning**: data is partitioned so that each database has a subset of the data stored on local disks.
+	- **Replication**: data is copied so that more than one database has the same data stored on local disks.
+- Concurrency is only applicable on a single key, and concurrency conﬂict is thus easy to handle.
+- Can **gain signiﬁcant performance beneﬁt** when structuring data access along keys for right applications, e.g. Amazons shopping cart runs on a key-value store (Amazon Dynamo).
+- If you need complex operations on values, you should look at other solutions, such as document-oriented data stores.
+
+### Column-oriented Data Stores
+
+- Store data grouped by columns (rather than rows) and may have a very What is a column-store? large number of columns.
+
+- Uses a **shared-nothing architecture** to provide scalability over massive data sets:
+	- **Horizontal partitioning** by range of row keys.
+	- **Vertical partitioning** by column families
+- **Replication**: eventual-consistency replication across datacenters, between multiple BigTable serving setups (master/slave & multi-master)
+- Supports **single-row transactions**.
+- Supports **only simple queries**.
+- Does **not support secondary indices**.

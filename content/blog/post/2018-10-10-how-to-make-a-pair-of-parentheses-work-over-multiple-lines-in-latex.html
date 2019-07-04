@@ -1,0 +1,24 @@
+---
+title: How to Make a Pair of Parentheses Work over Multiple Lines in LaTeX?
+author: Qiu Rui
+date: '2018-10-10'
+slug: how-to-make-a-pair-of-parentheses-work-over-multiple-lines-in-latex
+categories: []
+tags:
+  - LaTeX
+---
+
+
+
+<p>Gotta say this is a really handy trick.</p>
+<pre class="latex"><code>\[
+    \begin{split}
+        a &amp;= \left( \frac12 + \frac13 + \frac14 \right.\\
+          &amp;\ \ \ \ \ \ \quad \left. {} + a + b + c \vphatom{\frac12}\right)\\
+          &amp;= x + y + z
+    \end{split}
+\]</code></pre>
+<p>The key idea is to use <code>\vphatom{\frac12}</code>, which is of the same height of previous line, to force the right parenthesis in the second line to match with its counterpart.</p>
+<center>
+<img src="/image/parantheses.png" />
+</center>

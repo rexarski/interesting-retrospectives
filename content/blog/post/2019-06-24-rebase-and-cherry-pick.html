@@ -1,0 +1,51 @@
+---
+title: Rebase and Cherry-pick
+author: Qiu Rui
+date: '2019-06-24'
+slug: rebase-and-cherry-pick
+categories: []
+tags:
+  - git
+---
+
+
+
+<p>After reading the book <em><a href="https://leanpub.com/learngitthehardway">Learn Git the Hard Way</a></em>, I’m still a little bit confused about:</p>
+<ul>
+<li><code>git rebase</code></li>
+<li><code>git cherry-pick</code></li>
+</ul>
+<p>The book is quite practical, but the pdf version misses lots of figures in the original e-book (on Leanpub.com).</p>
+<p>So I turn to <em><a href="https://git-scm.com/">The Documentation</a></em> for help.</p>
+<div id="rebase" class="section level2">
+<h2>Rebase</h2>
+<p>To summarize, what <code>git rebase</code> can do are:</p>
+<div id="to-combine-multiple-commits-into-one" class="section level3">
+<h3>To combine multiple commits into “one”</h3>
+<p><img src="/image/rebase1.png" /></p>
+<p>The command format is</p>
+<pre class="git"><code>git rebase -i [startpoint] [endpoint]</code></pre>
+<p>The tag <code>-i</code> stands for <code>—interactive</code>. Follow the instructions.</p>
+</div>
+<div id="to-paste-a-collection-of-commits-to-another-branch" class="section level3">
+<h3>To paste a collection of commits to another branch</h3>
+<p><img src="/image/rebase2.png" /></p>
+<pre class="git"><code>git rebase [startpoint] [endpoint] --onto [branchname]</code></pre>
+<p>After that, just don’t forget the <code>HEAD</code> is detached at this moment, like this:
+<img src="/image/rebase3.png" /></p>
+<p>So, a proper follow-up is:</p>
+<pre class="git"><code>git checkout master
+git reset --hard [endpoint] # the id will be prompted after the previous command</code></pre>
+</div>
+</div>
+<div id="cherry-pick" class="section level2">
+<h2>Cherry-pick</h2>
+<p>A better solution to <code>rebase</code>’s second functionality?</p>
+<pre class="git"><code>git branch acorrectbranch
+# in a correct branch, use this
+git cherry-pick [commit id]</code></pre>
+<ul>
+<li>If any conflict happens, resolve the conflicts, add files if needed. <code>git cherry-pick —continue</code></li>
+<li><code>git cherry-pick --abort</code> to abort the process.</li>
+</ul>
+</div>

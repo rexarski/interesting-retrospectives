@@ -1,0 +1,61 @@
+---
+title: Rebase and Cherry-pick
+author: Qiu Rui
+date: '2019-06-24'
+slug: rebase-and-cherry-pick
+categories: []
+tags:
+  - git
+---
+
+After reading the book *[Learn Git the Hard Way](https://leanpub.com/learngitthehardway)*, I’m still a little bit confused about:
+
+- `git rebase`
+- `git cherry-pick`
+
+The book is quite practical, but the pdf version misses lots of figures in the original e-book (on Leanpub.com).
+
+So I turn to *[The Documentation](https://git-scm.com/)* for help.
+
+## Rebase
+To summarize, what `git rebase` can do are:
+
+### To combine multiple commits into “one”
+![](/image/rebase1.png)
+
+The command format is
+
+```git
+git rebase -i [startpoint] [endpoint]
+```
+
+The tag `-i` stands for `—interactive`. Follow the instructions.
+
+### To paste a collection of commits to another branch
+![](/image/rebase2.png)
+
+```git
+git rebase [startpoint] [endpoint] --onto [branchname]
+```
+
+After that, just don’t forget the `HEAD` is detached at this moment, like this:
+![](/image/rebase3.png)
+
+So, a proper follow-up is:
+
+```git
+git checkout master
+git reset --hard [endpoint]	# the id will be prompted after the previous command
+```
+
+## Cherry-pick
+A better solution to `rebase`’s second functionality?
+
+```git
+git branch acorrectbranch
+# in a correct branch, use this
+git cherry-pick [commit id]
+```
+
+- If any conflict happens, resolve the conflicts, add files if needed. `git cherry-pick —continue`
+- `git cherry-pick --abort` to abort the process.

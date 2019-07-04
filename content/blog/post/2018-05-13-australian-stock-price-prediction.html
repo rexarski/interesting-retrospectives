@@ -105,7 +105,7 @@ PriorClose Min. : 0.001 1st Qu.: 0.115 Median : 0.900 Mean : 5.921 3rd Qu.: 4.89
 <p><span class="math display">\[\text{Close}_t=S_t+T_t+E_t,\]</span></p>
 <p>where <span class="math inline">\(S_t\)</span> is the seasonal component, <span class="math inline">\(T_t\)</span> is the trend component and <span class="math inline">\(E_t\)</span> is the random noise. A seasonal ARIMA model can be expressed as <span class="math inline">\(ARIMA(p,d,q)(P,D,Q)_m\)</span> where <span class="math inline">\((p,d,q)\)</span> is the non-seasonal part of the model and <span class="math inline">\((P,D,Q)_m\)</span> is the seasonal part. <span class="math inline">\(m\)</span> is the number of periods per season.</p>
 <div class="figure">
-<img src="/image/stock/wow-price.png" alt="Figure 1: Woolworths stock price" />
+<img src="/image/stock/wow-price.png" alt="" />
 <p class="caption">Figure 1: Woolworths stock price</p>
 </div>
 <p>From the stock price line plot, we cannot directly confirm the size of a cycle. But recall that we have found some frequent patterns that stock prices tend to be increasing on Thursdays and Fridays, so we would like to give 7-day-cycle a try, letting <span class="math inline">\(m=7\)</span>. Then we use the built-in <code>auto.arima()</code> function in <code>forecast</code> package <a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a> to automatically determine the model parameter by finding the model with the least AIC (Akaike information criterion) <a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a>. Note that <code>auto.arima()</code> speeds up by taking shortcuts in the algorithm, but we can set <code>stepwise=F</code> and <code>approximation=F</code> to avoid it. In such a way, we have the following model.</p>
@@ -141,7 +141,7 @@ AIC=-221.67   AICc=-221.49   BIC=-202.29
 </output></pre>
 <p>The barplot in Figure 2 indicates the support count and confidence of rules of our selection.</p>
 <div class="figure">
-<img src="/image/stock/rules.png" alt="Figure 2: Barplot of frequent rules" />
+<img src="/image/stock/rules.png" alt="" />
 <p class="caption">Figure 2: Barplot of frequent rules</p>
 </div>
 <p>An interpretation of these interesting rules can be: during the whole year of 2017 and the first quarter of 2018, the Australian stock prices (according to the selection of 61 stocks) tend to be increasing on Thursday and Friday. Among all industries, the technology industry and basic materials industry are prosperous. Two types of sub-industries, the mining and metals (under resources) and software (under technology) are typical examples.</p>
@@ -150,7 +150,7 @@ AIC=-221.67   AICc=-221.49   BIC=-202.29
 <div id="general-stock-price-predictions-1" class="section level3">
 <h3>4.2 General Stock Price Predictions</h3>
 <div class="figure">
-<img src="/image/stock/original.png" alt="Figure 3: Trained Neural Network" />
+<img src="/image/stock/original.png" alt="" />
 <p class="caption">Figure 3: Trained Neural Network</p>
 </div>
 <p><span class="math display">\[MAE=\frac{\sum^N_{i=1}|x^*_i-x_i|}{N},\]</span></p>
@@ -162,7 +162,7 @@ MAE_{NN}=0.0725,\ MAE_{LM}=0.0223
 \]</span></p>
 <p>This means, on average, the neural network’s prediction deviates about <span class="math inline">\(\pm 0.0725\)</span> around the actual values, and linear regression’s prediction deviates about <span class="math inline">\(\pm 0.0223\)</span>. It seems that linear regression performs better in predicting <code>Close</code> prices. We look back into the basic summary statistics of numeric inputs in part 1.</p>
 <div class="figure">
-<img src="/image/stock/original-vs.png" alt="Figure 4: Real value vs predicted values" />
+<img src="/image/stock/original-vs.png" alt="" />
 <p class="caption">Figure 4: Real value vs predicted values</p>
 </div>
 <pre><output>
@@ -250,7 +250,7 @@ Number of Fisher Scoring iterations: 2
 <h3>4.3 Time Series Analysis</h3>
 <p>After finding the seasonal ARIMA model, we are interested in its predicting power.</p>
 <div class="figure">
-<img src="/image/stock/wow-forecast.png" alt="Figure 5: Predicted Woolworths stock price" />
+<img src="/image/stock/wow-forecast.png" alt="" />
 <p class="caption">Figure 5: Predicted Woolworths stock price</p>
 </div>
 <p>As we can see, the red curve indicates the real stock price of Woolworths in the year 2018, while the blue curve is the original prediction by ARIMA. Meanwhile, the outer shaded area stands for 80% confidence interval, and the inner is 95%. In other words, there is 80% or 95% chance the future stock prices fall in these areas. In fact, the real stock prices in 2018 are inside the 95% confidence interval region. However, the real fluctuation is larger, and the prediction does not capture a downward trend on a large scale. But if we zoom in, consider different segments of data, it is clear that the prediction is correct about up and down in most of the cases, only the magnitudes are underestimated to some extent. For this reason, but generally we have a solid prediction.</p>
@@ -283,18 +283,18 @@ Number of Fisher Scoring iterations: 2
 <div class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p>T. Ganegedara, “LSTM in Python: Stock Market Predictions”, <em>DataCamp Community</em>, 2018. [Online]. Available: <a href="https://www.datacamp.com/community/tutorials/lstm-python-stock-market" class="uri">https://www.datacamp.com/community/tutorials/lstm-python-stock-market</a>. [Accessed: 13-May-2018].<a href="#fnref1" class="footnote-back">↩</a></p></li>
-<li id="fn2"><p>“Company List - Wall Street Journal”, <em>The Wall Street Journal</em>, 2018. [Online]. Available: <a href="https://quotes.wsj.com" class="uri">https://quotes.wsj.com</a>. [Accessed: 13- May- 2018].<a href="#fnref2" class="footnote-back">↩</a></p></li>
-<li id="fn3"><p>G. Williams, <em>Rattle</em>. Togaware, 2017.<a href="#fnref3" class="footnote-back">↩</a></p></li>
-<li id="fn4"><p>J. Rice, <em>Mathematical statistics and data analysis (with cd data sets)</em>, 3rd ed. Cengage Learning/Brooks/Cole, 2007, p. 520.<a href="#fnref4" class="footnote-back">↩</a></p></li>
-<li id="fn5"><p>“How to choose the number of hidden layers and nodes in a feedforward neural network?”, <em>Cross Validated</em>. [Online]. Available: <a href="https://stats.stackexchange.com/questions/181/how-to-choose-the-number-of-hidden" class="uri">https://stats.stackexchange.com/questions/181/how-to-choose-the-number-of-hidden</a> -layers-and-nodes-in-a-feedforward-neural-netw. [Accessed: 13-May-2018].<a href="#fnref5" class="footnote-back">↩</a></p></li>
-<li id="fn6"><p>S. Fritsch and F. Guenther, <em>neuralnet: Training of Neural Networks</em>. 2016.<a href="#fnref6" class="footnote-back">↩</a></p></li>
-<li id="fn7"><p>J. Faraway, <em>Linear models with R</em>, 2nd ed. Boca Raton: Chapman &amp; Hall/CRC, 2014, p. 28.<a href="#fnref7" class="footnote-back">↩</a></p></li>
-<li id="fn8"><p>R. Hyndman, G. Athanasopoulos and C. Bergmeir, <em>forecast: Forecasting Functions for Time Series and Linear Models</em>. 2018.<a href="#fnref8" class="footnote-back">↩</a></p></li>
-<li id="fn9"><p>R. Hyndman and G. Athanasopoulos, “Forecasting: principles and practice”, <em>OTexts</em>, 2012. [Online]. Available: <a href="https://www.otexts.org/fpp" class="uri">https://www.otexts.org/fpp</a>. [Accessed: 13-May-2018].<a href="#fnref9" class="footnote-back">↩</a></p></li>
-<li id="fn10"><p>H. Akaike, “Information Theory and an Extension of the Maximum Likelihood Principle,” in <em>Selected Papers of Hirotugu Akaike</em>, E. Parzen, K. Tanabe and G. Kitagawa. Springer, New York, NY, 1998, pp-199-213.<a href="#fnref10" class="footnote-back">↩</a></p></li>
-<li id="fn11"><p>G. Williams, <em>Rattle</em>. Togaware, 2017.<a href="#fnref11" class="footnote-back">↩</a></p></li>
-<li id="fn12"><p>R. Hyndman and G. Athanasopoulos, “Forecasting: principles and practice”, <em>OTexts</em>, 2012. [Online]. Available: <a href="https://www.otexts.org/fpp" class="uri">https://www.otexts.org/fpp</a>. [Accessed: 13-May-2018].<a href="#fnref12" class="footnote-back">↩</a></p></li>
-<li id="fn13"><p>R. Hyndman and G. Athanasopoulos, “Forecasting: principles and practice”, <em>OTexts</em>, 2012. [Online]. Available: <a href="https://www.otexts.org/fpp" class="uri">https://www.otexts.org/fpp</a>. [Accessed: 13-May-2018].<a href="#fnref13" class="footnote-back">↩</a></p></li>
+<li id="fn1"><p>T. Ganegedara, “LSTM in Python: Stock Market Predictions”, <em>DataCamp Community</em>, 2018. [Online]. Available: <a href="https://www.datacamp.com/community/tutorials/lstm-python-stock-market" class="uri">https://www.datacamp.com/community/tutorials/lstm-python-stock-market</a>. [Accessed: 13-May-2018].<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>“Company List - Wall Street Journal”, <em>The Wall Street Journal</em>, 2018. [Online]. Available: <a href="https://quotes.wsj.com" class="uri">https://quotes.wsj.com</a>. [Accessed: 13- May- 2018].<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>G. Williams, <em>Rattle</em>. Togaware, 2017.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>J. Rice, <em>Mathematical statistics and data analysis (with cd data sets)</em>, 3rd ed. Cengage Learning/Brooks/Cole, 2007, p. 520.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+<li id="fn5"><p>“How to choose the number of hidden layers and nodes in a feedforward neural network?”, <em>Cross Validated</em>. [Online]. Available: <a href="https://stats.stackexchange.com/questions/181/how-to-choose-the-number-of-hidden" class="uri">https://stats.stackexchange.com/questions/181/how-to-choose-the-number-of-hidden</a> -layers-and-nodes-in-a-feedforward-neural-netw. [Accessed: 13-May-2018].<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
+<li id="fn6"><p>S. Fritsch and F. Guenther, <em>neuralnet: Training of Neural Networks</em>. 2016.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
+<li id="fn7"><p>J. Faraway, <em>Linear models with R</em>, 2nd ed. Boca Raton: Chapman &amp; Hall/CRC, 2014, p. 28.<a href="#fnref7" class="footnote-back">↩︎</a></p></li>
+<li id="fn8"><p>R. Hyndman, G. Athanasopoulos and C. Bergmeir, <em>forecast: Forecasting Functions for Time Series and Linear Models</em>. 2018.<a href="#fnref8" class="footnote-back">↩︎</a></p></li>
+<li id="fn9"><p>R. Hyndman and G. Athanasopoulos, “Forecasting: principles and practice”, <em>OTexts</em>, 2012. [Online]. Available: <a href="https://www.otexts.org/fpp" class="uri">https://www.otexts.org/fpp</a>. [Accessed: 13-May-2018].<a href="#fnref9" class="footnote-back">↩︎</a></p></li>
+<li id="fn10"><p>H. Akaike, “Information Theory and an Extension of the Maximum Likelihood Principle,” in <em>Selected Papers of Hirotugu Akaike</em>, E. Parzen, K. Tanabe and G. Kitagawa. Springer, New York, NY, 1998, pp-199-213.<a href="#fnref10" class="footnote-back">↩︎</a></p></li>
+<li id="fn11"><p>G. Williams, <em>Rattle</em>. Togaware, 2017.<a href="#fnref11" class="footnote-back">↩︎</a></p></li>
+<li id="fn12"><p>R. Hyndman and G. Athanasopoulos, “Forecasting: principles and practice”, <em>OTexts</em>, 2012. [Online]. Available: <a href="https://www.otexts.org/fpp" class="uri">https://www.otexts.org/fpp</a>. [Accessed: 13-May-2018].<a href="#fnref12" class="footnote-back">↩︎</a></p></li>
+<li id="fn13"><p>R. Hyndman and G. Athanasopoulos, “Forecasting: principles and practice”, <em>OTexts</em>, 2012. [Online]. Available: <a href="https://www.otexts.org/fpp" class="uri">https://www.otexts.org/fpp</a>. [Accessed: 13-May-2018].<a href="#fnref13" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>

@@ -1,0 +1,972 @@
+---
+title: R for Data Science Notes
+author: Qiu Rui
+date: '2018-11-09'
+slug: r-for-data-science-notes
+categories: []
+tags:
+  - R
+  - notes
+output:
+  blogdown::html_page:
+    toc: true
+---
+
+**The followings notes are taken from the book *[R for Data Science](https://r4ds.had.co.nz/)* by Hadley Wickham & Garrett Grolemund.**
+
+Additionally, me after posting this:
+
+> The formatting is a lie.
+
+## part I explore
+### chapter 1 data visualization with `ggplot2`
+
+> The simple graph as brought more information to the data analyst’s mind than any other device. —— John Tukey  
+
+> The greatest value of a picture is when it forces us to notice what we never expected to see. —— John Tukey  
+
+- `ggplot2` will not use 6 shapes at a time. So when dealing with more than 5 categories, don’t use `shape` in `aes`.
+- If you want to set the aesthetic properties of your geom manually, specify the parameter outside the `aes`.
+- Common problem: the `+` in `ggplot2` graphics has to be put at the end of the line, not the start.
+- Don’t mess up `facet_wrap(~ var1)` with `facet_grid(var1 ~ var2)`  or `facet_grid(. ~ var1)` or `facet_grid(var1 ~ .)`.
+- Fun fact: `geom_bar()` and `stat_count()` are interchangeable.
+- `geom_bar()` and related
+	- `geom_bar()` displaying a proportion -> set `y=..prop.., group=1` in `aes()`
+	- `stat_summary()` summarizes the `y` values for each unique `x` value, have multiple arguments like `fun.ymin`, `fun.ymax`, `fun.y`, etc.
+	- In `aes()` of `geom_bar()`, `fill()` is the color, `color` is the border color.
+	- 3 `position=`
+		- `"identity"`
+		- `"fill"`
+		- `"dodge"`
+	- one extra position for `geom_point()`: `"jitter"`
+- coordinate systems
+	- `coord_flip()`: x -> y, y -> x.
+	- `coord_quickmap()` sets the aspect ratio correctly for maps.
+	- `coord_polar()` bar chart -> Coxcomb chart.
+
+### chapter 3 data transformation with `dplyr`
+
+- five key `dplyr` functions:
+	- pick observations by their values `filter()`
+	- reorder the rows `arrange()`
+	- pick variables by their names `select()`
+	- create new variables with functions of existing variables `mutate()`
+	- collapse many values down to a single summary `summarize()`
+	- aka. **FAMSS**,
+		- work together with `group_by()`
+- `arrange()`
+	- by default, ascending order
+	- `desc()` descending order
+	- missing values `NA` are always sorted at the end
+- `select()`
+	- helper functions in `select()`
+		- `starts_with("abc)`
+		- `ends_with(“abc”)`
+		- `contains(“abc”)`
+		- `matches(“(.)\\1”)` matches a regex.
+		- `num_range(“x”, 1:3)` matches `x1`, `x2` and `x3`
+	- can be used to rename variables, but rarely useful because it drops all of the variables not explicitly mentioned.
+		- instead, use `rename()` that keeps all the variables that aren’t explicitly mentioned.
+	- another option is to use `select()` with `everything()` , like `select(fights, time_hour, air_time, everything())`
+- `mutate()`
+	- not only keeps the original variables, also include the new variables.
+	- if you want to keeps new variables only, use `transmutate()` instead in the same manner.
+	- some other creation functions
+		- `%/%` integer division, `%%` remainder.
+		- `lead()` and `lag()`
+		- `cumsum()`, `cummean()`, etc.
+		- `min_rank()`, `dense_rank()`, `percent_rank()`, `cume_dist()`, `ntile()` etc.
+
+### chapter 5 EDA
+
+- why load separate packages/libraries when you could achieve the same goal with `library(tidyverse)`?
+> There are no routine statistical questions, only questionable statistical routines. —— Sir David Cox  
+
+> Far better an approximate answer to the right question, which is often vague, than an exact answer to the wrong question, which can always be made precise. —— John Tukey  
+
+- visualizing distributions
+	- if you want to plot multiple overlapping distributions, don’t use `geom_histogram()`, use `geom_freqpoly()`
+	- `coord_cartesian()` can “zoom in” while keeping the same ratio of x-y.
+- covariation
+	- for more informative display of a boxplot, it’s always better to use a `reorder()` inside the `geom_boxplot()` to rank the variables fro low to high.
+- two categorical variables
+	- use `geom_tile()`
+	- if both unordered, use `seriation` package.
+	- for larger plots, use `d3heatmap` or `heatmaply` package.
+- two continuous variables
+	- use `alpha` for crowded points
+	- `geom_bin2d()`
+	- `geom_hex()` in `hexbin` package
+	- or, use `cut_width(x, width)` to transform continuous data into categorical with binwidth.
+- pattern and models
+	- `library(modelr)`
+	- `add_residuals(mod)` corporates with `lm()` model and `ggplot()` pipeline
+	
+## part II wrangle
+
+### chapter 7 tibbles with `tibble`
+
+- tibble is a modern data frame.
+- `tibble` package is in the core of `tidyverse`  package.
+- `as_tibble(df)`
+- a tibble could have _nonsyntactic_ names 
+- can create a tibble with `tribble()`, aka. _transposed tibble_, which is in an easy-to-read form
+
+```r
+tribble(
+	~x, ~y, ~z,
+	#--/--/----
+	"a", 2, 3.6,
+	"b", 1, 8.5
+)
+```
+
+- tibbles vs data.frames
+	- printing
+		- tibble only shows the first 10 rows, and all the columns that fit on screen
+	- subsetting
+		- extract by name
+			- `df$x` or `df[["x"]]`
+		- extract by position
+			- `df[[1]]`
+		- to use in a pipe, need to use the special placeholder `.`
+			- `df %>% .$x` or `df %>% .[[“x”]]`
+
+- - - -
+
+### chapter 8 data import with `readr`
+
+- basics about `readr`
+	- `read_csv()` , `read_csv2()` reads semicolon-separated files (common in countries where `,` is used as decimal place), `read_tsv()` tab-delimited files, and `read_delim()` for any format.
+	- `read_fwf()` reads fixed-width files.
+	- `read_log()` reads Apache style log files. (check out `webreadr` package )
+	- all these reads a file as a `tibble`, and the usage is pretty similar.
+	- sometimes, there are a few lines of metadata not necessarily needed.
+	
+```r
+read_csv("The first line of metadata
+The second line of metadata
+x,y,z
+1,2,3", skip = 2)
+
+read_csv("# A comment I want to skip
+x,y,z
+1,2,3", comment = "#")
+```
+
+	- if a file does not have column name, need to specify:
+
+```r
+read_csv("1,2,3\n4,5,6", col_names = FALSE)
+read_csv("1,2,3\n4,5,6", col_names = c("x", "y", "z"))
+```
+
+	- another common tweaking is `na`, which specifies the value or values to be missing values:
+
+```r
+read_csv(“a,b,c\n1,2,.”, na = “.”)
+```
+
+- `readr` comparing with base R
+	- typically  ~10x faster than base R (long-running jobs have a progress bar)
+	- produce **tibbles** and don’t **convert character vectors to factors, use row names, or munge the column names.**  
+	- more reproducible.
+- parsing a vector
+	- some `parse_*()` functions are highlighted. (8 in total)
+		- `parse_logical()`
+		- `parse_integer()`
+		- `parse_double()` -> a strict number parser
+		- `parse_number()` -> a flexible number parser
+		- `parse_character()`
+		- `parse_factor()`
+		- `parse_datetime()`
+		- `parse_date()`
+		- `parse_time()`
+		- could use `na = ` to specify missing values, e.g. `parse_integer(c(“1”, “231”, “.”, “456”), na = “.”)`
+		- failure will have a warning, failures will be missing in the output.
+	- parsing numbers
+	
+```r
+parse_double("1.23")
+parse_double("1,23", locale = locale(decimal_mark = ","))
+
+parse_number("$100")
+parse_number("20%")
+parse_number("$123,456,789") # in America
+parse_number("123.456.789", locale = locale(grouping_mark = ".")) # in many parts of Europe
+parse_number("123'456'789', locale = locale(grouping_mark = "'")) # in Switzerland
+```
+
+	- parsing strings
+		- `parse_character()` is really simple, it just returns its input. But it is not always like that. It does something about **encoding**.
+		- note that `readr` uses UTF-8 everywhere, so it assumes your data is UTF-8 encoded, but sometimes it is not.
+		
+```r
+x1 <- "El Ni\xf1o was particularly bad this year"
+x2 <- "\x82\xb1\x82\xf1\x82\xc9\x82\xbf\x82\xcd"
+parse_character(x1, locale = locale(encoding = "Latin1"))
+parse_character(x2, locale = locale(encoding = "Shift-JIS"))
+```
+
+		- sometimes, we don’t know what encoding should be used, `readr` provides a function `guess_encoding()` as its name tells.
+
+```r
+guess_encoding(charToRaw(x1))
+guess_encoding(charToRaw(x2))
+```
+
+		- The first argument to `guess_encoding` could be either a path to a file or a raw vector.
+	- parsing factors
+
+```r
+fruit <- c("apple", "banana")
+parse_factor(c("apple", "banana", "bananana"), levels = fruit)
+```
+
+	- parsing dates, date-times, and times
+		- `parse_datetime()` expects an ISO8601 date-time.
+			- if time is omitted, will be set to 12:00 am.
+		- `parse_date()` expects a four-digit year, a `-` or `/`, the month, a `-` or `/`, then the day.
+		- `parse_time()` expects hour, `:`, minutes, optionally, `:` and seconds, and an optional a.m./p.m. specifier.
+			- base R does not have good built-in class for time data, so use `hms` package
+
+```r
+library(hms)
+parse_time("01:10 am")
+parse_time("20:10:01")
+```
+
+		- if you want to supply your own date or datetime or time `format`, better remember all these:
+			- Year
+				- `%Y` (4 digits)
+				- `%y` (2 digits; 00-69 -> 2000-2069, 70-99 -> 1970-1999)
+			- Month
+				- `%m` (2 digits)
+				- `%b` (abbreviated name, like “Jan”)
+				- `%B` (full name)
+			- Day
+				- `%d` (2 digits)
+				- `%e` (optional leading space)
+			- Time
+				- `%H` (0-23 hour format)
+				- `%I` (0-12, must be used with `%p`)
+				- `%p` (a.m./p.m. indicator)
+				- `%M` (minutes)
+				- `%S` (integer seconds)
+				- `%OS`(real seconds)
+				- `%Z` (time zone)
+				- `%z` (as offset from UTC, e.g., `+0800`)
+			- Nondigits
+				- `%.` (skips one non digit character)
+				- `%*` (skips any number of non digits)
+
+```r
+parse_date("1 janvier 2015", "%d %B %Y", locale = locale("fr"))
+#> [1] "2015-01-01"
+```
+
+- parsing a file
+	- uses a heuristic to figure out the type of each column (for the first 1000 rows)
+		- could use `guess_parser()` to emulate
+	- problems (for larger files)
+		- the first 1000 rows could be a special case
+		- lots of missing values. if 1000 rows contain only `NA`s, will guess it’s a character vector.
+
+### chapter 9 tidy data with `tidyr`
+
+> Happy families are all alike; every unhappy family is unhappy in its own way. —— Leo Tolstoy  
+
+> Tidy datasets are all alike, but every messy dataset is messy in its own way. —— Hadley Wickham  
+
+- 3 interrelated rules which make a dataset tidy:
+	- 1. each variable must have its own column.
+	- 2. each observation must have its own row.
+	- 3. each value must have its own cell.
+- in practice, these lead to a set of practical instructions:
+	- 1. put each dataset in a tibble
+	- 2. put each variable in a column
+- spreading an gathering
+	- common problems:
+		- one variable might be spread across multiple columns
+		- one observation might be scattered across multiple rows
+	- `gather()`
+
+```r
+table4a
+#> # A tibble: 3 x 3
+#>			country	 `1999`	 `2000`
+#>	 *		  <chr>  <int>   <int>
+#> 1	Afghanistan    745    2666
+#> 2       Brazil  37737   80488
+#> 3        China 212258  213766
+
+table4a %>%
+	gather(`1999`, `2000`, key = "year", value = "cases")
+#> # A tibble: 3 x 3
+#>			country	  year	  cases
+#>	 *		  <chr>  <int>   <int>
+#> 1	Afghanistan   1999     745
+#> 2       Brazil   1999   37737
+#> 3        China   1999  212258
+#> 4  Afghanistan   2000    2666
+#> 5       Brazil   2000   80488
+#> 6        China   2000  213766
+```
+
+	- `spread()` is the opposite of gathering.
+		- `spread(table2, key = type, value = count)`
+- separating and pull
+	- `separate()` pulls apart one column into multiple columns, by splitting wherever a separator character appears.
+	- the separator character can be specified as a character.
+	- or, we can pass a vector of integers to `sep`, then it will be interpreted as the positions to split at!
+
+```r
+table3
+#> # A tibble: 6 x 3
+#>       country   year           rate
+#> *       <chr>  <int>          <chr>
+#> 1 Afghanistan   1999   745/19987071
+#> 2Afghaanistan   2000  2666/20595360
+
+table3 %>%
+	separate(rate, into = c("cases", "population"), sep = "/")
+#> # A tibble: 6 x 4
+#>       country   year    cases   population
+#> *       <chr>  <int>    <chr>        <chr>
+#> 1 Afghanistan   1999      745     19987071
+#> 2 Afghanistan   2000     2666     20595360
+
+table3 %>%
+	separate(
+		rate, 
+		into = c("cases", "population"),
+		sep = "/",
+		convert = TRUE
+	)
+#> # A tibble: 6 x 4
+#>       country   year    cases   population
+#> *       <chr>  <int>    <int>        <int>
+#> 1 Afghanistan   1999      745     19987071
+#> 2 Afghanistan   2000     2666     20595360
+
+table3 %>%
+	separate(year, into = c("century", "year"), sep = 2)
+#> # A tibble: 6 x 4
+#>       country   century   year           rate
+#> *       <chr>     <chr>  <chr>          <chr>
+#> 1 Afghanistan        19     99   745/19987071
+#> 2Afghaanistan        20     00  2666/20595360
+```
+
+	- `unite()` is the inverse of `separate()`
+		- much less frequently used than `separate()`
+		
+```r
+df %>% unite(new_var_name, var1, var2)
+
+# by default the separtor is underscore _, but can be specified 
+df %>% unite(new_var_name, var1, var2, sep = "")
+```
+
+- missing values
+	- explicitly as `NA`s or implicitly as not present.
+	
+```r
+stocks <- tibble(
+	year = c(2015, 2015, 2015, 2015, 2016, 2016, 2016),
+	qtr  = c(1, 2, 3, 4, 2, 3, 4),
+	return = c(1.88, 0.59, 0.35, NA, 0.92, 0.17, 2.66)
+)
+
+stocks %>% 
+	spread(year, return) %>%  # make implicit missing value explicit
+	gather(key = year, value = return, `2015`:`2016`, na.rm = TRUE)  # turn explicit missing value implicit
+```
+
+	- another tool for making missing values explicit is `complete()`
+		- takes a set of columns, and finds all unique combinations, then ensures the original dataset contains all those values, filling in explicit `NA`s where necessary.
+	- another tool for filling in `NA`s with **the most recent non missing value** (last observation carried forward): `fill()`
+
+### chapter 10 relational data with `dplyr`
+- mutating joins
+	- with `select()` and `mutate()`
+	- understanding joins
+		- `inner_join()`
+		- outer joins
+			- `left_join()` keeps all observations in `x`
+			- `right_join()` keeps all observations in `y`
+			- `full_join()` keeps all observations in both `x` and `y`
+
+
+|`dplyr`| postgreSQL |
+|:----- |:----| 
+|`inner_join(x,y)`|`SELECT * FROM x INNER JOIN y USING (z)`|
+|`left_join(x,y)` |`SELECT * FROM x LEFT JOIN y USING (z) `|
+|`right_join(x,y)`|`SELECT * FROM x RIGHT JOIN y USING (z)`|
+|`full_join(x,y)` |`SELECT * FROM x FULL JOIN y USING (z)` |
+
+
+- filering joins
+	- filtering joins match observations in the same way as mutating joins, but affect the observations, not the variables.
+		- `semi_join(x,y)` keeps all observations in `x` that have a  match in `y`.
+		- `anti_join(x,y)` drops all observations in `x` that have a match in `y`.
+- set operations
+	- `intersect(x,y)`
+	- `union(x,y)`
+	- `setdiff(x,y)`
+
+### chapter 11 strings with `stringr`
+
+- `stringr` is not part of the core `tidyverse`. (2018-10-26, actually, it is in)
+- this chapter is mainly about _regex_  basics.
+- suggest to use double quotes as default, unless single quote to contain double quotes inside.
+- to include a literal single or double quote in a string can use `\` to escape it:
+
+```r
+double_quote <- "\""  # or '"'
+single_quote <- '\''  # or "'"
+blackslash <- "\\"
+```
+
+- string length
+	- (why not base R? because they can be inconsistent, which makes them hard to remember.)
+	- functions in `stringr` package have intuitive prefixes in their names, all start with `str_`
+	- `str_length()`
+
+- string combine
+	- `str_c()`
+	- `str_c(x, y, sep=“, “)`
+	- missing values can be contagious, `str_replace_na()` will treat them as string `”NA”`
+	
+```r
+x <- c("abc", NA)
+str_c("|-", x, "-|")
+#> [1] "|-abc-|" NA
+str_c("|-", str_replace_na(x), "-|")
+#> [1] "|-abc-|" "|-NA-|"
+```
+
+	- note `str_c()` is vectorized, automatically recycles shorter vectors to the same length as the longest.
+	- to collapse a vector of strings into a single string, use `collapse`:
+	
+```r
+str_c(c("x", "y", "z"), collapse = ", ")
+```
+
+- subsetting strings
+	- `str_sub(string, start_ind, end_ind)` (not substitute, but subset!)
+		- inclusive
+		- it won’t fail if `start_ind, end_ind` are out of range, will just return as much as possible (forgiving)
+		- can use assignment form of `str_sub()` to modify strings:
+		
+```r
+str_sub(x, 1, 1) <- str_to_lower(str_sub(x, 1, 1))  # lowercase the first letter of words
+```
+
+- locales
+	- previously with `str_to_lower()`, of course there are `str_to_upper()` and `str_to_title()`.
+	- the locale is specified as an ISO 639 language code, which is a two- or three-letter abbreviation.
+
+```r
+x <- c("apple", "eggplant", "banana")
+str_sort(x, locale = "en")  # English
+#> [1] "apple"  "banana"   "eggplant"
+str_sort(x, locale = "haw")  # Hawaiian
+#> [1] "apple"  "eggplant" "banana"
+```
+
+- matching patterns
+	- to learn regex, use `str_view()` and `str_view_all()` which take a character vector and a regex and show you how they match.
+
+```r
+# basic matches
+
+x <- c("apple", "banana", "pear")
+str_view(x, "an")  # exact matching, only banana will be circled
+str_view(x, ".a.")  # ban in banana, ear in pear will be circled. `.` matches any character (except a newline)
+
+# a real dot will be matched with `\\.`
+# a real backslash will be matched with `\\\\`
+
+# anchors
+# by default, regex will matcha any part of a string. it's useful to anchor the regex so that it matches from the start or end of the string.
+
+# ^ to match the start
+# $ to match the end
+
+str_view(x, "^a")  # only apple will be matched
+str_view(x, "a$")  # only banana will be matched
+str_view(x, "^a$")  # nothing will be matched since it forces to match a complete string
+
+# character classes and alternatives
+# \d matches any digit
+# \s matches any whitespace (e.g. space, tab, newline)
+# [abc] matches a, b, or c
+# [^abc] matches anything except a, b, or c
+
+# the precedence for | (or) is low
+# e.g. abc|xyz matches abc or xyz, not abcyz or abxyz.
+str_view(c("grey", "gray"), "gr(e|a)y")  # matches gray and grey
+
+# repetition
+# ?: 0 or 1
+# +: 1 or more
+# *: 0 or more
+# {n}: exactly n
+# {n,}: n or more
+# {,m}: at most m
+# {n,m}: between n and m
+# those matches are greedy, they will match the longest string if possible, but adding a ? will make them "lazy".
+str_view("CCCL", "C{2,3}")  # will match "CCC"
+str_view("CCCL", "C{2,3}?")  # will match only "CC"
+
+# grouping and backreferences
+str_view(fruit, "(..)\\1", match = TRUE)  # matches repeated pair of letters, e.g. banana, coconut, cucumber, jujube, papaya, salal berry
+```
+
+	- check [http://stackoverflow.com/a/201378](http://stackoverflow.com/a/201378]) for a more complex example of regex.
+- detect matches
+	- `str_detect(strings, pattern)` returns a logical vector the same length as the input
+	- a common use of `str_detect()` is to select the elements that match a pattern. but the same goal can be achieved with `str_subset()`
+	
+```r
+words[str_detect(words, "x$")]
+str_subset(words, "x$")
+```
+
+- extract matches
+
+```r
+colors <- c("red", "orange", "yellow", "green", "blue", "purple")
+color_match <- str_c(colors, collapse = "|")
+color_match
+#> [1] "red|orange|yellow|green|blue|purple"
+has_color <- str_subset(setences, color_match)
+matches <- str_extract(has_color, color_match)
+head(matches)
+#> [1] "blue" "blue" "red" "red" "red" "blue"
+
+# stringr functions only extract the first match in a sentence
+more <- sentences[str_count(sentences, color_match) > 1]
+str_view_all(more, color_match)
+
+		It is hard to erase blue or red ink.
+		The green light in the brown box flickered.
+		The sky in the west is tinged with orange red.
+
+str_extract(more, color_match)
+#> [1] "blue" "green" "orange"
+
+str_extract_all(more, color_match)
+#> [[1]]
+#> [1] "blue" "red"
+#>
+#> [[2]]
+#> [1] "green" "red"
+#>
+#> [[3]]
+#> [1] "orange" "red"
+
+str_extract_all(more, color_match, simplify = TRUE)
+#> 	      [,1]   [,2]
+#> [1,]   "blue"  "red"
+#> [2,]  "green"  "red"
+#> [3,] "orange"  "red"
+```
+
+- grouped matches
+	- `str_extract()`  gives us the complete match, `str_match()` gives each individual component. Instead of a character vector, it returns a matrix, with one column for the complete match followed by one column for each group.
+	- if the data is a tibble, easier to use `tidyr::extract()` which works like `str_match()` but requires you to name the matches.
+	- also, there is a `str_match_all()`
+- replacing matches
+	- `str_replace()` and `str_replace_all()`
+		- `str_replace(strings, pattern, replaced_to)`
+		- with `str_replace_all()` can perform multiple replacements by supplying a named vector `str_replace_all(x, c(“1” = “one”, “2” = “two”, “3” = “three”))`
+	- `str_replace(“([^ ]+) ([^ ]+) ([^ ]+)", "\\1 \\3 \\2)` flips the second and the third word for every sentence
+- splitting
+	- `str_split(“ “)` splits a string up into pieces by a whitespace.
+	- because each component might contain a different number of pieces, the returned value is in a **list**
+	- or can use `simplify = TRUE` to return a matrix (like `str_extract_all()`
+	- also `n` can be specified to request a maximum number of `n` pieces returned
+	
+```r
+fields <- c("Name: Hadley", "Country: NZ", "Age: 35")
+fields %>% str_split(": ", n = 2, simplify = TRUE)
+#> 		[,1]		[,2]
+#> [1,]   "Name"      "Hadley"
+#> [2,]   "Country"   "NZ"
+#> [3,]   "Age"       "35"
+```
+
+	- instead of splitting by patterns, can also split up by **character, line, sentence, and word** `boundary()`s:
+	
+```r
+x <- "This is a sentence. This is another sentence."
+str_view_all(x, boundary("word"))  # shows every word
+str_split(x, " ")[[1]]
+#> [1] "This"    "is"      "a"     "sentence." ""
+#> [6]       "This"
+#> [7] "is"      "another" "sentence."
+str_split(x, boundary("word"))[[1]]
+#> [1] "This"    "is"      "a"     "sentence" "This"
+#> [6] "is"      
+#> [7] "another" "sentence"
+```
+
+- find matches
+	- `str_locate()`, `str_locate_all()` return starting and ending positions of each match.
+	
+- other types of pattern
+	- our version of regex inside `str_` function is in fact short for …
+	
+```r
+str_view(fruit, "nana")
+str_view(fruit, regex("nana"))
+```
+
+	- some arguments of `regex()` worth mentioning
+		- `ignore_case = TRUE` ignores uppercase or lowercase forms.
+		- `multiline = TRUE` allows `^` and `$` to match the start and end of each line rather than the start and end of the complete string.
+		- `comments = TRUE` allows you to use comments and white space to make complex regular expressions more understandable. In this case, spaces are ignored, as is everything after `#`, e.g.
+
+```r
+phone <- regex("
+	\\(?		# optional opening parens
+	(\\d{3}) 	# area code
+	[)- ]?		# optional closing parens, dash, or space
+	(\\d{3})	# another three numbers
+	[ -]?		# optional space or dash
+	(\\d{3})	# three more numbers
+	", comments = TRUE)
+```
+
+		- `fixed()` matches exactly the specified sequence of bytes
+		- `coll()` compares strings using standard _collation_ rules. …
+
+	- other uses of regex
+		- `apropos()` searches all objects available from the global environment.
+		- `dir()` lists all the files in a directory.
+			- `dir(pattern = “\\.Rmd$”))` shows all R Markdown files
+
+> another stronger version of `stringr` called `stringi`.  
+
+- - - -
+2018-10-26
+
+~_from now on, we are going to organize the notes as question-and-answer pairs._ ~
+
+### chapter 12 factors with `forcats`
+
+- how to create factors?
+
+```r
+month_levels <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+y1 <- factor(c("Dec","Apr","Jan","Mar"), levels = month_levels)
+sort(y1)
+```
+
+	- any values not in the levels will be converted to `NA`
+	- if use `parse_factor()` in `readr` -> an error will be raised
+
+- how to create a factor by its appearance order?
+	- setting levels to `unique(x)`
+	- or, after the fact, with `fct_inorder()`
+	
+```r
+f1 <- factor(x1, levels = unique(x1))
+f2 <- x1 %>% factor() %>% fct_inorder()
+```
+
+- how to reorder the factors?
+	- `fct_reorder(f, x, fun=median)`
+		- `f` is the factor whose levels you want to modify
+		- `x` is a numeric vector that you want to use to reorder the levels.
+		- `fun` is an optional function that’s used if there are multiple values of `x` for each value of `f`, default is median.
+	- `fct_relevel()`
+	- `fct_reorder2()`
+	- `fct_infreq()`, `fct_rev()`
+
+- how to modify factor levels? rename/collapse
+	- `fct_recode()`
+	
+```r
+gss_cat %>%
+	mutate(partyid = fct_recode(partyid,
+		"Republican, strong"	= "Strong republican",
+		"Republican, weak"		= "Not str republican"
+)) %>%
+count(partyid)
+```
+
+		- `fct_recode()` will leave levels that aren’t explicitly mentioned as is and will warn you.
+	- `fct_collapse()`
+	
+```r
+gss_cat %>%
+	mutate(partyid = fct_collapse(partyid,
+		other = c("No answer", "Don't know", "Other party"),
+		rep = c("Strong republican", "Not str republican"),
+		ind = c("Ind,near rep", "Independent", "Ind,near dem"),
+		dem = c("Not str democrat", "Strong democrat")
+)) %>% count(partyid)
+```
+
+	- `fct_lump()` lump together all the small groups to make a plot or table simpler.
+		- the default will progressively lump together the smallest groups, ensuring that the aggregate is still the smallest group.
+		- we can specify how many groups (excluding other) we want to keep with parameter `n`: `fct_lump(relig, n=10)`
+
+### chapter 13 dates and times with `lubridate`
+
+- date, time, datetime?
+	- `today()`, `now()`
+	- rule: select a data type as simple as possible
+	- `hms` package if needed
+	- create a date/time
+		- from a string
+		- from individual date-time components
+		- from an existing date/time object
+
+- how to create date/time from strings?
+	- with robust `lubridate` functions like:
+		- `ymd()`, `mdy()`, `dmy()`, `ymd_hms()`, `mdy_hm()`, `ymd(…, tz = “UTC")`, etc.
+
+- how to create date/time from individual components?
+	- when individual components spread across columns.
+	- `make_date()` for dates, `make_datetime()` for date-times
+	- `geom_freqpoly()` for plotting the time series data
+		- the argument `binwidth=` is in seconds.
+
+- how to create date/time from other types?
+	- `as_date()` and `as_datetime()`
+
+- how to extract components from datetime?
+
+```r
+datetime <- ymd_hms("2016-07-08 12:34:56"
+year(datetime)
+month(datetime)
+mday(datetime)
+yday(datetime)
+wday(datetime)
+hour(datetime)
+minute(datetime)
+second(datetime)
+
+month(datetime, label = TRUE) # this will return the abbreviated name of the month
+wday(datetime, label = TRUE, abbr = FALSE)  # this will return the full name of the weekday
+```
+
+- how to round datetime?
+	- `round_date()`, `floor_date()`, `ceiling_date()`
+
+- how to set components?
+	- method 1: `year(datetime) <- 2020`, using accessor functions one by one
+	- method 2: `update(dateline, year = 2020, month = 2, mday = 2, hour = 2)`
+		- if the updated value is too large, the datetime will  roll over to the correct datetime value.
+
+- what are three important representations of time spans?
+	- 1. _Durations_, which represent an exact number of seconds.
+	- 2. _ Periods_, which represent human units like weeks and months.
+	- 3. _Intervals_, which represent a starting and ending point.
+
+- how to get durations?
+	- in R, if you subtract two dates you get a `difftime` object
+	- `lubridate` package `as.duration()`
+	- constructors:
+		- `dseconds()`, `dminutes()`, `dhours()`, `ddays()`, `dweeks()`, `dyears()`
+
+- how to get periods?
+	- **periods** are time spans but don’t have a fixed length in seconds; they work with “human” times, like days and months.
+	- constructors:
+		- `seconds()`, `minutes()`, `hours()`, `days()`, `months()`, `weeks()`, `years()`
+
+```r
+datetime + ddays(1)  # gets a duration
+datetime + days(1)  # gets a period
+```
+
+- how to get intervals?
+	- an **interval** is a duration with a starting point
+		- with `%—%`
+	
+```r
+next_year <- today() + years(1)
+(today() %--% next_year) %/% ddays(1)  # how long the interval is
+(today() %--% next_year) %/% days(1)  # how many periods fall into an interval
+````
+
+- time zones
+	- `Sys.timezone()`
+	- `OlsonNames()`
+	- change the timezone in two ways:
+		- 1. keep the “real time”, just change the “display”
+		- 2. change the “real time”
+
+```r
+# x4 is a vector of datetimes
+x4a <- with_tz(x4, tzone = "Australia/Lord_Howe")
+x4b <- force_tz(x4, tzone = "Australia/Lord_Howe")
+```
+
+- - - -
+
+## part III program
+### chapter 14 pipes with `magrittr`
+
+- when not to use pipe
+	- when pipes are longer than 10 steps -> better create some intermediate objects with meaningful names.
+	- when you have multiple inputs or outputs.
+	- when start thinking about a directed graph with a complex dependency structure since pipe is rather linear and expressing complex relationships with them typically yields confusing code.
+
+- `%>%` is universal in `tidyverse`, but what other could `magrittr` provide?
+	- `%T>%` tee pipe, returns the lefthand side instead of the righthand side.
+	
+```r
+rnorm(100) %>%
+	matrix(ncol = 2) %T>%
+	plot() %>%
+	str()
+```
+	- `%$%` explodes out the variables in a data frame so that can be referred to them explicitly.
+	
+```r
+mtcars %$%
+	cor(disp, mpg)
+```
+	- `%<>%` assignment:
+
+```r
+mtcars <- mtcars %>% transform(cyl = cyl * 2)
+
+# to
+mtcars %<>% transform(cyl = cyl * 2)
+```
+
+### chapter 15 functions
+
+- what makes a good function name?
+	- either `snake_case` or `camelCase`, but not mixed!
+	- using a common prefix better than a common suffix
+
+- use cmd+ctrl+shift+R to provide a break up codes into readable chunks
+- coding styles
+- conditions
+- function arguments
+	- **when calling a function, should place a space around** `=` **in function calls, always put a space after a comma, not before.**
+
+### chapter 16 vectors
+
+- say something about vector basics?
+	- there are two types of vectors:
+		- _atomic vectors_, of which there are six types: logical, integer, double, character, complex, and raw. (integer + double are called numeric)
+		- _lists_, which are sometimes called recursive vectors because lists can contain other lists.
+	- every vector has two key properties
+		- `typeof()` , which type of data is contained inside?
+		- `length()`, how many elements?
+	- starting from vectors, we can create **augmented vectors**
+		- factors are built on top of integer vectors.
+		- dates and date-times are built on top of numeric vectors.
+		- data frames and tibbles are built on top of lists.
+
+- coercion 
+- how to name a vector?
+	- all types of vectors can be named, can name them during creation with `c()` or after the fact with `purrr::set_names()`
+
+```r
+c(x = 1, y = 2, z = 4)
+#> x y z
+#> 1 2 4
+
+set_names(1:3, c("a", "b", "c"))
+#> a b c
+#> 1 2 3
+```
+
+- just be careful with list subsetting
+- vector attributes!
+	- any vector can contain arbitrary additional metadata through its _attributes_.
+	- just treat attributes as a named list of vectors that can be attached to any object.
+		- can get and set individual attribute value with `attr()`
+		- see them all at once with `attributes()`
+
+```r
+x <- 1:10
+attr(x, "greeting")
+#> NULL
+attr(x, "greeting") <- "Hi!"
+attr(x, "farewell") <- "Bye!"
+attributes(x)
+#> $greeting
+#> [1] "Hi!"
+#>
+#> $farewell
+#> [1] "Bye!"
+```
+
+### chapter 17 iteration with `purrr`
+
+- `set_along(df)`  the row noms of a data frame.
+- the goal of using `purrr` functions instead of loops is to allow you to break common list manipulation challenges into small pieces.
+
+the pattern of looping over a vector, doing something to each element, and saving the results is so common that the `purrr` package provides a family of functions to do it for you.
+
+- the Map functions
+	- `map()` makes a list.
+	- `map_lgl()` makes a logical vector.
+	- `map_int()` makes an integer vector.
+	- `map_dbl()` makes a double vector.
+	- `map_chr()` makes a character vector.
+
+- all `purrr` functions are implemented in C, so a little faster at the expense of readability.
+
+- - - -
+
+## part IV model
+### chapter 18 model basics with `modelr`
+
+> The goal of a model is to provide a simple low-dimensional summary of a dataset.  
+
+- visualizing models
+	- predictions
+		- `modelr::data_grid()`: the first argument is a data frame, for each subsequent argument it finds the unique variable 
+		- `modelr::add_predictions()` takes a data frame and and model, adds the predictions from the model to a new column in the data frame.
+	- residuals
+		- `add_residuals()`
+
+### ~~chapter 19 model building~~
+
+### ~~chapter 20 many models with `purrr` and `broom`~~
+
+## part V communicate
+
+### ~~chapter 21 R markdown~~
+
+### chapter 22 graphics fro communication with `ggplot2`
+
+- label
+	- `labs()` function
+		- `title`
+		- `subtitile`
+		- `caption`
+		- applying `quote()` inside `labs()` uses mathematical equations instead of text strings
+- annotations
+	- `geom_text()` is like `geom_point()` but with extra labels
+	- `geom_label()` draws a rectangle behind the text, also use `nudge_y` parameter to move the labels slightly above the corresponding points.
+	- use `ggrepel` package by Kamil Slowikowski, it adjust labels so that they don’t overlap.
+
+```r
+ggplot(mpg, aes(dispel, hwy)) +
+	geom_point(aes(color = class)) +
+	geom_point(size = 3, shape = 1, data = best_in_class) +
+	ggrepel::geom_label_repel(
+		aes(label = model),
+		data = best_in_class
+	)
+```
+
+### ~~chapter 23 R markdown formats~~
+
+### ~~chapter 24 R markdown workflow~~
+
+
+

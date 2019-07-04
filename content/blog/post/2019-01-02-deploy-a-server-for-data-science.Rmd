@@ -29,10 +29,10 @@ tags:
 2. `yum install mysql-community-server -y`, 并用`mysqld --version`查看是否安装成功。
 3. 配置MySQL使其自动启动`systemctl enable mysqld.service`.
 4. 启动`systemctl start mysqld.service`.
-5. 对于5.7以上版本的MySQL，还需要以下的方法修改默认root用户的登录密码。第一步是先找到临时密码：`sudo grep ‘temporary password’ /var/log/mysqld.log`
-6. `mysql -uroot -p`后接temporary password进入MySQL.
-7. MySQL现在的密码要求规则比较复杂，如果自己想设置简单密码，则需要`SET GLOBAL validate_password.policy=LOW`.
-8. 最后修改密码`ALTER USER ‘root’@‘localhost’ IDENTIFIED BY ‘mynewpassword’;`
+5. 对于5.7以上版本的MySQL，还需要以下的方法修改默认root用户的登录密码。第一步是先找到临时密码：`sudo grep 'temporary password' /var/log/mysqld.log`
+6. `mysql -u root -p`后接temporary password进入MySQL.
+7. MySQL现在的密码要求规则比较复杂，如果自己想设置简单密码，则需要`SET GLOBAL validate_password.policy=LOW;`.
+8. 最后修改密码`ALTER USER 'root'@'localhost' IDENTIFIED BY 'mynewpassword';`
 9. `\q`退出MySQL,  `exit`退出ssh连接。
 
 

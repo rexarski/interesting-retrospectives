@@ -179,17 +179,17 @@ G:N         0.0654  0.33171054   0.000000 10.672953</code></pre>
 <h2>3.1 MCMC Diagnostics</h2>
 <p>The traceplot<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> of <code>$ \beta_1,\cdots,\beta_8 $</code> shows that the Gibbs sampled values are generally stable in trend. For intercept, <code>Nobility</code>, <code>POV</code>, <code>first</code> whose effects are significant, the sampled values are fluctuating around their estimated values. While <code>Gender</code>, <code>second</code> and the only interaction term <code>Gender:Nobility</code> stay as zero for most of the time.</p>
 <div class="figure">
-<img src="/image/westerosi/trace1.png" alt="trace1" />
+<img src="/image/westerosi/trace1.png" alt="" />
 <p class="caption">trace1</p>
 </div>
 <div class="figure">
-<img src="/image/westerosi/trace2.png" alt="trace2" />
+<img src="/image/westerosi/trace2.png" alt="" />
 <p class="caption">trace2</p>
 </div>
 <p>The autocorrelation functions of <code>$ \beta $</code>’s are also satisfying, indicating that MCMC converges and the effective sample sizes are all greater than <code>$ 1000 $</code>.</p>
 <pre><code>[1]  9631.787 10000.000  6748.320 10000.000  8933.820  9401.725  6174.081</code></pre>
 <div class="figure">
-<img src="/image/westerosi/acf.png" alt="acf" />
+<img src="/image/westerosi/acf.png" alt="" />
 <p class="caption">acf</p>
 </div>
 <p>So far, we can confirm the legitimacy of our model via Gibbs sampling and model averaging. Then the task remained is to see whether our model is suitable for predicting some other characters’ destinies.</p>
@@ -202,11 +202,11 @@ G:N         0.0654  0.33171054   0.000000 10.672953</code></pre>
 </div>
 <p>We plug in the predictor values into testing data, calculate the predicted life span of each character, and draw the observation versus prediction scatter plot.</p>
 <div class="figure">
-<img src="/image/westerosi/pred1.png" alt="pred1" />
+<img src="/image/westerosi/pred1.png" alt="" />
 <p class="caption">pred1</p>
 </div>
 <div class="figure">
-<img src="/image/westerosi/pred2.png" alt="pred2" />
+<img src="/image/westerosi/pred2.png" alt="" />
 <p class="caption">pred2</p>
 </div>
 <p>Based on the scatter plot, we find that the predicted life spans are aggregating at some values. In other words, our predictions form a discrete instead of a continuous distribution. This is not surprising as most of our predictor variables included in this model (or even among all the model candidates) are binary. Moreover, the greatest feature of the sole continuous variable <code>POV</code> is that only some main characters have the privilege to have their own POV chapters. Thus it leads to a situation where most of our 899 characters have a <code>POV</code> with value 0, and the rest of model-related variables are binary, namely either 0 or 1. As a result, the combinations of limited number of binary response is very limited. And this is why we have “stripe-shape” predictions.</p>
@@ -217,15 +217,15 @@ G:N         0.0654  0.33171054   0.000000 10.672953</code></pre>
 <h2>3.3 Survival Analysis</h2>
 <p>From the beginning, we keep discussing the life span of a character as how long they have been on stage since their first introduction. But looking at it from another perspective, we can measure how long they can live by continuously presenting the survival probability as the time proceeds. And we can fulfill such investigation through a Kaplan-Meier survival analysis (Kaplan–Meier estimator 2017). We utlize the function <code>ggsurvplot()</code> in the R package <code>survminer</code> to visualize different survival curves by allegiance group, gender and nobility.</p>
 <div class="figure">
-<img src="/image/westerosi/surv1.png" alt="surv1" />
+<img src="/image/westerosi/surv1.png" alt="" />
 <p class="caption">surv1</p>
 </div>
 <div class="figure">
-<img src="/image/westerosi/surv2.png" alt="surv2" />
+<img src="/image/westerosi/surv2.png" alt="" />
 <p class="caption">surv2</p>
 </div>
 <div class="figure">
-<img src="/image/westerosi/surv3.png" alt="surv3" />
+<img src="/image/westerosi/surv3.png" alt="" />
 <p class="caption">surv3</p>
 </div>
 <p>The survival curves unearth some interesting facts:</p>
@@ -659,6 +659,6 @@ lpy.X&lt;-function(y,X,
 <div class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p>Here we used a R package still under development called <code>fitR</code>.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn1"><p>Here we used a R package still under development called <code>fitR</code>.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>

@@ -1,0 +1,1154 @@
+---
+title: R for Data Science Notes
+author: Qiu Rui
+date: '2018-11-09'
+slug: r-for-data-science-notes
+categories: []
+tags:
+  - R
+  - notes
+output:
+  blogdown::html_page:
+    toc: true
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#part-i-explore">part I explore</a><ul>
+<li><a href="#chapter-1-data-visualization-with-ggplot2">chapter 1 data visualization with <code>ggplot2</code></a></li>
+<li><a href="#chapter-3-data-transformation-with-dplyr">chapter 3 data transformation with <code>dplyr</code></a></li>
+<li><a href="#chapter-5-eda">chapter 5 EDA</a></li>
+</ul></li>
+<li><a href="#part-ii-wrangle">part II wrangle</a><ul>
+<li><a href="#chapter-7-tibbles-with-tibble">chapter 7 tibbles with <code>tibble</code></a></li>
+<li><a href="#chapter-8-data-import-with-readr">chapter 8 data import with <code>readr</code></a></li>
+<li><a href="#chapter-9-tidy-data-with-tidyr">chapter 9 tidy data with <code>tidyr</code></a></li>
+<li><a href="#chapter-10-relational-data-with-dplyr">chapter 10 relational data with <code>dplyr</code></a></li>
+<li><a href="#chapter-11-strings-with-stringr">chapter 11 strings with <code>stringr</code></a></li>
+<li><a href="#chapter-12-factors-with-forcats">chapter 12 factors with <code>forcats</code></a></li>
+<li><a href="#chapter-13-dates-and-times-with-lubridate">chapter 13 dates and times with <code>lubridate</code></a></li>
+</ul></li>
+<li><a href="#part-iii-program">part III program</a><ul>
+<li><a href="#chapter-14-pipes-with-magrittr">chapter 14 pipes with <code>magrittr</code></a></li>
+<li><a href="#chapter-15-functions">chapter 15 functions</a></li>
+<li><a href="#chapter-16-vectors">chapter 16 vectors</a></li>
+<li><a href="#chapter-17-iteration-with-purrr">chapter 17 iteration with <code>purrr</code></a></li>
+</ul></li>
+<li><a href="#part-iv-model">part IV model</a><ul>
+<li><a href="#chapter-18-model-basics-with-modelr">chapter 18 model basics with <code>modelr</code></a></li>
+<li><a href="#chapter-19-model-building"><del>chapter 19 model building</del></a></li>
+<li><a href="#chapter-20-many-models-with-purrr-and-broom"><del>chapter 20 many models with <code>purrr</code> and <code>broom</code></del></a></li>
+</ul></li>
+<li><a href="#part-v-communicate">part V communicate</a><ul>
+<li><a href="#chapter-21-r-markdown"><del>chapter 21 R markdown</del></a></li>
+<li><a href="#chapter-22-graphics-fro-communication-with-ggplot2">chapter 22 graphics fro communication with <code>ggplot2</code></a></li>
+<li><a href="#chapter-23-r-markdown-formats"><del>chapter 23 R markdown formats</del></a></li>
+<li><a href="#chapter-24-r-markdown-workflow"><del>chapter 24 R markdown workflow</del></a></li>
+</ul></li>
+</ul>
+</div>
+
+<p><strong>The followings notes are taken from the book <em><a href="https://r4ds.had.co.nz/">R for Data Science</a></em> by Hadley Wickham &amp; Garrett Grolemund.</strong></p>
+<p>Additionally, me after posting this:</p>
+<blockquote>
+<p>The formatting is a lie.</p>
+</blockquote>
+<div id="part-i-explore" class="section level2">
+<h2>part I explore</h2>
+<div id="chapter-1-data-visualization-with-ggplot2" class="section level3">
+<h3>chapter 1 data visualization with <code>ggplot2</code></h3>
+<blockquote>
+<p>The simple graph as brought more information to the data analyst’s mind than any other device. —— John Tukey</p>
+</blockquote>
+<blockquote>
+<p>The greatest value of a picture is when it forces us to notice what we never expected to see. —— John Tukey</p>
+</blockquote>
+<ul>
+<li><code>ggplot2</code> will not use 6 shapes at a time. So when dealing with more than 5 categories, don’t use <code>shape</code> in <code>aes</code>.</li>
+<li>If you want to set the aesthetic properties of your geom manually, specify the parameter outside the <code>aes</code>.</li>
+<li>Common problem: the <code>+</code> in <code>ggplot2</code> graphics has to be put at the end of the line, not the start.</li>
+<li>Don’t mess up <code>facet_wrap(~ var1)</code> with <code>facet_grid(var1 ~ var2)</code> or <code>facet_grid(. ~ var1)</code> or <code>facet_grid(var1 ~ .)</code>.</li>
+<li>Fun fact: <code>geom_bar()</code> and <code>stat_count()</code> are interchangeable.</li>
+<li><code>geom_bar()</code> and related
+<ul>
+<li><code>geom_bar()</code> displaying a proportion -&gt; set <code>y=..prop.., group=1</code> in <code>aes()</code></li>
+<li><code>stat_summary()</code> summarizes the <code>y</code> values for each unique <code>x</code> value, have multiple arguments like <code>fun.ymin</code>, <code>fun.ymax</code>, <code>fun.y</code>, etc.</li>
+<li>In <code>aes()</code> of <code>geom_bar()</code>, <code>fill()</code> is the color, <code>color</code> is the border color.</li>
+<li>3 <code>position=</code>
+<ul>
+<li><code>"identity"</code></li>
+<li><code>"fill"</code></li>
+<li><code>"dodge"</code></li>
+</ul></li>
+<li>one extra position for <code>geom_point()</code>: <code>"jitter"</code></li>
+</ul></li>
+<li>coordinate systems
+<ul>
+<li><code>coord_flip()</code>: x -&gt; y, y -&gt; x.</li>
+<li><code>coord_quickmap()</code> sets the aspect ratio correctly for maps.</li>
+<li><code>coord_polar()</code> bar chart -&gt; Coxcomb chart.</li>
+</ul></li>
+</ul>
+</div>
+<div id="chapter-3-data-transformation-with-dplyr" class="section level3">
+<h3>chapter 3 data transformation with <code>dplyr</code></h3>
+<ul>
+<li>five key <code>dplyr</code> functions:
+<ul>
+<li>pick observations by their values <code>filter()</code></li>
+<li>reorder the rows <code>arrange()</code></li>
+<li>pick variables by their names <code>select()</code></li>
+<li>create new variables with functions of existing variables <code>mutate()</code></li>
+<li>collapse many values down to a single summary <code>summarize()</code></li>
+<li>aka. <strong>FAMSS</strong>,
+<ul>
+<li>work together with <code>group_by()</code></li>
+</ul></li>
+</ul></li>
+<li><code>arrange()</code>
+<ul>
+<li>by default, ascending order</li>
+<li><code>desc()</code> descending order</li>
+<li>missing values <code>NA</code> are always sorted at the end</li>
+</ul></li>
+<li><code>select()</code>
+<ul>
+<li>helper functions in <code>select()</code>
+<ul>
+<li><code>starts_with("abc)</code></li>
+<li><code>ends_with(“abc”)</code></li>
+<li><code>contains(“abc”)</code></li>
+<li><code>matches(“(.)\\1”)</code> matches a regex.</li>
+<li><code>num_range(“x”, 1:3)</code> matches <code>x1</code>, <code>x2</code> and <code>x3</code></li>
+</ul></li>
+<li>can be used to rename variables, but rarely useful because it drops all of the variables not explicitly mentioned.
+<ul>
+<li>instead, use <code>rename()</code> that keeps all the variables that aren’t explicitly mentioned.</li>
+</ul></li>
+<li>another option is to use <code>select()</code> with <code>everything()</code> , like <code>select(fights, time_hour, air_time, everything())</code></li>
+</ul></li>
+<li><code>mutate()</code>
+<ul>
+<li>not only keeps the original variables, also include the new variables.</li>
+<li>if you want to keeps new variables only, use <code>transmutate()</code> instead in the same manner.</li>
+<li>some other creation functions
+<ul>
+<li><code>%/%</code> integer division, <code>%%</code> remainder.</li>
+<li><code>lead()</code> and <code>lag()</code></li>
+<li><code>cumsum()</code>, <code>cummean()</code>, etc.</li>
+<li><code>min_rank()</code>, <code>dense_rank()</code>, <code>percent_rank()</code>, <code>cume_dist()</code>, <code>ntile()</code> etc.</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+<div id="chapter-5-eda" class="section level3">
+<h3>chapter 5 EDA</h3>
+<ul>
+<li>why load separate packages/libraries when you could achieve the same goal with <code>library(tidyverse)</code>?
+&gt; There are no routine statistical questions, only questionable statistical routines. —— Sir David Cox</li>
+</ul>
+<blockquote>
+<p>Far better an approximate answer to the right question, which is often vague, than an exact answer to the wrong question, which can always be made precise. —— John Tukey</p>
+</blockquote>
+<ul>
+<li>visualizing distributions
+<ul>
+<li>if you want to plot multiple overlapping distributions, don’t use <code>geom_histogram()</code>, use <code>geom_freqpoly()</code></li>
+<li><code>coord_cartesian()</code> can “zoom in” while keeping the same ratio of x-y.</li>
+</ul></li>
+<li>covariation
+<ul>
+<li>for more informative display of a boxplot, it’s always better to use a <code>reorder()</code> inside the <code>geom_boxplot()</code> to rank the variables fro low to high.</li>
+</ul></li>
+<li>two categorical variables
+<ul>
+<li>use <code>geom_tile()</code></li>
+<li>if both unordered, use <code>seriation</code> package.</li>
+<li>for larger plots, use <code>d3heatmap</code> or <code>heatmaply</code> package.</li>
+</ul></li>
+<li>two continuous variables
+<ul>
+<li>use <code>alpha</code> for crowded points</li>
+<li><code>geom_bin2d()</code></li>
+<li><code>geom_hex()</code> in <code>hexbin</code> package</li>
+<li>or, use <code>cut_width(x, width)</code> to transform continuous data into categorical with binwidth.</li>
+</ul></li>
+<li>pattern and models
+<ul>
+<li><code>library(modelr)</code></li>
+<li><code>add_residuals(mod)</code> corporates with <code>lm()</code> model and <code>ggplot()</code> pipeline</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div id="part-ii-wrangle" class="section level2">
+<h2>part II wrangle</h2>
+<div id="chapter-7-tibbles-with-tibble" class="section level3">
+<h3>chapter 7 tibbles with <code>tibble</code></h3>
+<ul>
+<li>tibble is a modern data frame.</li>
+<li><code>tibble</code> package is in the core of <code>tidyverse</code> package.</li>
+<li><code>as_tibble(df)</code></li>
+<li>a tibble could have <em>nonsyntactic</em> names</li>
+<li>can create a tibble with <code>tribble()</code>, aka. <em>transposed tibble</em>, which is in an easy-to-read form</li>
+</ul>
+<pre class="r"><code>tribble(
+    ~x, ~y, ~z,
+    #--/--/----
+    &quot;a&quot;, 2, 3.6,
+    &quot;b&quot;, 1, 8.5
+)</code></pre>
+<ul>
+<li>tibbles vs data.frames
+<ul>
+<li>printing
+<ul>
+<li>tibble only shows the first 10 rows, and all the columns that fit on screen</li>
+</ul></li>
+<li>subsetting
+<ul>
+<li>extract by name
+<ul>
+<li><code>df$x</code> or <code>df[["x"]]</code></li>
+</ul></li>
+<li>extract by position
+<ul>
+<li><code>df[[1]]</code></li>
+</ul></li>
+<li>to use in a pipe, need to use the special placeholder <code>.</code>
+<ul>
+<li><code>df %&gt;% .$x</code> or <code>df %&gt;% .[[“x”]]</code></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+<hr />
+</div>
+<div id="chapter-8-data-import-with-readr" class="section level3">
+<h3>chapter 8 data import with <code>readr</code></h3>
+<ul>
+<li>basics about <code>readr</code>
+<ul>
+<li><code>read_csv()</code> , <code>read_csv2()</code> reads semicolon-separated files (common in countries where <code>,</code> is used as decimal place), <code>read_tsv()</code> tab-delimited files, and <code>read_delim()</code> for any format.</li>
+<li><code>read_fwf()</code> reads fixed-width files.</li>
+<li><code>read_log()</code> reads Apache style log files. (check out <code>webreadr</code> package )</li>
+<li>all these reads a file as a <code>tibble</code>, and the usage is pretty similar.</li>
+<li>sometimes, there are a few lines of metadata not necessarily needed.</li>
+</ul></li>
+</ul>
+<pre class="r"><code>read_csv(&quot;The first line of metadata
+The second line of metadata
+x,y,z
+1,2,3&quot;, skip = 2)
+
+read_csv(&quot;# A comment I want to skip
+x,y,z
+1,2,3&quot;, comment = &quot;#&quot;)</code></pre>
+<pre><code>- if a file does not have column name, need to specify:</code></pre>
+<pre class="r"><code>read_csv(&quot;1,2,3\n4,5,6&quot;, col_names = FALSE)
+read_csv(&quot;1,2,3\n4,5,6&quot;, col_names = c(&quot;x&quot;, &quot;y&quot;, &quot;z&quot;))</code></pre>
+<pre><code>- another common tweaking is `na`, which specifies the value or values to be missing values:</code></pre>
+<pre class="r"><code>read_csv(“a,b,c\n1,2,.”, na = “.”)</code></pre>
+<ul>
+<li><code>readr</code> comparing with base R
+<ul>
+<li>typically ~10x faster than base R (long-running jobs have a progress bar)</li>
+<li>produce <strong>tibbles</strong> and don’t <strong>convert character vectors to factors, use row names, or munge the column names.</strong><br />
+</li>
+<li>more reproducible.</li>
+</ul></li>
+<li>parsing a vector
+<ul>
+<li>some <code>parse_*()</code> functions are highlighted. (8 in total)
+<ul>
+<li><code>parse_logical()</code></li>
+<li><code>parse_integer()</code></li>
+<li><code>parse_double()</code> -&gt; a strict number parser</li>
+<li><code>parse_number()</code> -&gt; a flexible number parser</li>
+<li><code>parse_character()</code></li>
+<li><code>parse_factor()</code></li>
+<li><code>parse_datetime()</code></li>
+<li><code>parse_date()</code></li>
+<li><code>parse_time()</code></li>
+<li>could use <code>na =</code> to specify missing values, e.g. <code>parse_integer(c(“1”, “231”, “.”, “456”), na = “.”)</code></li>
+<li>failure will have a warning, failures will be missing in the output.</li>
+</ul></li>
+<li>parsing numbers</li>
+</ul></li>
+</ul>
+<pre class="r"><code>parse_double(&quot;1.23&quot;)
+parse_double(&quot;1,23&quot;, locale = locale(decimal_mark = &quot;,&quot;))
+
+parse_number(&quot;$100&quot;)
+parse_number(&quot;20%&quot;)
+parse_number(&quot;$123,456,789&quot;) # in America
+parse_number(&quot;123.456.789&quot;, locale = locale(grouping_mark = &quot;.&quot;)) # in many parts of Europe
+parse_number(&quot;123&#39;456&#39;789&#39;, locale = locale(grouping_mark = &quot;&#39;&quot;)) # in Switzerland</code></pre>
+<pre><code>- parsing strings
+    - `parse_character()` is really simple, it just returns its input. But it is not always like that. It does something about **encoding**.
+    - note that `readr` uses UTF-8 everywhere, so it assumes your data is UTF-8 encoded, but sometimes it is not.
+    </code></pre>
+<pre class="r"><code>x1 &lt;- &quot;El Ni\xf1o was particularly bad this year&quot;
+x2 &lt;- &quot;\x82\xb1\x82\xf1\x82\xc9\x82\xbf\x82\xcd&quot;
+parse_character(x1, locale = locale(encoding = &quot;Latin1&quot;))
+parse_character(x2, locale = locale(encoding = &quot;Shift-JIS&quot;))</code></pre>
+<pre><code>    - sometimes, we don’t know what encoding should be used, `readr` provides a function `guess_encoding()` as its name tells.</code></pre>
+<pre class="r"><code>guess_encoding(charToRaw(x1))
+guess_encoding(charToRaw(x2))</code></pre>
+<pre><code>    - The first argument to `guess_encoding` could be either a path to a file or a raw vector.
+- parsing factors</code></pre>
+<pre class="r"><code>fruit &lt;- c(&quot;apple&quot;, &quot;banana&quot;)
+parse_factor(c(&quot;apple&quot;, &quot;banana&quot;, &quot;bananana&quot;), levels = fruit)</code></pre>
+<pre><code>- parsing dates, date-times, and times
+    - `parse_datetime()` expects an ISO8601 date-time.
+        - if time is omitted, will be set to 12:00 am.
+    - `parse_date()` expects a four-digit year, a `-` or `/`, the month, a `-` or `/`, then the day.
+    - `parse_time()` expects hour, `:`, minutes, optionally, `:` and seconds, and an optional a.m./p.m. specifier.
+        - base R does not have good built-in class for time data, so use `hms` package</code></pre>
+<pre class="r"><code>library(hms)
+parse_time(&quot;01:10 am&quot;)
+parse_time(&quot;20:10:01&quot;)</code></pre>
+<pre><code>    - if you want to supply your own date or datetime or time `format`, better remember all these:
+        - Year
+            - `%Y` (4 digits)
+            - `%y` (2 digits; 00-69 -&gt; 2000-2069, 70-99 -&gt; 1970-1999)
+        - Month
+            - `%m` (2 digits)
+            - `%b` (abbreviated name, like “Jan”)
+            - `%B` (full name)
+        - Day
+            - `%d` (2 digits)
+            - `%e` (optional leading space)
+        - Time
+            - `%H` (0-23 hour format)
+            - `%I` (0-12, must be used with `%p`)
+            - `%p` (a.m./p.m. indicator)
+            - `%M` (minutes)
+            - `%S` (integer seconds)
+            - `%OS`(real seconds)
+            - `%Z` (time zone)
+            - `%z` (as offset from UTC, e.g., `+0800`)
+        - Nondigits
+            - `%.` (skips one non digit character)
+            - `%*` (skips any number of non digits)</code></pre>
+<pre class="r"><code>parse_date(&quot;1 janvier 2015&quot;, &quot;%d %B %Y&quot;, locale = locale(&quot;fr&quot;))
+#&gt; [1] &quot;2015-01-01&quot;</code></pre>
+<ul>
+<li>parsing a file
+<ul>
+<li>uses a heuristic to figure out the type of each column (for the first 1000 rows)
+<ul>
+<li>could use <code>guess_parser()</code> to emulate</li>
+</ul></li>
+<li>problems (for larger files)
+<ul>
+<li>the first 1000 rows could be a special case</li>
+<li>lots of missing values. if 1000 rows contain only <code>NA</code>s, will guess it’s a character vector.</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+<div id="chapter-9-tidy-data-with-tidyr" class="section level3">
+<h3>chapter 9 tidy data with <code>tidyr</code></h3>
+<blockquote>
+<p>Happy families are all alike; every unhappy family is unhappy in its own way. —— Leo Tolstoy</p>
+</blockquote>
+<blockquote>
+<p>Tidy datasets are all alike, but every messy dataset is messy in its own way. —— Hadley Wickham</p>
+</blockquote>
+<ul>
+<li>3 interrelated rules which make a dataset tidy:
+<ul>
+<li><ol style="list-style-type: decimal">
+<li>each variable must have its own column.</li>
+</ol></li>
+<li><ol start="2" style="list-style-type: decimal">
+<li>each observation must have its own row.</li>
+</ol></li>
+<li><ol start="3" style="list-style-type: decimal">
+<li>each value must have its own cell.</li>
+</ol></li>
+</ul></li>
+<li>in practice, these lead to a set of practical instructions:
+<ul>
+<li><ol style="list-style-type: decimal">
+<li>put each dataset in a tibble</li>
+</ol></li>
+<li><ol start="2" style="list-style-type: decimal">
+<li>put each variable in a column</li>
+</ol></li>
+</ul></li>
+<li>spreading an gathering
+<ul>
+<li>common problems:
+<ul>
+<li>one variable might be spread across multiple columns</li>
+<li>one observation might be scattered across multiple rows</li>
+</ul></li>
+<li><code>gather()</code></li>
+</ul></li>
+</ul>
+<pre class="r"><code>table4a
+#&gt; # A tibble: 3 x 3
+#&gt;          country  `1999`  `2000`
+#&gt;   *        &lt;chr&gt;  &lt;int&gt;   &lt;int&gt;
+#&gt; 1    Afghanistan    745    2666
+#&gt; 2       Brazil  37737   80488
+#&gt; 3        China 212258  213766
+
+table4a %&gt;%
+    gather(`1999`, `2000`, key = &quot;year&quot;, value = &quot;cases&quot;)
+#&gt; # A tibble: 3 x 3
+#&gt;          country   year    cases
+#&gt;   *        &lt;chr&gt;  &lt;int&gt;   &lt;int&gt;
+#&gt; 1    Afghanistan   1999     745
+#&gt; 2       Brazil   1999   37737
+#&gt; 3        China   1999  212258
+#&gt; 4  Afghanistan   2000    2666
+#&gt; 5       Brazil   2000   80488
+#&gt; 6        China   2000  213766</code></pre>
+<pre><code>- `spread()` is the opposite of gathering.
+    - `spread(table2, key = type, value = count)`</code></pre>
+<ul>
+<li>separating and pull
+<ul>
+<li><code>separate()</code> pulls apart one column into multiple columns, by splitting wherever a separator character appears.</li>
+<li>the separator character can be specified as a character.</li>
+<li>or, we can pass a vector of integers to <code>sep</code>, then it will be interpreted as the positions to split at!</li>
+</ul></li>
+</ul>
+<pre class="r"><code>table3
+#&gt; # A tibble: 6 x 3
+#&gt;       country   year           rate
+#&gt; *       &lt;chr&gt;  &lt;int&gt;          &lt;chr&gt;
+#&gt; 1 Afghanistan   1999   745/19987071
+#&gt; 2Afghaanistan   2000  2666/20595360
+
+table3 %&gt;%
+    separate(rate, into = c(&quot;cases&quot;, &quot;population&quot;), sep = &quot;/&quot;)
+#&gt; # A tibble: 6 x 4
+#&gt;       country   year    cases   population
+#&gt; *       &lt;chr&gt;  &lt;int&gt;    &lt;chr&gt;        &lt;chr&gt;
+#&gt; 1 Afghanistan   1999      745     19987071
+#&gt; 2 Afghanistan   2000     2666     20595360
+
+table3 %&gt;%
+    separate(
+        rate, 
+        into = c(&quot;cases&quot;, &quot;population&quot;),
+        sep = &quot;/&quot;,
+        convert = TRUE
+    )
+#&gt; # A tibble: 6 x 4
+#&gt;       country   year    cases   population
+#&gt; *       &lt;chr&gt;  &lt;int&gt;    &lt;int&gt;        &lt;int&gt;
+#&gt; 1 Afghanistan   1999      745     19987071
+#&gt; 2 Afghanistan   2000     2666     20595360
+
+table3 %&gt;%
+    separate(year, into = c(&quot;century&quot;, &quot;year&quot;), sep = 2)
+#&gt; # A tibble: 6 x 4
+#&gt;       country   century   year           rate
+#&gt; *       &lt;chr&gt;     &lt;chr&gt;  &lt;chr&gt;          &lt;chr&gt;
+#&gt; 1 Afghanistan        19     99   745/19987071
+#&gt; 2Afghaanistan        20     00  2666/20595360</code></pre>
+<pre><code>- `unite()` is the inverse of `separate()`
+    - much less frequently used than `separate()`
+    </code></pre>
+<pre class="r"><code>df %&gt;% unite(new_var_name, var1, var2)
+
+# by default the separtor is underscore _, but can be specified 
+df %&gt;% unite(new_var_name, var1, var2, sep = &quot;&quot;)</code></pre>
+<ul>
+<li>missing values
+<ul>
+<li>explicitly as <code>NA</code>s or implicitly as not present.</li>
+</ul></li>
+</ul>
+<pre class="r"><code>stocks &lt;- tibble(
+    year = c(2015, 2015, 2015, 2015, 2016, 2016, 2016),
+    qtr  = c(1, 2, 3, 4, 2, 3, 4),
+    return = c(1.88, 0.59, 0.35, NA, 0.92, 0.17, 2.66)
+)
+
+stocks %&gt;% 
+    spread(year, return) %&gt;%  # make implicit missing value explicit
+    gather(key = year, value = return, `2015`:`2016`, na.rm = TRUE)  # turn explicit missing value implicit</code></pre>
+<pre><code>- another tool for making missing values explicit is `complete()`
+    - takes a set of columns, and finds all unique combinations, then ensures the original dataset contains all those values, filling in explicit `NA`s where necessary.
+- another tool for filling in `NA`s with **the most recent non missing value** (last observation carried forward): `fill()`</code></pre>
+</div>
+<div id="chapter-10-relational-data-with-dplyr" class="section level3">
+<h3>chapter 10 relational data with <code>dplyr</code></h3>
+<ul>
+<li>mutating joins
+<ul>
+<li>with <code>select()</code> and <code>mutate()</code></li>
+<li>understanding joins
+<ul>
+<li><code>inner_join()</code></li>
+<li>outer joins
+<ul>
+<li><code>left_join()</code> keeps all observations in <code>x</code></li>
+<li><code>right_join()</code> keeps all observations in <code>y</code></li>
+<li><code>full_join()</code> keeps all observations in both <code>x</code> and <code>y</code></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+<table>
+<thead>
+<tr class="header">
+<th align="left"><code>dplyr</code></th>
+<th align="left">postgreSQL</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>inner_join(x,y)</code></td>
+<td align="left"><code>SELECT * FROM x INNER JOIN y USING (z)</code></td>
+</tr>
+<tr class="even">
+<td align="left"><code>left_join(x,y)</code></td>
+<td align="left"><code>SELECT * FROM x LEFT JOIN y USING (z)</code></td>
+</tr>
+<tr class="odd">
+<td align="left"><code>right_join(x,y)</code></td>
+<td align="left"><code>SELECT * FROM x RIGHT JOIN y USING (z)</code></td>
+</tr>
+<tr class="even">
+<td align="left"><code>full_join(x,y)</code></td>
+<td align="left"><code>SELECT * FROM x FULL JOIN y USING (z)</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>filering joins
+<ul>
+<li>filtering joins match observations in the same way as mutating joins, but affect the observations, not the variables.
+<ul>
+<li><code>semi_join(x,y)</code> keeps all observations in <code>x</code> that have a match in <code>y</code>.</li>
+<li><code>anti_join(x,y)</code> drops all observations in <code>x</code> that have a match in <code>y</code>.</li>
+</ul></li>
+</ul></li>
+<li>set operations
+<ul>
+<li><code>intersect(x,y)</code></li>
+<li><code>union(x,y)</code></li>
+<li><code>setdiff(x,y)</code></li>
+</ul></li>
+</ul>
+</div>
+<div id="chapter-11-strings-with-stringr" class="section level3">
+<h3>chapter 11 strings with <code>stringr</code></h3>
+<ul>
+<li><code>stringr</code> is not part of the core <code>tidyverse</code>. (2018-10-26, actually, it is in)</li>
+<li>this chapter is mainly about <em>regex</em> basics.</li>
+<li>suggest to use double quotes as default, unless single quote to contain double quotes inside.</li>
+<li>to include a literal single or double quote in a string can use <code>\</code> to escape it:</li>
+</ul>
+<pre class="r"><code>double_quote &lt;- &quot;\&quot;&quot;  # or &#39;&quot;&#39;
+single_quote &lt;- &#39;\&#39;&#39;  # or &quot;&#39;&quot;
+blackslash &lt;- &quot;\\&quot;</code></pre>
+<ul>
+<li>string length
+<ul>
+<li>(why not base R? because they can be inconsistent, which makes them hard to remember.)</li>
+<li>functions in <code>stringr</code> package have intuitive prefixes in their names, all start with <code>str_</code></li>
+<li><code>str_length()</code></li>
+</ul></li>
+<li>string combine
+<ul>
+<li><code>str_c()</code></li>
+<li><code>str_c(x, y, sep=“, “)</code></li>
+<li>missing values can be contagious, <code>str_replace_na()</code> will treat them as string <code>”NA”</code></li>
+</ul></li>
+</ul>
+<pre class="r"><code>x &lt;- c(&quot;abc&quot;, NA)
+str_c(&quot;|-&quot;, x, &quot;-|&quot;)
+#&gt; [1] &quot;|-abc-|&quot; NA
+str_c(&quot;|-&quot;, str_replace_na(x), &quot;-|&quot;)
+#&gt; [1] &quot;|-abc-|&quot; &quot;|-NA-|&quot;</code></pre>
+<pre><code>- note `str_c()` is vectorized, automatically recycles shorter vectors to the same length as the longest.
+- to collapse a vector of strings into a single string, use `collapse`:</code></pre>
+<pre class="r"><code>str_c(c(&quot;x&quot;, &quot;y&quot;, &quot;z&quot;), collapse = &quot;, &quot;)</code></pre>
+<ul>
+<li>subsetting strings
+<ul>
+<li><code>str_sub(string, start_ind, end_ind)</code> (not substitute, but subset!)
+<ul>
+<li>inclusive</li>
+<li>it won’t fail if <code>start_ind, end_ind</code> are out of range, will just return as much as possible (forgiving)</li>
+<li>can use assignment form of <code>str_sub()</code> to modify strings:</li>
+</ul></li>
+</ul></li>
+</ul>
+<pre class="r"><code>str_sub(x, 1, 1) &lt;- str_to_lower(str_sub(x, 1, 1))  # lowercase the first letter of words</code></pre>
+<ul>
+<li>locales
+<ul>
+<li>previously with <code>str_to_lower()</code>, of course there are <code>str_to_upper()</code> and <code>str_to_title()</code>.</li>
+<li>the locale is specified as an ISO 639 language code, which is a two- or three-letter abbreviation.</li>
+</ul></li>
+</ul>
+<pre class="r"><code>x &lt;- c(&quot;apple&quot;, &quot;eggplant&quot;, &quot;banana&quot;)
+str_sort(x, locale = &quot;en&quot;)  # English
+#&gt; [1] &quot;apple&quot;  &quot;banana&quot;   &quot;eggplant&quot;
+str_sort(x, locale = &quot;haw&quot;)  # Hawaiian
+#&gt; [1] &quot;apple&quot;  &quot;eggplant&quot; &quot;banana&quot;</code></pre>
+<ul>
+<li>matching patterns
+<ul>
+<li>to learn regex, use <code>str_view()</code> and <code>str_view_all()</code> which take a character vector and a regex and show you how they match.</li>
+</ul></li>
+</ul>
+<pre class="r"><code># basic matches
+
+x &lt;- c(&quot;apple&quot;, &quot;banana&quot;, &quot;pear&quot;)
+str_view(x, &quot;an&quot;)  # exact matching, only banana will be circled
+str_view(x, &quot;.a.&quot;)  # ban in banana, ear in pear will be circled. `.` matches any character (except a newline)
+
+# a real dot will be matched with `\\.`
+# a real backslash will be matched with `\\\\`
+
+# anchors
+# by default, regex will matcha any part of a string. it&#39;s useful to anchor the regex so that it matches from the start or end of the string.
+
+# ^ to match the start
+# $ to match the end
+
+str_view(x, &quot;^a&quot;)  # only apple will be matched
+str_view(x, &quot;a$&quot;)  # only banana will be matched
+str_view(x, &quot;^a$&quot;)  # nothing will be matched since it forces to match a complete string
+
+# character classes and alternatives
+# \d matches any digit
+# \s matches any whitespace (e.g. space, tab, newline)
+# [abc] matches a, b, or c
+# [^abc] matches anything except a, b, or c
+
+# the precedence for | (or) is low
+# e.g. abc|xyz matches abc or xyz, not abcyz or abxyz.
+str_view(c(&quot;grey&quot;, &quot;gray&quot;), &quot;gr(e|a)y&quot;)  # matches gray and grey
+
+# repetition
+# ?: 0 or 1
+# +: 1 or more
+# *: 0 or more
+# {n}: exactly n
+# {n,}: n or more
+# {,m}: at most m
+# {n,m}: between n and m
+# those matches are greedy, they will match the longest string if possible, but adding a ? will make them &quot;lazy&quot;.
+str_view(&quot;CCCL&quot;, &quot;C{2,3}&quot;)  # will match &quot;CCC&quot;
+str_view(&quot;CCCL&quot;, &quot;C{2,3}?&quot;)  # will match only &quot;CC&quot;
+
+# grouping and backreferences
+str_view(fruit, &quot;(..)\\1&quot;, match = TRUE)  # matches repeated pair of letters, e.g. banana, coconut, cucumber, jujube, papaya, salal berry</code></pre>
+<pre><code>- check [http://stackoverflow.com/a/201378](http://stackoverflow.com/a/201378]) for a more complex example of regex.</code></pre>
+<ul>
+<li>detect matches
+<ul>
+<li><code>str_detect(strings, pattern)</code> returns a logical vector the same length as the input</li>
+<li>a common use of <code>str_detect()</code> is to select the elements that match a pattern. but the same goal can be achieved with <code>str_subset()</code></li>
+</ul></li>
+</ul>
+<pre class="r"><code>words[str_detect(words, &quot;x$&quot;)]
+str_subset(words, &quot;x$&quot;)</code></pre>
+<ul>
+<li>extract matches</li>
+</ul>
+<pre class="r"><code>colors &lt;- c(&quot;red&quot;, &quot;orange&quot;, &quot;yellow&quot;, &quot;green&quot;, &quot;blue&quot;, &quot;purple&quot;)
+color_match &lt;- str_c(colors, collapse = &quot;|&quot;)
+color_match
+#&gt; [1] &quot;red|orange|yellow|green|blue|purple&quot;
+has_color &lt;- str_subset(setences, color_match)
+matches &lt;- str_extract(has_color, color_match)
+head(matches)
+#&gt; [1] &quot;blue&quot; &quot;blue&quot; &quot;red&quot; &quot;red&quot; &quot;red&quot; &quot;blue&quot;
+
+# stringr functions only extract the first match in a sentence
+more &lt;- sentences[str_count(sentences, color_match) &gt; 1]
+str_view_all(more, color_match)
+
+        It is hard to erase blue or red ink.
+        The green light in the brown box flickered.
+        The sky in the west is tinged with orange red.
+
+str_extract(more, color_match)
+#&gt; [1] &quot;blue&quot; &quot;green&quot; &quot;orange&quot;
+
+str_extract_all(more, color_match)
+#&gt; [[1]]
+#&gt; [1] &quot;blue&quot; &quot;red&quot;
+#&gt;
+#&gt; [[2]]
+#&gt; [1] &quot;green&quot; &quot;red&quot;
+#&gt;
+#&gt; [[3]]
+#&gt; [1] &quot;orange&quot; &quot;red&quot;
+
+str_extract_all(more, color_match, simplify = TRUE)
+#&gt;        [,1]   [,2]
+#&gt; [1,]   &quot;blue&quot;  &quot;red&quot;
+#&gt; [2,]  &quot;green&quot;  &quot;red&quot;
+#&gt; [3,] &quot;orange&quot;  &quot;red&quot;</code></pre>
+<ul>
+<li>grouped matches
+<ul>
+<li><code>str_extract()</code> gives us the complete match, <code>str_match()</code> gives each individual component. Instead of a character vector, it returns a matrix, with one column for the complete match followed by one column for each group.</li>
+<li>if the data is a tibble, easier to use <code>tidyr::extract()</code> which works like <code>str_match()</code> but requires you to name the matches.</li>
+<li>also, there is a <code>str_match_all()</code></li>
+</ul></li>
+<li>replacing matches
+<ul>
+<li><code>str_replace()</code> and <code>str_replace_all()</code>
+<ul>
+<li><code>str_replace(strings, pattern, replaced_to)</code></li>
+<li>with <code>str_replace_all()</code> can perform multiple replacements by supplying a named vector <code>str_replace_all(x, c(“1” = “one”, “2” = “two”, “3” = “three”))</code></li>
+</ul></li>
+<li><code>str_replace(“([^ ]+) ([^ ]+) ([^ ]+)", "\\1 \\3 \\2)</code> flips the second and the third word for every sentence</li>
+</ul></li>
+<li>splitting
+<ul>
+<li><code>str_split(“ “)</code> splits a string up into pieces by a whitespace.</li>
+<li>because each component might contain a different number of pieces, the returned value is in a <strong>list</strong></li>
+<li>or can use <code>simplify = TRUE</code> to return a matrix (like <code>str_extract_all()</code></li>
+<li>also <code>n</code> can be specified to request a maximum number of <code>n</code> pieces returned</li>
+</ul></li>
+</ul>
+<pre class="r"><code>fields &lt;- c(&quot;Name: Hadley&quot;, &quot;Country: NZ&quot;, &quot;Age: 35&quot;)
+fields %&gt;% str_split(&quot;: &quot;, n = 2, simplify = TRUE)
+#&gt;      [,1]        [,2]
+#&gt; [1,]   &quot;Name&quot;      &quot;Hadley&quot;
+#&gt; [2,]   &quot;Country&quot;   &quot;NZ&quot;
+#&gt; [3,]   &quot;Age&quot;       &quot;35&quot;</code></pre>
+<pre><code>- instead of splitting by patterns, can also split up by **character, line, sentence, and word** `boundary()`s:</code></pre>
+<pre class="r"><code>x &lt;- &quot;This is a sentence. This is another sentence.&quot;
+str_view_all(x, boundary(&quot;word&quot;))  # shows every word
+str_split(x, &quot; &quot;)[[1]]
+#&gt; [1] &quot;This&quot;    &quot;is&quot;      &quot;a&quot;     &quot;sentence.&quot; &quot;&quot;
+#&gt; [6]       &quot;This&quot;
+#&gt; [7] &quot;is&quot;      &quot;another&quot; &quot;sentence.&quot;
+str_split(x, boundary(&quot;word&quot;))[[1]]
+#&gt; [1] &quot;This&quot;    &quot;is&quot;      &quot;a&quot;     &quot;sentence&quot; &quot;This&quot;
+#&gt; [6] &quot;is&quot;      
+#&gt; [7] &quot;another&quot; &quot;sentence&quot;</code></pre>
+<ul>
+<li>find matches
+<ul>
+<li><code>str_locate()</code>, <code>str_locate_all()</code> return starting and ending positions of each match.</li>
+</ul></li>
+<li>other types of pattern
+<ul>
+<li>our version of regex inside <code>str_</code> function is in fact short for …</li>
+</ul></li>
+</ul>
+<pre class="r"><code>str_view(fruit, &quot;nana&quot;)
+str_view(fruit, regex(&quot;nana&quot;))</code></pre>
+<pre><code>- some arguments of `regex()` worth mentioning
+    - `ignore_case = TRUE` ignores uppercase or lowercase forms.
+    - `multiline = TRUE` allows `^` and `$` to match the start and end of each line rather than the start and end of the complete string.
+    - `comments = TRUE` allows you to use comments and white space to make complex regular expressions more understandable. In this case, spaces are ignored, as is everything after `#`, e.g.</code></pre>
+<pre class="r"><code>phone &lt;- regex(&quot;
+    \\(?        # optional opening parens
+    (\\d{3})    # area code
+    [)- ]?      # optional closing parens, dash, or space
+    (\\d{3})    # another three numbers
+    [ -]?       # optional space or dash
+    (\\d{3})    # three more numbers
+    &quot;, comments = TRUE)</code></pre>
+<pre><code>    - `fixed()` matches exactly the specified sequence of bytes
+    - `coll()` compares strings using standard _collation_ rules. …
+
+- other uses of regex
+    - `apropos()` searches all objects available from the global environment.
+    - `dir()` lists all the files in a directory.
+        - `dir(pattern = “\\.Rmd$”))` shows all R Markdown files</code></pre>
+<blockquote>
+<p>another stronger version of <code>stringr</code> called <code>stringi</code>.</p>
+</blockquote>
+<hr />
+<p>2018-10-26</p>
+<p>~<em>from now on, we are going to organize the notes as question-and-answer pairs.</em> ~</p>
+</div>
+<div id="chapter-12-factors-with-forcats" class="section level3">
+<h3>chapter 12 factors with <code>forcats</code></h3>
+<ul>
+<li>how to create factors?</li>
+</ul>
+<pre class="r"><code>month_levels &lt;- c(&quot;Jan&quot;, &quot;Feb&quot;, &quot;Mar&quot;, &quot;Apr&quot;, &quot;May&quot;, &quot;Jun&quot;, &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot;)
+y1 &lt;- factor(c(&quot;Dec&quot;,&quot;Apr&quot;,&quot;Jan&quot;,&quot;Mar&quot;), levels = month_levels)
+sort(y1)</code></pre>
+<pre><code>- any values not in the levels will be converted to `NA`
+- if use `parse_factor()` in `readr` -&gt; an error will be raised</code></pre>
+<ul>
+<li>how to create a factor by its appearance order?
+<ul>
+<li>setting levels to <code>unique(x)</code></li>
+<li>or, after the fact, with <code>fct_inorder()</code></li>
+</ul></li>
+</ul>
+<pre class="r"><code>f1 &lt;- factor(x1, levels = unique(x1))
+f2 &lt;- x1 %&gt;% factor() %&gt;% fct_inorder()</code></pre>
+<ul>
+<li>how to reorder the factors?
+<ul>
+<li><code>fct_reorder(f, x, fun=median)</code>
+<ul>
+<li><code>f</code> is the factor whose levels you want to modify</li>
+<li><code>x</code> is a numeric vector that you want to use to reorder the levels.</li>
+<li><code>fun</code> is an optional function that’s used if there are multiple values of <code>x</code> for each value of <code>f</code>, default is median.</li>
+</ul></li>
+<li><code>fct_relevel()</code></li>
+<li><code>fct_reorder2()</code></li>
+<li><code>fct_infreq()</code>, <code>fct_rev()</code></li>
+</ul></li>
+<li>how to modify factor levels? rename/collapse
+<ul>
+<li><code>fct_recode()</code></li>
+</ul></li>
+</ul>
+<pre class="r"><code>gss_cat %&gt;%
+    mutate(partyid = fct_recode(partyid,
+        &quot;Republican, strong&quot;    = &quot;Strong republican&quot;,
+        &quot;Republican, weak&quot;      = &quot;Not str republican&quot;
+)) %&gt;%
+count(partyid)</code></pre>
+<pre><code>    - `fct_recode()` will leave levels that aren’t explicitly mentioned as is and will warn you.
+- `fct_collapse()`</code></pre>
+<pre class="r"><code>gss_cat %&gt;%
+    mutate(partyid = fct_collapse(partyid,
+        other = c(&quot;No answer&quot;, &quot;Don&#39;t know&quot;, &quot;Other party&quot;),
+        rep = c(&quot;Strong republican&quot;, &quot;Not str republican&quot;),
+        ind = c(&quot;Ind,near rep&quot;, &quot;Independent&quot;, &quot;Ind,near dem&quot;),
+        dem = c(&quot;Not str democrat&quot;, &quot;Strong democrat&quot;)
+)) %&gt;% count(partyid)</code></pre>
+<pre><code>- `fct_lump()` lump together all the small groups to make a plot or table simpler.
+    - the default will progressively lump together the smallest groups, ensuring that the aggregate is still the smallest group.
+    - we can specify how many groups (excluding other) we want to keep with parameter `n`: `fct_lump(relig, n=10)`</code></pre>
+</div>
+<div id="chapter-13-dates-and-times-with-lubridate" class="section level3">
+<h3>chapter 13 dates and times with <code>lubridate</code></h3>
+<ul>
+<li>date, time, datetime?
+<ul>
+<li><code>today()</code>, <code>now()</code></li>
+<li>rule: select a data type as simple as possible</li>
+<li><code>hms</code> package if needed</li>
+<li>create a date/time
+<ul>
+<li>from a string</li>
+<li>from individual date-time components</li>
+<li>from an existing date/time object</li>
+</ul></li>
+</ul></li>
+<li>how to create date/time from strings?
+<ul>
+<li>with robust <code>lubridate</code> functions like:
+<ul>
+<li><code>ymd()</code>, <code>mdy()</code>, <code>dmy()</code>, <code>ymd_hms()</code>, <code>mdy_hm()</code>, <code>ymd(…, tz = “UTC")</code>, etc.</li>
+</ul></li>
+</ul></li>
+<li>how to create date/time from individual components?
+<ul>
+<li>when individual components spread across columns.</li>
+<li><code>make_date()</code> for dates, <code>make_datetime()</code> for date-times</li>
+<li><code>geom_freqpoly()</code> for plotting the time series data
+<ul>
+<li>the argument <code>binwidth=</code> is in seconds.</li>
+</ul></li>
+</ul></li>
+<li>how to create date/time from other types?
+<ul>
+<li><code>as_date()</code> and <code>as_datetime()</code></li>
+</ul></li>
+<li>how to extract components from datetime?</li>
+</ul>
+<pre class="r"><code>datetime &lt;- ymd_hms(&quot;2016-07-08 12:34:56&quot;
+year(datetime)
+month(datetime)
+mday(datetime)
+yday(datetime)
+wday(datetime)
+hour(datetime)
+minute(datetime)
+second(datetime)
+
+month(datetime, label = TRUE) # this will return the abbreviated name of the month
+wday(datetime, label = TRUE, abbr = FALSE)  # this will return the full name of the weekday</code></pre>
+<ul>
+<li>how to round datetime?
+<ul>
+<li><code>round_date()</code>, <code>floor_date()</code>, <code>ceiling_date()</code></li>
+</ul></li>
+<li>how to set components?
+<ul>
+<li>method 1: <code>year(datetime) &lt;- 2020</code>, using accessor functions one by one</li>
+<li>method 2: <code>update(dateline, year = 2020, month = 2, mday = 2, hour = 2)</code>
+<ul>
+<li>if the updated value is too large, the datetime will roll over to the correct datetime value.</li>
+</ul></li>
+</ul></li>
+<li>what are three important representations of time spans?
+<ul>
+<li><ol style="list-style-type: decimal">
+<li><em>Durations</em>, which represent an exact number of seconds.</li>
+</ol></li>
+<li><ol start="2" style="list-style-type: decimal">
+<li>_ Periods_, which represent human units like weeks and months.</li>
+</ol></li>
+<li><ol start="3" style="list-style-type: decimal">
+<li><em>Intervals</em>, which represent a starting and ending point.</li>
+</ol></li>
+</ul></li>
+<li>how to get durations?
+<ul>
+<li>in R, if you subtract two dates you get a <code>difftime</code> object</li>
+<li><code>lubridate</code> package <code>as.duration()</code></li>
+<li>constructors:
+<ul>
+<li><code>dseconds()</code>, <code>dminutes()</code>, <code>dhours()</code>, <code>ddays()</code>, <code>dweeks()</code>, <code>dyears()</code></li>
+</ul></li>
+</ul></li>
+<li>how to get periods?
+<ul>
+<li><strong>periods</strong> are time spans but don’t have a fixed length in seconds; they work with “human” times, like days and months.</li>
+<li>constructors:
+<ul>
+<li><code>seconds()</code>, <code>minutes()</code>, <code>hours()</code>, <code>days()</code>, <code>months()</code>, <code>weeks()</code>, <code>years()</code></li>
+</ul></li>
+</ul></li>
+</ul>
+<pre class="r"><code>datetime + ddays(1)  # gets a duration
+datetime + days(1)  # gets a period</code></pre>
+<ul>
+<li>how to get intervals?
+<ul>
+<li>an <strong>interval</strong> is a duration with a starting point
+<ul>
+<li>with <code>%—%</code></li>
+</ul></li>
+</ul></li>
+</ul>
+<pre class="r"><code>next_year &lt;- today() + years(1)
+(today() %--% next_year) %/% ddays(1)  # how long the interval is
+(today() %--% next_year) %/% days(1)  # how many periods fall into an interval</code></pre>
+<ul>
+<li>time zones
+<ul>
+<li><code>Sys.timezone()</code></li>
+<li><code>OlsonNames()</code></li>
+<li>change the timezone in two ways:
+<ul>
+<li><ol style="list-style-type: decimal">
+<li>keep the “real time”, just change the “display”</li>
+</ol></li>
+<li><ol start="2" style="list-style-type: decimal">
+<li>change the “real time”</li>
+</ol></li>
+</ul></li>
+</ul></li>
+</ul>
+<pre class="r"><code># x4 is a vector of datetimes
+x4a &lt;- with_tz(x4, tzone = &quot;Australia/Lord_Howe&quot;)
+x4b &lt;- force_tz(x4, tzone = &quot;Australia/Lord_Howe&quot;)</code></pre>
+<hr />
+</div>
+</div>
+<div id="part-iii-program" class="section level2">
+<h2>part III program</h2>
+<div id="chapter-14-pipes-with-magrittr" class="section level3">
+<h3>chapter 14 pipes with <code>magrittr</code></h3>
+<ul>
+<li>when not to use pipe
+<ul>
+<li>when pipes are longer than 10 steps -&gt; better create some intermediate objects with meaningful names.</li>
+<li>when you have multiple inputs or outputs.</li>
+<li>when start thinking about a directed graph with a complex dependency structure since pipe is rather linear and expressing complex relationships with them typically yields confusing code.</li>
+</ul></li>
+<li><code>%&gt;%</code> is universal in <code>tidyverse</code>, but what other could <code>magrittr</code> provide?
+<ul>
+<li><code>%T&gt;%</code> tee pipe, returns the lefthand side instead of the righthand side.</li>
+</ul></li>
+</ul>
+<pre class="r"><code>rnorm(100) %&gt;%
+    matrix(ncol = 2) %T&gt;%
+    plot() %&gt;%
+    str()</code></pre>
+<pre><code>- `%$%` explodes out the variables in a data frame so that can be referred to them explicitly.</code></pre>
+<pre class="r"><code>mtcars %$%
+    cor(disp, mpg)</code></pre>
+<pre><code>- `%&lt;&gt;%` assignment:</code></pre>
+<pre class="r"><code>mtcars &lt;- mtcars %&gt;% transform(cyl = cyl * 2)
+
+# to
+mtcars %&lt;&gt;% transform(cyl = cyl * 2)</code></pre>
+</div>
+<div id="chapter-15-functions" class="section level3">
+<h3>chapter 15 functions</h3>
+<ul>
+<li>what makes a good function name?
+<ul>
+<li>either <code>snake_case</code> or <code>camelCase</code>, but not mixed!</li>
+<li>using a common prefix better than a common suffix</li>
+</ul></li>
+<li>use cmd+ctrl+shift+R to provide a break up codes into readable chunks</li>
+<li>coding styles</li>
+<li>conditions</li>
+<li>function arguments
+<ul>
+<li><strong>when calling a function, should place a space around</strong> <code>=</code> <strong>in function calls, always put a space after a comma, not before.</strong></li>
+</ul></li>
+</ul>
+</div>
+<div id="chapter-16-vectors" class="section level3">
+<h3>chapter 16 vectors</h3>
+<ul>
+<li>say something about vector basics?
+<ul>
+<li>there are two types of vectors:
+<ul>
+<li><em>atomic vectors</em>, of which there are six types: logical, integer, double, character, complex, and raw. (integer + double are called numeric)</li>
+<li><em>lists</em>, which are sometimes called recursive vectors because lists can contain other lists.</li>
+</ul></li>
+<li>every vector has two key properties
+<ul>
+<li><code>typeof()</code> , which type of data is contained inside?</li>
+<li><code>length()</code>, how many elements?</li>
+</ul></li>
+<li>starting from vectors, we can create <strong>augmented vectors</strong>
+<ul>
+<li>factors are built on top of integer vectors.</li>
+<li>dates and date-times are built on top of numeric vectors.</li>
+<li>data frames and tibbles are built on top of lists.</li>
+</ul></li>
+</ul></li>
+<li>coercion</li>
+<li>how to name a vector?
+<ul>
+<li>all types of vectors can be named, can name them during creation with <code>c()</code> or after the fact with <code>purrr::set_names()</code></li>
+</ul></li>
+</ul>
+<pre class="r"><code>c(x = 1, y = 2, z = 4)
+#&gt; x y z
+#&gt; 1 2 4
+
+set_names(1:3, c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;))
+#&gt; a b c
+#&gt; 1 2 3</code></pre>
+<ul>
+<li>just be careful with list subsetting</li>
+<li>vector attributes!
+<ul>
+<li>any vector can contain arbitrary additional metadata through its <em>attributes</em>.</li>
+<li>just treat attributes as a named list of vectors that can be attached to any object.
+<ul>
+<li>can get and set individual attribute value with <code>attr()</code></li>
+<li>see them all at once with <code>attributes()</code></li>
+</ul></li>
+</ul></li>
+</ul>
+<pre class="r"><code>x &lt;- 1:10
+attr(x, &quot;greeting&quot;)
+#&gt; NULL
+attr(x, &quot;greeting&quot;) &lt;- &quot;Hi!&quot;
+attr(x, &quot;farewell&quot;) &lt;- &quot;Bye!&quot;
+attributes(x)
+#&gt; $greeting
+#&gt; [1] &quot;Hi!&quot;
+#&gt;
+#&gt; $farewell
+#&gt; [1] &quot;Bye!&quot;</code></pre>
+</div>
+<div id="chapter-17-iteration-with-purrr" class="section level3">
+<h3>chapter 17 iteration with <code>purrr</code></h3>
+<ul>
+<li><code>set_along(df)</code> the row noms of a data frame.</li>
+<li>the goal of using <code>purrr</code> functions instead of loops is to allow you to break common list manipulation challenges into small pieces.</li>
+</ul>
+<p>the pattern of looping over a vector, doing something to each element, and saving the results is so common that the <code>purrr</code> package provides a family of functions to do it for you.</p>
+<ul>
+<li>the Map functions
+<ul>
+<li><code>map()</code> makes a list.</li>
+<li><code>map_lgl()</code> makes a logical vector.</li>
+<li><code>map_int()</code> makes an integer vector.</li>
+<li><code>map_dbl()</code> makes a double vector.</li>
+<li><code>map_chr()</code> makes a character vector.</li>
+</ul></li>
+<li>all <code>purrr</code> functions are implemented in C, so a little faster at the expense of readability.</li>
+</ul>
+<hr />
+</div>
+</div>
+<div id="part-iv-model" class="section level2">
+<h2>part IV model</h2>
+<div id="chapter-18-model-basics-with-modelr" class="section level3">
+<h3>chapter 18 model basics with <code>modelr</code></h3>
+<blockquote>
+<p>The goal of a model is to provide a simple low-dimensional summary of a dataset.</p>
+</blockquote>
+<ul>
+<li>visualizing models
+<ul>
+<li>predictions
+<ul>
+<li><code>modelr::data_grid()</code>: the first argument is a data frame, for each subsequent argument it finds the unique variable</li>
+<li><code>modelr::add_predictions()</code> takes a data frame and and model, adds the predictions from the model to a new column in the data frame.</li>
+</ul></li>
+<li>residuals
+<ul>
+<li><code>add_residuals()</code></li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+<div id="chapter-19-model-building" class="section level3">
+<h3><del>chapter 19 model building</del></h3>
+</div>
+<div id="chapter-20-many-models-with-purrr-and-broom" class="section level3">
+<h3><del>chapter 20 many models with <code>purrr</code> and <code>broom</code></del></h3>
+</div>
+</div>
+<div id="part-v-communicate" class="section level2">
+<h2>part V communicate</h2>
+<div id="chapter-21-r-markdown" class="section level3">
+<h3><del>chapter 21 R markdown</del></h3>
+</div>
+<div id="chapter-22-graphics-fro-communication-with-ggplot2" class="section level3">
+<h3>chapter 22 graphics fro communication with <code>ggplot2</code></h3>
+<ul>
+<li>label
+<ul>
+<li><code>labs()</code> function
+<ul>
+<li><code>title</code></li>
+<li><code>subtitile</code></li>
+<li><code>caption</code></li>
+<li>applying <code>quote()</code> inside <code>labs()</code> uses mathematical equations instead of text strings</li>
+</ul></li>
+</ul></li>
+<li>annotations
+<ul>
+<li><code>geom_text()</code> is like <code>geom_point()</code> but with extra labels</li>
+<li><code>geom_label()</code> draws a rectangle behind the text, also use <code>nudge_y</code> parameter to move the labels slightly above the corresponding points.</li>
+<li>use <code>ggrepel</code> package by Kamil Slowikowski, it adjust labels so that they don’t overlap.</li>
+</ul></li>
+</ul>
+<pre class="r"><code>ggplot(mpg, aes(dispel, hwy)) +
+    geom_point(aes(color = class)) +
+    geom_point(size = 3, shape = 1, data = best_in_class) +
+    ggrepel::geom_label_repel(
+        aes(label = model),
+        data = best_in_class
+    )</code></pre>
+</div>
+<div id="chapter-23-r-markdown-formats" class="section level3">
+<h3><del>chapter 23 R markdown formats</del></h3>
+</div>
+<div id="chapter-24-r-markdown-workflow" class="section level3">
+<h3><del>chapter 24 R markdown workflow</del></h3>
+</div>
+</div>
