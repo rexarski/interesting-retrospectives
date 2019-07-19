@@ -34,7 +34,9 @@ choroLayer(spdf = iso,
            legend.title.txt = &quot;Isochrones\n(min)&quot;,
            add = TRUE)
 plot(apotheke.sp[10,], add=TRUE, col =&quot;red&quot;, pch = 20)</code></pre>
-<p><img src="/image/canberra-osrm.png" /></p>
+<center>
+<img src="/image/canberra-osrm.png" />
+</center>
 <p>However, the processing time of this plot is not very satisfying. What about drawing the polygons with <code>leaflet</code>?</p>
 <pre class="r"><code># Map as leaflet
 iso@data$drive_times &lt;- factor(paste(iso@data$min, &quot;to&quot;, iso@data$max, &quot;min&quot;))
@@ -50,7 +52,9 @@ leaflet() %&gt;%
                 data = iso, popup = iso@data$drive_times,
                 group = &quot;Drive Time&quot;) %&gt;% 
     addLegend(&quot;bottomright&quot;, pal = factpal, values = iso@data$drive_time,   title = &quot;Drive Time&quot;)</code></pre>
-<p><img src="/image/canberra-leaflet.png" /></p>
+<center>
+<img src="/image/canberra-leaflet.png" />
+</center>
 <p>An interactive map is not a bad idea. And can use <code>proc.time()</code> to track the processing time of both methods.</p>
 <pre class="r"><code>ptm &lt;- proc.time()
 # plotting method

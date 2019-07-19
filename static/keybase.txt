@@ -1,0 +1,75 @@
+==================================================================
+https://keybase.io/rexarski
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of https://interetro.rbind.io
+  * I am rexarski (https://keybase.io/rexarski) on keybase.
+  * I have a public key with fingerprint 56BC AFC4 48A1 9D30 9522  4FEE 86AB F8A5 E6BB A7E7
+
+To do so, I am signing this object:
+
+{
+  "body": {
+    "key": {
+      "eldest_kid": "0120cdc32bf49401a4eae18b2d473b7205c821c29cb1136ef983c5c693dc22e5bd050a",
+      "fingerprint": "56bcafc448a19d3095224fee86abf8a5e6bba7e7",
+      "host": "keybase.io",
+      "key_id": "86abf8a5e6bba7e7",
+      "kid": "01019e8f997ac8ab86d76b41cb6d95b7e590ea2721547e1a482b1a739c1c270502d80a",
+      "uid": "083335b3dc971ce1e84ac655a9c23019",
+      "username": "rexarski"
+    },
+    "service": {
+      "hostname": "interetro.rbind.io",
+      "protocol": "https:"
+    },
+    "type": "web_service_binding",
+    "version": 1
+  },
+  "ctime": 1563503641,
+  "expire_in": 157680000,
+  "prev": "1e713eea2995a4a4787d026a356f5cb10e903ae87539a42a5744fa0cc19d227d",
+  "seqno": 19,
+  "tag": "signature"
+}
+
+which yields the signature:
+
+-----BEGIN PGP MESSAGE-----
+Version: Keybase OpenPGP v2.1.0
+Comment: https://keybase.io/crypto
+
+yMN1AnicbVJ7UFRVHF4QoXYIotQGdBjmqqw8gvt+LLMoCs42iTXjlJNjrefeexZu
+LLvrvQviA+ghGoamDaZIII8QHCVLRmssE4hhdWSc5NVoKRQqqcgKAcGQ2Lmo/3X+
+OXPO+b7vfN/v92t7YY7B6LfrxGTdnR/qB/0ut1TmGN4l4sO3Y6JL3oqZt2NZcHaD
+DhlqHluWImNmDCdIXJIlihTttEDjBKAhgAQvkjLNUSJH4ozEk4RECpJIEBQL7QJP
+SYzECpQskSRkRBlncIDFY3bFmQFVt6o4PUiWYUUJ2CWa5gEhyBQuMCRJ2yHkWSDa
+ecBAVhQBBzlEzHRpOgOZE4EGExQXukMH26y9/8E/840TAuTtgsABiQciz8ocK9KE
+JLKywIgcZAQcApIjCYbmIIrFkyIBOEqQUBgOeSZlftZ3zhM5nqIoRkShBI6QIAF5
+GkgswwBBIin0kw7UoOoE2RChVZgHVC1LwfLjMXSbq0hQL6ye5CkCVQGq0KO6ElRR
+ccpPUrlVl8cluRzoPdPjcWtmne/Z6tYJW6Boeypl0xmomoiRC1VNcTkxM4GQkkfR
+tQmGpRicYmkiHoN5bkWFNkVHMBzL42jp/8BcJElAjqAgKoIgMIAGNMdzMk6ygGJY
+O4PaiUMBpwDkOYYSAE0ChqNpO8AlCXWMJDkZ08NtdrqQtoB8ggykqSkZTuDJUSGW
+39qyMcDgZzQEzvXXx8xgfP7FZ8M3vyD08ZoqbzIdrCwM9R7Z+HXR+MPJUMs9X8fq
+2MbitV+tGAiclyOs5S+4HLXYoSBj0/feDRG3j/ZHf3DqtrrvrdE+n7m64G1H03Fr
+l60ypt0TdjrqveiZ5sOD545+++DXJY+Xmg5nGhZkWtNKk16NSl35R1VnWevE5pBV
+V4derp44u/g6uc4itTvyYsJ9L1nHUru7RdPHRMBPfsU1j8jytBDlVpr1bGxK8KOw
+jIVHMF8x+/Po1XPmbdkpLTcLv9N6pNTIi0MxcZ9e7LEtr3snuiksZdGDTf9OFc7v
+6H/lUvLOyJb9X3w+sr7rr+XeJeXJ6eUph2IDuscwx3X/uojXfHvaRm8uTu8tGl2U
+eT4u9WGRD9e6DHvryGNm4MrwzoT2R+Zb2dX97kv1c4Ona25sahv/J8l05crv48Mr
+3p8pXRp3YNmXw9GWkXUTFf6mD0/tHpvKt/wyOO1XEhl0PytJW3ng8jdZlo7BhDdT
+zM17wycbWnfByuHuvFvSj9eiPjPOm17lC/wkv7NtC9W8oDBv6sSaxNPpZfGGZeYG
+a+Po/qHO3d13rk2ZS+BBu1ZM7bkb3Our2hHUZ71PzjnO9cYObJhUoph7IzcOxqZV
+9zxXkFjrbyr5s6I3taKmwlHf3uwyiQ2/aa+XRmefKRsx7qhtPBnSF3GyXi7cdncn
+kzhwwVrz0fn1lmPtZ3Dv32Nv/AdNDsxg
+=FO3O
+-----END PGP MESSAGE-----
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/rexarski
+
+==================================================================
