@@ -52,3 +52,10 @@ weight = 2
 # name = "Knits of Internet"
 # url = "https://knits.typlog.io/"
 # weight = 3
+
+[[menu.primary]]
+identifier = "Jibber-jabber"
+name = "not Twitter"
+url = "/jj/"
+weight = 4
+
