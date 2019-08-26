@@ -1,0 +1,27 @@
+---
+title: The Lost R Packages (after updating R)
+author: Qiu Rui
+date: '2019-07-24'
+slug: the-lost-r-packages
+categories: []
+tags:
+  - R
+---
+
+
+
+<p>On Windows, we have a package called <a href="https://cran.r-project.org/web/packages/installr/index.html"><code>installr</code></a>. Use function <code>copy.packages.between.libraries()</code>, then problem solved.</p>
+<p>On macOS, unfortunately, we don’t have that handy tool.</p>
+<p>But we can still use the following to retrieve all current installed packages’ names:</p>
+<pre class="r"><code>to_install &lt;- as.vector(installed.packages()[,1])
+install.packages(to_install)</code></pre>
+<p>A more concrete <a href="https://www.r-bloggers.com/quick-way-of-installing-all-your-old-r-libraries-on-a-new-device/">solution</a> would be only updating those non-base-R packages:</p>
+<pre class="r"><code>installed &lt;- as.data.frame(installed.packages())
+write.csv(installed, &#39;installed_previously.csv&#39;)
+
+installedPreviously &lt;- read.csv(&#39;installed_previously.csv&#39;)
+baseR &lt;- as.data.frame(installed.packages())
+toInstall &lt;- setdiff(installedPreviously, baseR)
+
+install.packages(toInstall)</code></pre>
+<p>Still, I wish those old packages can be transfered to a new version of R painlessly.</p>

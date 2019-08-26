@@ -1,0 +1,26 @@
+---
+title: Python 3 网络爬虫开发实战·笔记一
+author: Qiu Rui
+date: '2019-08-26'
+slug: python-crawler-note-01
+categories: []
+tags:
+  - web-crawler
+  - Python
+---
+
+在读《[Python 3 网络爬虫开发实战](https://book.douban.com/subject/30175598/)》。
+
+第一章「开发环境配置」里碰到如下几个问题：
+
+1. macOS 下 ChromeDriver 下载完成后，应将其拖拽到「环境变量」或「属于环境变量的目录」里。书中以 `/usr/bin` 为例，但问题是 `sudo mv chromedriver /usr/bin` 并没有权限。查阅 [StackOverflow](https://stackoverflow.com/questions/32659348/operation-not-permitted-when-on-root-el-capitan-rootless-disabled) 之后说这是一个 **System Integrity Protection (SIP)** 问题，解决方法是整到 `/usr/local/bin` 里。果然，问题解决。
+
+<div style='position:relative; padding-bottom:calc(54.94% + 44px)'><iframe src='https://gfycat.com/ifr/UnimportantSilentEland' frameborder='0' scrolling='no' width='100%' height='100%' style='position:absolute;top:0;left:0;' allowfullscreen></iframe></div>
+
+2. `pyspider` 在 `conda` 下安装碰到一点小问题，说安装的 `tornado` 版本太低，但当我重新安装 `tornado` 之后，又有其他依赖说 `tornado` 版本太高。一头雾水。重新开了一个环境，问题解决了。（此处插入 Nick Young.）
+
+3. 在刚刚解决 `conda` 的问题时，发现 `conda remove --name my_env --all` 会返回错误 `PackagesNotFoundError:` 紧跟一个 empty name package. 可是这明明是[官方文档](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)里提出的解决方案啊！跑去 GitHub 里发现了同样的 [issue](https://github.com/conda/conda/issues/8351)。最终的解释是：如果在新创 environment 时未申明 Python 版本会出现问题。一个通用的解决方案是 `conda env remove -n my_env`. （Nick Young x 2.）
+
+4. 用 [Setapp](https://setapp.com/) 全家桶中的 [Proxyman](https://proxyman.io/) 代替了需要另外付费的 [Charles](https://www.charlesproxy.com/).
+
+
