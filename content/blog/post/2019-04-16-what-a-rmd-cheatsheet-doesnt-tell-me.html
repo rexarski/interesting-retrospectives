@@ -10,6 +10,10 @@ tags:
 
 
 
+<p><strong>Updated on 2019-09-08:</strong> Today I realized the best approach to insert a centered image inside a html-supported markdown post is:</p>
+<pre class="html"><code>&lt;img class=&quot;special-img-class&quot; style=&quot;width:100%&quot; src=&quot;url-to-image&quot; /&gt;</code></pre>
+<p><img class="special-img-class" style="width:100%" src="https://media.giphy.com/media/d3mlE7uhX8KFgEmY/giphy.gif" /></p>
+<hr />
 <p>Two common misunderstanding for longtime <code>blogdown</code> lurkers (like me) or R markdown newbies:</p>
 <ol style="list-style-type: decimal">
 <li><p>Blogging with <code>blogdown</code> <span class="math inline">\(\equiv\)</span> writing reports with <code>knitr</code>. There is no need to “knit” every post you write, no matter which format (<code>.md</code> or <code>.Rmd</code>) you are using, since <code>blogdown</code> will handle them itself.</p></li>

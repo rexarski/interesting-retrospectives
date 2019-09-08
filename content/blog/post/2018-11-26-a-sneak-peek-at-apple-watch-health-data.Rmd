@@ -12,7 +12,7 @@ I've always been wondering if Apple could utilize its collected health data in a
 
 Well, that's basically my perspective and I don't have any constructive suggestions yet. But one thing that always interests me is that if I can play some magic around those hidden data. The answer is an absolute yes. The data export from iPhone is quite easy, and kudos to Apple. The problem is, the data comes in JSON format. [Ryan Praskievicz](http://www.ryanpraski.com/apple-health-data-how-to-export-analyze-visualize-guide/#2) provided a Python script to convert those extracted JSON to csv, but also he attached a link to an online converter [here](http://ericwolter.com/projects/health-export.html).
 
-![](/image/apple-health-to-csv.png)
+<img class="special-img-class" style="width:100%" src="/image/apple-health-to-csv.png" />
 
 
 I initially had the very first model of Apple Watch, aka the "Apple Watch before Series 1", aka "Series 0", which should be considered as a crappy smart watch even back in a scenario 4 years ago. The battery life could hardly power through one day, and launching a third-party app could literally take half a minute. So the only two functions I used were time keeping and activaity monitoring. Unfortunately, the watch encountered a serious this May and I still haven't figured out what happened to it. But in short, the watch stopped syncing with my iPhone and did not track any movements either. I had to perform a hard reset and thus lost all data prior to that day. So far, the data sitting on my MacBook is my Apple Watch health data collected from early this May to October.

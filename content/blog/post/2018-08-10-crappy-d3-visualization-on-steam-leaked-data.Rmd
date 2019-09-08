@@ -13,10 +13,11 @@ However, [Tyler Glaiel](https://medium.com/@tglaiel/using-achievement-stats-to-e
 
 Soon, Mike Bostock, the creator of D3.js posted a visualization of this dataset in the subreddit [r/dataisbeautiful](https://www.reddit.com/r/dataisbeautiful/comments/8ww7c2/leaked_estimates_of_steam_player_counts_oc/).
 
-![](https://i.redditmedia.com/5stBS4SrvyMtObQBWW5Md3MvJLWleSgPMPAWwJfPsfE.png?fit=crop&crop=faces%2Centropy&arh=2&w=960&s=77c3111de715d935010a4705aeff3e75)
+<img class="special-img-class" style="width:100%" src="https://i.redditmedia.com/5stBS4SrvyMtObQBWW5Md3MvJLWleSgPMPAWwJfPsfE.png?fit=crop&crop=faces%2Centropy&arh=2&w=960&s=77c3111de715d935010a4705aeff3e75" />
 
 Inspired by his work, and also his previous implementation in D3 gallery, I also sketched a crappy version of this dataset.
 
-![](/image/steam-viz-dead.png)
+<img class="special-img-class" style="width:100%" src="/image/steam-viz-dead.png" />
+
 
 <strike>I'll just leave it here. </strike> Unfortunately, I haven't figured out how to insert a live version of d3 to a webpage.

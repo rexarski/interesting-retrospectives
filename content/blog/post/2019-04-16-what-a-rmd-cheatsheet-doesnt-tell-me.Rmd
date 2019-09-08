@@ -8,6 +8,16 @@ tags:
   - rmarkdown
 ---
 
+**Updated on 2019-09-08:** Today I realized the best approach to insert a centered image inside a html-supported markdown post is:
+
+```html
+<img class="special-img-class" style="width:100%" src="url-to-image" />
+```
+
+<img class="special-img-class" style="width:100%" src="https://media.giphy.com/media/d3mlE7uhX8KFgEmY/giphy.gif" />
+
+***
+
 Two common misunderstanding for longtime `blogdown` lurkers (like me) or R markdown newbies:
 
 1. Blogging with `blogdown` $\equiv$ writing reports with `knitr`. There is no need to "knit" every post you write, no matter which format (`.md` or `.Rmd`) you are using, since `blogdown` will handle them itself.

@@ -1,0 +1,78 @@
+---
+title: AWS VOD 调教失败
+author: ''
+date: '2019-09-03'
+slug: aws-vod
+categories: []
+tags:
+  - AWS
+---
+
+先放罪恶的缘起：
+
+- 中文文档：[简单的无服务器视频点播 (VOD) 工作流 | 亚马逊AWS官方博客](https://aws.amazon.com/cn/blogs/china/%E7%AE%80%E5%8D%95%E7%9A%84%E6%97%A0%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%A7%86%E9%A2%91%E7%82%B9%E6%92%AD-vod-%E5%B7%A5%E4%BD%9C%E6%B5%81/)
+- 英文文档：[Simple Serverless Video On Demand (VOD) Workflow | Networking & Content Delivery](https://aws.amazon.com/blogs/networking-and-content-delivery/serverless-video-on-demand-vod-workflow/)
+
+流程逻辑简单梳理一下：
+
+1. 将视频文件传至目标 S3 储存桶的 input 文件夹。
+2. Lambda 监视该文件夹并向 MediaConvert 发出转码指令。
+3. MediaConvert 按照格式设置转码，生成文件，存入 S3 储存桶的另一文件夹 output 之中。
+4. 转码完成的同时，通过 CloudWatch 发出通知邮件。
+5. output 文件夹内的视频通过 CloudFront 分发。
+
+<img class="special-img-class" style="width:100%" src="https://i.imgur.com/dLBtcq5.jpg" />
+
+原文中给出了建立 CloudFormation Stack 的模板 (template)，由此加载并新建出的 Stack 会在另一头的 MediaConvert 服务中新建出六个（或者十二个，取决于 `PackageType` 的选择）转码 Output Presets，分别为：
+
+<img class="special-img-class" style="width:100%" src="https://i.imgur.com/aytfyRL.png" />
+
+但问题是，考虑到真正的生产成本因素，如果我们仅仅需要使用其中的两个 presets，那我们应该做什么样的操作呢？
+
+## 第一次尝试
+
+最简单的想法是——删掉不需要的 presets 设置文件就好了。
+
+**结果：**新存入 input 的视频不再自动转码。于是只好一个文件一个文件手动导入回去。
+
+## 第二次尝试
+
+尝试从 Lambda 那里查阅到整个新建 stack 的过程中，同时新建了两个 Lambda functions，一个是 `CustomPresetsFunction`， 一个是 `TranscodingFunction`. 两者可以通过访问 AWS 的 Lambda 服务页面，或者 CloudFormation 的 Stack details / Resources 中获取。
+先研究了 `CustomPresetsFunction`,  在 `index.js` 中有这么一段：
+
+```javascript
+//create the presets
+  for(let preset of configJson.hls_presets) {
+    let presetParams = prepareHLSPreset(configJson.hls_default_preset, presetsPrefix, preset);
+    let response = await mediaconvert.createPreset(presetParams).promise();
+    responseData.hls.push(response.Preset.Name);
+  }
+```
+
+显然是遍历了 `configJson` 变量中提到所有 presets 组合，而 `configJson` 读取的是同一路径下 `config.json` 内的数据。 备份原文件并删除相应内容。
+
+<img class="special-img-class" style="width:100%" src="https://i.imgur.com/LqSV8Xj.png" />
+
+**结果：** 保存之后仍然不能「有效地」少转码几次；自动放入 `input` 的视频仍旧会自动转成六个不同的清晰度/码率。后来仔细研究了一下 `index.js` 发觉这个 function 应该是在「创建 (create)」或者「删除 (delete)」 presets 的时候才会触发，所以单单在这里修改并无作用。
+
+另外，这同时也涉及到后面踩的一个坑。这里先不细表。
+ 
+## 第三次尝试
+
+目光投向另外一个 function，即 `TranscodingFunction`，这里问题实际上简单一点。在设置下方有一个环境变量的文本框：
+
+<img class="special-img-class" style="width:100%" src="https://i.imgur.com/mTQ8JKu.png" />
+
+`PACKAGE_TYPE` 内原先存着六个 output presets 的大名，修改成所需要的两个。
+**结果：**并无改观。
+
+## 额外的坑
+
+尝试单独删除测试用的 stack 和 S3，删除的时候则会触发 `CustomPresetsFunction` 的 `index.js`  内的代码，会自动删除所有以 `Custom` 开头的 output presets. 那么，就会导致，**所有其他基于 template 新建的 stack 都会停止工作。**当然了，也包括了我们的 dev stack. 于是只能再新建一个测试 stack，先堵住这个漏洞再说。
+
+另外，新建倒还好，但删除 stack 的时长真的是太让人捉急了。
+
+## 结语
+
+目前还是没有相处解决方法；企图走 support 发一个 issue 结果等了三四天都没有回复，才学习到一个新概念—— **business hour** 是指朝九晚六的工作时间，需要至少 24 个工作小时后才会回复，还不包括双休日和节假日。
+
