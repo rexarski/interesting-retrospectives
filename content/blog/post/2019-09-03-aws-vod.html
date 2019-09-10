@@ -1,5 +1,5 @@
 ---
-title: AWS VOD 调教失败
+title: AWS VOD 视频点播踩坑记
 author: ''
 date: '2019-09-03'
 slug: aws-vod
@@ -62,4 +62,12 @@ tags:
 <div id="section-4" class="section level2">
 <h2>结语</h2>
 <p>目前还是没有相处解决方法；企图走 support 发一个 issue 结果等了三四天都没有回复，才学习到一个新概念—— <strong>business hour</strong> 是指朝九晚六的工作时间，需要至少 24 个工作小时后才会回复，还不包括双休日和节假日。</p>
+<p><strong>Update on 2019-09-09:</strong> Finally get an email reply from AWS today. It turns out that I had everything right about Lambda function <code>TranscodingFunction</code> except leaving its ARN intact. The remedy should be:</p>
+<ul>
+<li>Modify Lambda function.</li>
+<li>Publish a new version.</li>
+<li>Copy the new ARN of this version.</li>
+<li>Navigate to the correspondingly created S3 bucket.</li>
+<li>Paste the ARN in the <em>Properties - Event</em> tab.</li>
+</ul>
 </div>
