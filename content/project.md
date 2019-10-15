@@ -41,7 +41,6 @@ doi: 10.1101/065524.
 
 ## Ongoing
 
-- Koalabond (under construction).
 - [project-euleR](https://github.com/rexarski/project-euleR), solutions to Project Euler in R.
 - [McWia](https://github.com/rexarski/McWia), use Monte Carlo simulation to solve probability questions in the book ***[Fifty Challenging Problems in Probability with Solutions](https://www.goodreads.com/book/show/613077.Fifty_Challenging_Problems_in_Probability_with_Solutions)***.
 
