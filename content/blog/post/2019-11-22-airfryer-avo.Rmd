@@ -1,0 +1,30 @@
+---
+title: Air fryer avo 🥑
+author: Qiū Ruì
+date: '2019-10-10'
+slug: airfryer-avo
+categories: []
+tags:
+  - recipe
+---
+
+Was inspired by an Hearthstone cardback artwork featuring avocado and egg, so I decided to make a new dish with my newly purchased air fryer.
+
+<center>
+<img class="special-img-class" style="width:50%" src="/image/recipe/avo-prep.jpg" />
+</center>
+
+**Steps:**
+
+1. Cut the avocado into halves.
+2. Remove the seed.
+3. Crack an egg and pour it onto the avo.
+4. Spray some salt, pepper and spices.
+5. Pre-heat the air fryer at 200 Celsius degree for 5 minutes.
+6. Fry the avo at 180 Celsius degree for 8 minutes.
+
+Enjoy!
+
+<center>
+<img class="special-img-class" style="width:50%" src="/image/recipe/avo-eat.gif" />
+</center>

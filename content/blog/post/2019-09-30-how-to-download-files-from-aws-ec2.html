@@ -1,0 +1,20 @@
+---
+title: How to download files from AWS EC2
+author: Qiū Ruì
+date: '2019-09-30'
+slug: how-to-download-files-from-aws-ec2
+categories: []
+tags:
+  - AWS
+---
+
+
+
+<p><strike>SCP</strike> <code>scp</code> is always our friend.</p>
+<pre class="bash"><code>scp -i /path/to/permission/file username@ec2.url:/path/to/remote/file /path/to/local/directory</code></pre>
+<p><strong>Update on 2019-10-14.</strong> <em>What if I need to copy files that need root access?</em></p>
+<pre class="bash"><code>ssh -i /path/to/permission/file username@ec2.url &quot;sudo cat /var/log/nginx/access.log&quot; &gt; ~/Downloads/access.log</code></pre>
+<center>
+<img class="special-img-class" style="width:80%" src="/image/ec2-root-download.png" />
+</center>
+<p>Generally, if it is a log that could be printed out. Just print and save it to local.</p>

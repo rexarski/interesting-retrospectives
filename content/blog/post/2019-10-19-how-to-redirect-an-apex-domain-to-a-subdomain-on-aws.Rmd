@@ -1,0 +1,33 @@
+---
+title: How to redirect an apex domain to a subdomain on AWS
+author: Qiū Ruì
+date: '2019-10-19'
+slug: how-to-redirect-an-apex-domain-to-a-subdomain-on-aws
+categories: []
+tags:
+  - AWS
+---
+
+Here is a very detailed scenario: *I have set up all all https redirect for my subdomains except the apex domain itself. Say the following are good:*
+
+- http://www.example.com ➡️ https://www.example.com ✅
+- http://example.com ➡️ https://www.example.com ✅
+- https://example.com ➡️ 4️⃣0️⃣4️⃣ ❌
+
+AWS gave me a concrete answer in a tutorial video, [AWS KC Videos: How do I redirect (apex) domain to my website hosted on EC2 in AWS? - YouTube](https://www.youtube.com/watch?v=ZRSfJ6SWIqA). But it is actually redundant, especially there is no need to create an extra S3 bucket since `nginx` is enabled on our server.
+
+So here is what I did:
+
+- In Route 53, create a new name record, select `A`, alias use the current load balancer (as you want all your request are directed to https).
+- In the server’s `nginx` configuration file, add these lines to the target domain or subdomain you want to deal with. In our case, it’s the apex domain `example.com`.
+
+```
+location / {
+		proxy_pass http://localhost:port;
+}
+location ~ ^/$ {
+		return 301 https://example.com/;
+}
+```
+
+- The you restart `nginx` with `sudo systemctl restart nginx`.

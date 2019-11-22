@@ -1,0 +1,36 @@
+---
+title: How to assign subdomains to multiple EC2 instances?
+author: Qiū Ruì
+date: '2019-10-03'
+slug: how-to-assign-subdomains-to-multiple-ec2-instances
+categories: []
+tags:
+  - AWS
+---
+
+
+
+<p>Assume we’ve already set up everything for your first instance. What do we need to do for the second?</p>
+<p>In EC2, do the following:</p>
+<ul>
+<li>Once a new instance is created (make sure to use a specific security group), create a new target group with registered target to that instance.</li>
+<li>Then create a load balancer which checks connection requests.
+<ul>
+<li>Redirect <a href="HTTP:80" class="uri">HTTP:80</a> to HTTPS.</li>
+<li>Forward all <a href="HTTPS:443" class="uri">HTTPS:443</a> to previous target group.</li>
+</ul></li>
+</ul>
+<p>In Route 53, do the following:</p>
+<ul>
+<li>Select a hosted zone, create a new record set.</li>
+<li>Use Type “A - IPv4 address”, aiming your recent load balancer as the alias target.</li>
+</ul>
+<p>Then we are done here on the AWS end.</p>
+<ul>
+<li>References:
+<ul>
+<li><a href="https://stackoverflow.com/questions/5309910/https-setup-in-amazon-ec2">HTTPS setup in Amazon EC2 - Stack Overflow</a></li>
+<li><a href="https://www.reddit.com/r/aws/comments/302sv9/how_to_create_subdomain_on_separate_ec2_instance/">How to create subdomain on separate EC2 instance? : aws</a></li>
+<li><a href="https://serverfault.com/questions/236061/creating-subdomains-across-multiple-ec2-instances">networking - Creating subdomains across multiple EC2 instances - Server Fault</a></li>
+</ul></li>
+</ul>

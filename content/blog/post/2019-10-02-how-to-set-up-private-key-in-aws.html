@@ -1,0 +1,19 @@
+---
+title: How to set up private key in AWS
+author: Qiū Ruì
+date: '2019-10-02'
+slug: how-to-set-up-private-key-in-aws
+categories: []
+tags:
+  - AWS
+---
+
+
+
+<ul>
+<li>Create key pairs in the EC2 tab of AWS console.</li>
+<li>Download the private key as <code>.pem</code> file. <strong>This is your only chance!</strong></li>
+<li>Use <code>sudo ssh-keygen -y -f that-private-key.pem</code> to generate a public key.</li>
+<li>Copy and paste the public key, which should be in the form of <code>ssh-rsa **********</code> to path <code>~/.ssh/authorized_keys</code> of your remote server.</li>
+<li>Tada! Now you can use <code>sudo ssh -i that-private-key.pem ec2user@ec2ip</code> to access your remote from your local machine.</li>
+</ul>

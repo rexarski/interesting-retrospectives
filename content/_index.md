@@ -12,6 +12,6 @@ I finished my master degree here in the [Australian National University](https:/
 
 This blog basically serves as my learning notebook. (Yes, gotta keep on learning even after graduation.) I will try to jot down any sparks in my mind, share my experiences after graduation and keep a record of anything cool I find.
 
-(Please forgive me for any hilarious typo or grammatical error as English is my second language. Cheers.)
-
 <!--My skill set: ![](https://img.shields.io/badge/-Python-blue.svg)![](https://img.shields.io/badge/-R-9cf.svg)-->
+
+<!--script async src="https://telegram.org/js/telegram-widget.js?1" data-telegram-post="its2358/3" data-width="100%"></script>-->

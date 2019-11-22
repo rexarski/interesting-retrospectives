@@ -31,8 +31,10 @@ github = "rexarski"
 # linkedin = ""
 twitter = "rexarski"
 # medium = "rexarski"
-vsco = "fractals"
-unsplash = "rexarski"
+# vsco = ""
+instagram = "rexarski"
+telegram = "ghgibus"
+# unsplash = ""
 email = "rui@interetro.xyz"
 
 [[menu.primary]]
@@ -53,15 +55,8 @@ name = "23:58"
 url = "https://t.me/its2358"
 weight = 3
 
-[[menu.primary]]
-identifier = "Jibber-jabber"
-name = "not Twitter"
-url = "/jj/"
-weight = 4
-
 # [[menu.primary]]
 # identifier = "d3"
 # name = "d3"
 # url = "https://observablehq.com/@rexarski"
-# weight = 5
-
+# weight = 4

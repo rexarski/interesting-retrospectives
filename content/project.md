@@ -67,29 +67,3 @@ doi: 10.1101/065524.
 - **Chicago Insurance Redlining (2017).** A quite naïve exploratory analysis on Chicago insurance data set. <a href="/pdf/redlining.pdf" class="btn btn-outline-primary">PDF</a>
 
 ***
-
-<!--
-### Titanic regression model (2017)
-
-- [ ] add a description
-- [ ] **REWRITE** add a blog post specifically introducing problems and narrative.
-- [x] no pdf needed.
-
-***
--->
-
-<!--
-### some-side-projects-during-internship (2016)
-- [ ] Company2Domain in a Chinese Naming Fashion. [link2script](link22)
-- [ ] just scripts.
-
-***
--->
-
-<!--
-### Digit Recognition (2016)
-- [ ] too trivial to mention?
-- [ ] add a blog post
-- [ ] add github repo?
-- [ ] pdf?
--->
