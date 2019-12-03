@@ -1,0 +1,84 @@
+---
+title: Writing R codes on an iPad Pro
+author: Qiu Rui
+date: '2019-11-25'
+slug: writing-r-codes-on-an-ipad-pro
+categories: []
+tags:
+  - rstudio
+---
+
+
+
+<p>Two weeks ago I sent my 2017 model of MacBook Pro to our local Genius Bar to replace the keyboard and the battery. During this one week span of absence, I moved to my iPad Pro to finish the Australian universities’ course information <a href="https://github.com/rexarski/aussie">scraping</a>.</p>
+<div id="setup" class="section level2">
+<h2>Setup</h2>
+<p>Initially I tried to deploy an server version of RStudio on my Ubuntu 19.04 server. But constant errors occured during the installation. After downgrading from 19.04 to 18.04. the installation went on smoothly.</p>
+<p>In addtion, I installed <code>zsh</code> and <code>oh-my-zsh</code> as life-savers. (<a href="https://www.freecodecamp.org/news/jazz-up-your-zsh-terminal-in-seven-steps-a-visual-guide-e81a8fd59a38/">Guide</a>)</p>
+<p>Install R and <a href="https://rstudio.com/products/rstudio/download-server/debian-ubuntu/">RStudio server</a>.</p>
+</div>
+<div id="start" class="section level2">
+<h2>Start</h2>
+<p>RStudio Server will not permit logins by system users (those with user ids lower than 100).</p>
+<p>So we need to <a href="https://www.cyberciti.biz/faq/create-a-user-account-on-ubuntu-linux/">create</a> a “normal” user.</p>
+<p><img class="special-img-class" style="width:100%" src="https://imgur.com/xixSL4G.png" /></p>
+<pre class="bash"><code>$ sudo adduser rexarski // password==xingzilovexuanzi
+
+$ cat /etc/passwd($ grep &#39;^rexarski&#39; /etc/passwd</code></pre>
+<p><img class="special-img-class" style="width:100%" src="https://imgur.com/DVfqbU4.png" /></p>
+</div>
+<div id="unable-to-install-r-packages-on-linux" class="section level2">
+<h2>Unable to install R packages on Linux</h2>
+<ul>
+<li>Update and upgrade <code>sudo apt updates</code> and <code>sudo apt upgrade</code></li>
+<li><code>sudo apt autoremove curl</code> and <code>sudo apt install curl</code> <strong>no effect</strong></li>
+</ul>
+<pre><code>------------------------- ANTICONF ERROR ---------------------------
+Configuration failed because libcurl was not found. Try installing:
+ * deb: libcurl4-openssl-dev (Debian, Ubuntu, etc)
+ * rpm: libcurl-devel (Fedora, CentOS, RHEL)
+ * csw: libcurl_dev (Solaris)
+If libcurl is already installed, check that &#39;pkg-config&#39; is in your
+PATH and PKG_CONFIG_PATH contains a libcurl.pc file. If pkg-config
+is unavailable you can set INCLUDE_DIR and LIB_DIR manually via:
+R CMD INSTALL --configure-vars=&#39;INCLUDE_DIR=... LIB_DIR=...&#39;
+--------------------------------------------------------------------
+ERROR: configuration failed for package ‘curl’</code></pre>
+<ul>
+<li>Do these on root (who knows…)
+<a href="https://askubuntu.com/questions/1057455/some-r-packages-wont-install" class="uri">https://askubuntu.com/questions/1057455/some-r-packages-wont-install</a></li>
+</ul>
+<pre class="bash"><code>$ sudo apt-get install libcurl4-dev
+$ sudo apt-get install r-base-dev
+$ sudo apt-get install libssl-dev
+$ sudo apt-get install libxml2-dev</code></pre>
+<ul>
+<li>Then use a normal account (non-root) to install R packages.</li>
+</ul>
+<pre class="r"><code>install.packages(“tidyverse”, “rvest”, “pacman”)
+# verify
+library(tidyverse)</code></pre>
+</div>
+<div id="tidy-problem" class="section level2">
+<h2>Tidy problem</h2>
+<ul>
+<li>Takes forever to install <code>tidyverse</code> though. Also, <code>pacman</code> is not available for 3.4.4</li>
+<li>Some packages are easy to install, but some takes forever like <code>dplyr``tidyr</code> etc.</li>
+<li>Even loading an installed package <code>dplyr</code> is problematic:</li>
+</ul>
+<pre><code>Error: package or namespace load failed for ‘dplyr’ in library.dynam(lib, package, package.lib):
+ shared object ‘dplyr.so’ not found
+In addition: Warning message:
+S3 methods ‘[.fun_list’, ‘[.grouped_df’, ‘all.equal.tbl_df’, ‘anti_join.data.frame’, ‘anti_join.tbl_df’, ‘arrange.data.frame’, ‘arrange.default’, ‘arrange.grouped_df’, ‘arrange.tbl_df’, ‘arrange_.data.frame’, ‘arrange_.tbl_df’, ‘as.data.frame.grouped_df’, ‘as.data.frame.rowwise_df’, ‘as.data.frame.tbl_cube’, ‘as.table.tbl_cube’, ‘as.tbl.data.frame’, ‘as.tbl.tbl’, ‘as.tbl_cube.array’, ‘as.tbl_cube.data.frame’, ‘as.tbl_cube.matrix’, ‘as.tbl_cube.table’, ‘as_tibble.grouped_df’, ‘as_tibble.tbl_cube’, ‘auto_copy.tbl_cube’, ‘auto_copy.tbl_df’, ‘cbind.grouped_df’, ‘collapse.data.frame’, ‘collect.data.frame’, ‘common_by.NULL’, ‘common_by.character’, ‘common_by.default’, ‘common_by.list’, ‘compute.data.frame’, ‘copy_to.DBIConnection’, ‘copy_to.src_local’, ‘default_missing.data.frame’, ‘default_missing.default’, ‘dim.tbl_cube’, ‘distinct.data.f [... truncated] </code></pre>
+<p>Turns out, while installing <code>readr</code> i found there is not enough virtual memory. See this github issue: <a href="https://github.com/tidyverse/readr/issues/544">CRAN version of readr crashes the compiler on small-RAM Ubuntu 16.04 system</a>. The Vultr server I was using is a $5 per month 1GB RAM little kicker, so this pretty much explains everything.</p>
+<p>Thanks to this <a href="https://stackoverflow.com/questions/40945512/r-ubuntu-cant-install-packages-readr-and-eurostat">post</a>. I call this “black magic”. You can actually <em>install a prebuilt binary so that you do not have to compile the package from the source</em>.</p>
+<pre class="bash"><code>$ apt-get update
+$ apt-get install software-properties-common
+$ add-apt-repository -y “ppa:marutter/rrutter”
+$ add-apt-repository -y “ppa:marutter/c2d4u”
+$ apt-get update
+$ apt-get install r-cran-readr</code></pre>
+<p>Worked for me this time. But for packages like <code>dplyr</code> which were installed previously but could not be loaded on my end, I tried to <code>remove.packages()</code> them first, then installed the prebuilt version. The binary this time would not save the day because it is outdated and could not support the minimum requirement of <code>rlang</code>.</p>
+<p>But anyways, this whole process at least suffices to power me through scraping a few bunch of universities courses already.</p>
+<p>I am officially missing my lil buddy MacBook.</p>
+</div>

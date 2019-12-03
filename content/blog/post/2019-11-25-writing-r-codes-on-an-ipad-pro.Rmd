@@ -1,0 +1,103 @@
+---
+title: Writing R codes on an iPad Pro
+author: Qiu Rui
+date: '2019-11-25'
+slug: writing-r-codes-on-an-ipad-pro
+categories: []
+tags:
+  - rstudio
+---
+
+Two weeks ago I sent my 2017 model of MacBook Pro to our local Genius Bar to replace the keyboard and the battery. During this one week span of absence, I moved to my iPad Pro to finish the Australian universities' course information [scraping](https://github.com/rexarski/aussie).
+
+## Setup
+
+Initially I tried to deploy an server version of RStudio on my Ubuntu 19.04 server. But constant errors occured during the installation. After downgrading from 19.04 to 18.04. the installation went on smoothly.
+
+In addtion, I installed `zsh` and `oh-my-zsh` as life-savers. ([Guide](https://www.freecodecamp.org/news/jazz-up-your-zsh-terminal-in-seven-steps-a-visual-guide-e81a8fd59a38/))
+
+Install R and [RStudio server](https://rstudio.com/products/rstudio/download-server/debian-ubuntu/).
+
+## Start
+
+RStudio Server will not permit logins by system users (those with user ids lower than 100).
+
+So we need to [create](https://www.cyberciti.biz/faq/create-a-user-account-on-ubuntu-linux/) a "normal" user.
+
+<img class="special-img-class" style="width:100%" src="https://imgur.com/xixSL4G.png" />
+
+```bash
+$ sudo adduser rexarski // password==xingzilovexuanzi
+
+$ cat /etc/passwd($ grep '^rexarski' /etc/passwd
+```
+
+<img class="special-img-class" style="width:100%" src="https://imgur.com/DVfqbU4.png" />
+
+## Unable to install R packages on Linux
+
+- Update and upgrade `sudo apt updates`  and `sudo apt upgrade`
+- `sudo apt autoremove curl` and `sudo apt install curl` **no effect**
+
+```
+------------------------- ANTICONF ERROR ---------------------------
+Configuration failed because libcurl was not found. Try installing:
+ * deb: libcurl4-openssl-dev (Debian, Ubuntu, etc)
+ * rpm: libcurl-devel (Fedora, CentOS, RHEL)
+ * csw: libcurl_dev (Solaris)
+If libcurl is already installed, check that 'pkg-config' is in your
+PATH and PKG_CONFIG_PATH contains a libcurl.pc file. If pkg-config
+is unavailable you can set INCLUDE_DIR and LIB_DIR manually via:
+R CMD INSTALL --configure-vars='INCLUDE_DIR=... LIB_DIR=...'
+--------------------------------------------------------------------
+ERROR: configuration failed for package ‘curl’
+```
+
+- Do these on root (who knows...)
+https://askubuntu.com/questions/1057455/some-r-packages-wont-install
+
+```bash
+$ sudo apt-get install libcurl4-dev
+$ sudo apt-get install r-base-dev
+$ sudo apt-get install libssl-dev
+$ sudo apt-get install libxml2-dev
+```
+
+- Then use a normal account (non-root) to install R packages.
+```r
+install.packages(“tidyverse”, “rvest”, “pacman”)
+# verify
+library(tidyverse)
+```
+
+## Tidy problem
+
+- Takes forever to install `tidyverse` though. Also, `pacman` is not available for 3.4.4
+- Some packages are easy to install, but some takes forever like `dplyr``tidyr` etc.
+- Even loading an installed package `dplyr` is problematic:
+
+```
+Error: package or namespace load failed for ‘dplyr’ in library.dynam(lib, package, package.lib):
+ shared object ‘dplyr.so’ not found
+In addition: Warning message:
+S3 methods ‘[.fun_list’, ‘[.grouped_df’, ‘all.equal.tbl_df’, ‘anti_join.data.frame’, ‘anti_join.tbl_df’, ‘arrange.data.frame’, ‘arrange.default’, ‘arrange.grouped_df’, ‘arrange.tbl_df’, ‘arrange_.data.frame’, ‘arrange_.tbl_df’, ‘as.data.frame.grouped_df’, ‘as.data.frame.rowwise_df’, ‘as.data.frame.tbl_cube’, ‘as.table.tbl_cube’, ‘as.tbl.data.frame’, ‘as.tbl.tbl’, ‘as.tbl_cube.array’, ‘as.tbl_cube.data.frame’, ‘as.tbl_cube.matrix’, ‘as.tbl_cube.table’, ‘as_tibble.grouped_df’, ‘as_tibble.tbl_cube’, ‘auto_copy.tbl_cube’, ‘auto_copy.tbl_df’, ‘cbind.grouped_df’, ‘collapse.data.frame’, ‘collect.data.frame’, ‘common_by.NULL’, ‘common_by.character’, ‘common_by.default’, ‘common_by.list’, ‘compute.data.frame’, ‘copy_to.DBIConnection’, ‘copy_to.src_local’, ‘default_missing.data.frame’, ‘default_missing.default’, ‘dim.tbl_cube’, ‘distinct.data.f [... truncated] 
+```
+
+Turns out, while installing `readr` i found there is not enough virtual memory. See this github issue: [CRAN version of readr crashes the compiler on small-RAM Ubuntu 16.04 system](https://github.com/tidyverse/readr/issues/544). The Vultr server I was using is a $5 per month 1GB RAM little kicker, so this pretty much explains everything.
+
+Thanks to this [post](https://stackoverflow.com/questions/40945512/r-ubuntu-cant-install-packages-readr-and-eurostat). I call this “black magic”. You can actually *install a prebuilt binary so that you do not have to compile the package from the source*.
+
+```bash
+$ apt-get update
+$ apt-get install software-properties-common
+$ add-apt-repository -y “ppa:marutter/rrutter”
+$ add-apt-repository -y “ppa:marutter/c2d4u”
+$ apt-get update
+$ apt-get install r-cran-readr
+```
+
+Worked for me this time. But for packages like `dplyr` which were installed previously but could not be loaded on my end, I tried to `remove.packages()` them first, then installed the prebuilt version. The binary this time would not save the day because it is outdated and could not support the minimum requirement of `rlang`.
+
+But anyways, this whole process at least suffices to power me through scraping a few bunch of universities courses already.
+
+I am officially missing my lil buddy MacBook.
