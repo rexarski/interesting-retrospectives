@@ -1,0 +1,33 @@
+---
+title: radian and janitor
+author: Qiu Rui
+date: '2020-01-31'
+slug: radian-and-janitor
+categories: []
+tags:
+  - R
+  - data-cleaning
+---
+
+<script src="/rmarkdown-libs/jquery/jquery.min.js"></script>
+<script src="/rmarkdown-libs/elevate-section-attrs/elevate-section-attrs.js"></script>
+
+
+<p>两个好东西：</p>
+<p><a href="https://github.com/randy3k/radian">radian</a>. 号称是「A 21 century R console」，其实 21 世纪也都过了 20 年了，下个月 <a href="https://blog.revolutionanalytics.com/2019/12/preview-of-r-400.html">R 4.0</a> 也将赶着 20 周年的日子发布。但这都不是重点。重点是每次为了运行一两行指令而打开「笨重」的 IDE 从来都不是我所喜欢的操作行为。之前用过 console 里的 R，但总觉得差点意思。如果说用一张图来概括 radian 的优点，那就是这样的：</p>
+<div class="figure">
+<img src="https://user-images.githubusercontent.com/1690993/30728530-b5e9eb5c-9f26-11e7-8453-73a2e880c9de.png" alt="" />
+<p class="caption">img</p>
+</div>
+<p>另外一个是老朋友 <a href="https://garthtarr.github.io/meatR/janitor.html">janitor package</a> 了，曾经在看 <a href="https://r4ds.had.co.nz/">R for Data Science</a> 的时候用过一阵子，但是 package 这种东西你看到了不用就废了，或者用过一次之后隔一段时间不用，也等于废了。于是抽空在 radian 里把几个主要 functions 过了一下，觉得还是在处理「比较规整的、网上下载的数据」的时候比较方便。总结了一下功用：</p>
+<ul>
+<li><code>clean_names()</code>. 转为小写+下划线的变量名格式，能够处理特殊符号。</li>
+<li><code>tably()</code>. 输入 vector 输出频率和频数统计 table.
+<ul>
+<li>另外如果含有 <code>NA</code> 则不会计入统计。</li>
+<li>可以用 <code>remove_empty(x, which = c("rows", “cols”))</code> 去除整行和（或）整列为 <code>NA</code>的数据。</li>
+<li><code>tably()</code> 后跟随多个 vectors 则输出 crosstabulation 结果。</li>
+</ul></li>
+<li><code>get_dupes(x)</code>. 输入data frame 和 变量名 <code>x</code>，输出重复的数据（行）。</li>
+<li><code>excel_numeric_to_data()</code>. 将某些载入 Excel 文件时被转化的日期还原为 <code>Date</code> 类型。</li>
+</ul>
