@@ -44,19 +44,19 @@ url = "/blog/"
 weight = 1
 
 [[menu.primary]]
+identifier = "中文"
+name = "中文"
+url = "/cn/"
+weight = 2
+
+[[menu.primary]]
 identifier = "project"
 name = "Project"
 url = "/project/"
-weight = 2
+weight = 3
 
 [[menu.primary]]
 identifier = "telegram"
 name = "23:58"
 url = "https://t.me/its2358"
-weight = 3
-
-# [[menu.primary]]
-# identifier = "d3"
-# name = "d3"
-# url = "https://observablehq.com/@rexarski"
-# weight = 4
+weight = 4
