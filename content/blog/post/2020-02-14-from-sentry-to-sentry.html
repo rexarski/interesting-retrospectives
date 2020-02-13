@@ -1,0 +1,211 @@
+---
+title: From sentRy to Sentry
+author: Qiu Rui
+date: '2020-02-14'
+slug: sentry
+categories: []
+tags:
+  - telegram
+  - AWS
+  - R
+---
+
+<script src="/rmarkdown-libs/jquery/jquery.min.js"></script>
+<script src="/rmarkdown-libs/elevate-section-attrs/elevate-section-attrs.js"></script>
+
+
+<pre><code>      ___           ___           ___                         ___                   
+     /  /\         /  /\         /  /\          ___          /  /\          __      
+    /  /::\       /  /::\       /  /::|        /__/\        /  /::\        |  |\    
+   /__/:/\:\     /  /:/\:\     /  /:|:|        \  \:\      /  /:/\:\       |  |:|   
+  _\_ \:\ \:\   /  /::\ \:\   /  /:/|:|__       \__\:\    /  /::\ \:\      |  |:|   
+ /__/\ \:\ \:\ /__/:/\:\ \:\ /__/:/ |:| /\      /  /::\  /__/:/\:\_\:\     |__|:|__ 
+ \  \:\ \:\_\/ \  \:\ \:\_\/ \__\/  |:|/:/     /  /:/\:\ \__\/~|::\/:/     /  /::::\
+  \  \:\_\:\    \  \:\ \:\       |  |:/:/     /  /:/__\/    |  |:|::/     /  /:/~~~~
+   \  \:\/:/     \  \:\_\/       |__|::/     /__/:/         |  |:|\/     /__/:/     
+    \  \::/       \  \:\         /__/:/      \__\/          |__|:|~      \__\/      
+     \__\/         \__\/         \__\/                       \__\|                  </code></pre>
+<div id="tldr" class="section level2">
+<h2>tl;dr</h2>
+<p><img class="special-img-class" style="width:100%" src="/image/sentry/map.png" /></p>
+<p>Implemented a alerting (kinda hard to call it “monitoring”) system for Django with R Server and a Telegram bot.</p>
+<p>A typical instance of its report is like this:</p>
+<blockquote>
+<p>Some errors occurred in the last 15 minutes on the server, a copy of log will be processed by sentRy. It will identify those new errors which have not been reported yet and save them to local storage. Meanwhile, the incremental part will be parsed to a telegram bot, sending error summaries and a recent 12-hour bar chart to a channel. At the same time, an updated copy of notifications (of course, errors) will be synced to Shinyapps.io and the Shiny app should have the latest info displayed.</p>
+</blockquote>
+<center>
+<img class="special-img-class" style="width:50%" src="/image/sentry/bot.png" />
+</center>
+<p>It was designed to fulfill a particular job and I guess it got things done to some extent. But recently, our dev team deployed a fully functional monitoring system called <a href="https://sentry.io/welcome/">Sentry</a>. I mean, what a coincidence. I had no idea about this and only named it after the sentry gun in Team Fortress 2.</p>
+</div>
+<div id="dependencies" class="section level2">
+<h2>Dependencies</h2>
+<ul>
+<li><code>tidyverse</code></li>
+<li><code>telegram.bot</code></li>
+<li><code>cronR</code></li>
+<li><code>shinyFiles</code></li>
+<li><code>aws.s3</code></li>
+</ul>
+</div>
+<div id="how-to-use-it-anyway" class="section level2">
+<h2>How to use it (anyway)?</h2>
+<ol style="list-style-type: decimal">
+<li>In Telegram, create a new bot under the permission of <span class="citation">@BotFather</span>. Follow the order and make sure you have a valid API Token.</li>
+<li>You can test the basic message functionality with <code>bot_script.r</code>. But it won’t be needed in the main script.</li>
+<li>You can also test run the actual process with <code>log_process.r</code>.</li>
+<li>If there are problems no more, click <code>Addin</code> in RStudio and select “<em>Schedule R scripts on Linux/Unix</em>”.</li>
+</ol>
+<p><img class="special-img-class" style="width:100%" src="/image/sentry/cronR.png" /></p>
+</div>
+<div id="related-files" class="section level2">
+<h2>Related files</h2>
+<ul>
+<li><code>bot_script.r</code> The script for testing Telegram bot creation. Will be dropped later.</li>
+<li><code>dashboard</code> A shiny app displaying all the errors.</li>
+<li><code>error.log</code> An error log copied from Django.</li>
+<li><code>global.r</code> The script dedicated to setting up S3 connection.</li>
+<li><code>log_process.r</code> The main script which needs to run periodically.</li>
+<li><code>notification.csv</code> The formatted backup of errors captured by this monitoring script. It is de facto very similar to <code>error.log</code>.</li>
+<li><code>settings.csv</code> A file to save some setting parameters including the latest reported error time.</li>
+<li><code>log_process.log</code> The R console log for running <code>log_process.r</code>. Potentially useful when debugging.</li>
+</ul>
+</div>
+<div id="issues" class="section level2">
+<h2>Issues</h2>
+<ol style="list-style-type: decimal">
+<li><p>Even the files published to shinyapps.io do not involve any unchecked files (when publishing), they will be verified any ways, thus leading to some filename and path related error returning. A better idea is to create a separate folder and zip it before uploading. Since I claimed all the paths absolute in my code due to the limitation of <code>cronR</code>, I have to <code>scp</code> another copy to the directory of shiny after writing to <code>notification</code>.</p></li>
+<li><p>You can always refer to the “Log” tab in shiny app to debug. Really helpful.</p></li>
+<li><p>Very hard to read a csv file without any column names in S3 bucket. The function <code>aws.s3::s3read_using(FUN, ..., object, bucket, opts = NULL)</code> is problematic, as <code>FUN</code> cannot insert any extra parameters. It is a shame that <code>readr::read_delim</code> cannot be used as well. At last a blog post on <a href="https://medium.com/ibm-data-science-experience/read-and-write-data-to-and-from-amazon-s3-buckets-in-rstudio-1a0f29c44fa7">Medium</a> saved my life.</p></li>
+<li><p>Something weird happens when <code>meta1</code> and <code>meta2</code> extracted have different length. Specifically,
+<code>meta1</code> with “<code>ERROR|WARNING|CRITICAL</code>” has fewer than the number of rows. That is to say, some lines are not starting with “<code>ERROR…</code>” Turns out my regex should start with a <code>^</code> otherwise things like <code>"    self._log(ERROR, msg, args, **kwargs)”</code> could be matched as well. In short,</p></li>
+</ol>
+<pre><code>^</code></pre>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<ul>
+<li>telegram.bot. <a href="https://github.com/ebeneditos/telegram.bot">GitHub</a>. <a href="https://core.telegram.org/bots/api">API</a>.</li>
+<li><a href="https://stackoverflow.com/questions/29674661/r-list-of-lists-to-data-frame">R list of lists to data.frame</a></li>
+</ul>
+<pre class="r"><code>dd &lt;- as.data.frame(matrix(unlist(listHolder), nrow=length(unlist(listHolder[1]))))</code></pre>
+<ul>
+<li><p><a href="https://business-science.github.io/timetk/reference/tk_tbl.html">Coerce time-series objects to tibble</a>. Use <code>timetk</code> package.</p></li>
+<li><p><a href="https://honingds.com/blog/dplyr-rename/">dplyr rename() - For Renaming Columns</a>.</p></li>
+<li><p><a href="https://stackoverflow.com/questions/14568662/paste-multiple-columns-together">Paste multiple columns together</a>.</p></li>
+</ul>
+<pre class="r"><code># your starting data..
+data &lt;- data.frame(&#39;a&#39; = 1:3, &#39;b&#39; = c(&#39;a&#39;,&#39;b&#39;,&#39;c&#39;), &#39;c&#39; = c(&#39;d&#39;, &#39;e&#39;, &#39;f&#39;), &#39;d&#39; = c(&#39;g&#39;, &#39;h&#39;, &#39;i&#39;)) 
+
+# columns to paste together
+cols &lt;- c( &#39;b&#39; , &#39;c&#39; , &#39;d&#39; )
+
+# create a new column `x` with the three columns collapsed together
+data$x &lt;- apply( data[ , cols ] , 1 , paste , collapse = &quot;-&quot; )
+
+# remove the unnecessary columns
+data &lt;- data[ , !( names( data ) %in% cols ) ]</code></pre>
+<ul>
+<li><a href="https://stackoverflow.com/questions/32423837/telegram-bot-how-to-get-a-group-chat-id">Telegram Bot - how to get a group chat id?</a></li>
+<li><a href="https://stackoverflow.com/questions/23193219/strsplit-with-vertical-bar-pipe">strsplit with vertical bar (pipe)</a>. Cannot use double pipes <code>||</code> as separator/deliminator.</li>
+<li><a href="https://github.com/tidyverse/readr/issues/721">Multicharacter separator/deliminator in read_delim of tidyverse</a></li>
+<li><a href="https://stackoverflow.com/questions/9068397/import-text-file-as-single-character-string">Import text file as single character string</a>
+<ul>
+<li><code>readr::read_file()</code></li>
+</ul></li>
+<li><a href="https://cran.r-project.org/web/packages/cronR/README.html">cronR README</a></li>
+<li><a href="https://stackoverflow.com/questions/35807501/parse-datetime-with-lubridate">Parse datetime with lubridate</a>.
+<ul>
+<li><code>lubridate::ymd_hms("2004-05-07 18:24:58.666424")</code></li>
+</ul></li>
+<li><a href="https://stackoverflow.com/questions/18697005/r-split-text-with-multiple-regex-patterns-and-exceptions">R: split text with multiple regex patterns and exceptions</a>
+<ul>
+<li><code>strsplit</code> <a href="https://stat.ethz.ch/R-manual/R-patched/library/base/html/strsplit.html">doc</a></li>
+</ul></li>
+<li>[readtext: Import and handling for plain and formatted text files]</li>
+<li><code>stringr::str_split()</code> <a href="https://stringr.tidyverse.org/reference/str_split.html">doc</a></li>
+<li><code>stringr</code> <a href="https://stringr.tidyverse.org/articles/regular-expressions.html">regular expressions</a></li>
+<li><a href="https://stackoverflow.com/questions/43485419/split-string-and-extract-according-to-a-pattern-to-form-data-frame">split string and extract according to a pattern to form data frame</a></li>
+<li><a href="https://stackoverflow.com/questions/29144759/r-removing-blanks-from-the-list">R: Removing blanks from the list</a></li>
+</ul>
+<pre class="r"><code>L[] &lt;- lapply(L, function(x) x[!x %in% &quot;&quot;])</code></pre>
+<ul>
+<li><a href="https://stackoverflow.com/questions/14141537/change-timezone-in-a-posixct-object">Change timezone in a POSIXct object</a>
+<ul>
+<li><code>attr(data$dateTime, "tzone") &lt;- "Europe/Paris"</code></li>
+</ul></li>
+<li><a href="https://stackoverflow.com/questions/11134812/how-to-find-the-length-of-a-string-in-r">How to find the length of a string in R</a>
+<ul>
+<li><code>nchar("foo")</code></li>
+</ul></li>
+<li><a href="https://stackoverflow.com/questions/20428742/select-first-element-of-nested-list">Select first element of nested list</a>
+<ul>
+<li><code>lapply(x,</code>[[<code>, 1)</code></li>
+</ul></li>
+<li><a href="https://stackoverflow.com/questions/51195696/send-file-via-scp-in-r">Send file via SCP in R</a>
+<ul>
+<li><code>system(terminal command)</code></li>
+<li><a href="https://github.com/juanfrans/notes/wiki/Copying-Files-Between-Local-Computer-and-Instance-(AWS)">Copying files between local computer and instance (AWS)</a></li>
+</ul></li>
+<li><a href="https://towardsdatascience.com/how-to-run-rstudio-on-aws-in-under-3-minutes-for-free-65f8d0b6ccda">How to run RStudio on AWS in under 3 minutes for free</a></li>
+<li><a href="https://community.rstudio.com/t/automation-through-r/4394">RStudio Community - Automation through R</a></li>
+<li><a href="https://stackoverflow.com/questions/25436737/how-to-append-a-whole-dataframe-to-a-csv-in-r">How to append a whole dataframe to a CSV in R</a>
+<ul>
+<li><code>write.table(myDF, "myDF.csv", sep = ",", col.names = !file.exists("myDF.csv"), append = T)</code></li>
+</ul></li>
+<li><a href="https://stevenmortimer.com/automating-r-scripts-with-cron/">Automating R Scripts with Cron</a></li>
+<li><a href="https://stackoverflow.com/questions/2150138/how-to-parse-milliseconds">How to parse milliseconds?</a></li>
+</ul>
+<pre class="r"><code> z &lt;- strptime(&quot;2010-01-15 13:55:23.975&quot;, &quot;%Y-%m-%d %H:%M:%OS&quot;)
+ z # prints without fractional seconds
+ op &lt;- options(digits.secs=3)
+ z
+ options(op) #reset options</code></pre>
+<ul>
+<li>With <code>lubridate</code>? <a href="https://community.rstudio.com/t/recovering-date-time-milliseconds-w-lubridate/15797/2">RStudio Community</a></li>
+<li><a href="https://stackoverflow.com/questions/54369298/r-lubridate-ymd-hms-millisecond-diff">R lubridate ymd_hms millisecond diff</a></li>
+<li><a href="https://jagg19.github.io/2019/08/aws-r/#long_way">Running R on AWS EC2 and Logging into RStudio from Anywhere</a></li>
+<li><a href="https://www.vultr.com/docs/how-to-install-rstudio-server-on-centos-7">How to install RStudio Server on CentOS 7</a></li>
+<li><a href="https://manage.accuwebhosting.com/knowledgebase/2959/How-to-create-users-and-groups-in-CentOS7.html">How to create users and groups in CentOS7?</a></li>
+</ul>
+<pre class="bash"><code># adding a new user
+ssh root@server_ip_address
+adduser username
+passwd username
+# use the su command to switch to the new user account
+su - username
+sudo ls -la /root</code></pre>
+<ul>
+<li><a href="https://crontab.guru/#*/10_*_*_*_*">crontab guru</a>
+<ul>
+<li>“At every 10th minute”: <code>*/10 * * * *</code></li>
+</ul></li>
+<li><a href="https://community.rstudio.com/t/run-r-commands-after-restarting-shiny-server/3717">Run R commands after restarting shiny-server</a></li>
+<li><a href="https://docs.gitignore.io/use/command-line">gitignore generator</a>
+<ul>
+<li><a href="https://docs.gitignore.io/install/command-line">Installation</a>.</li>
+<li><a href="https://docs.gitignore.io/use/command-line">How to use</a>.</li>
+</ul></li>
+</ul>
+<pre class="bash"><code># linux bash
+echo &quot;function gi() { curl -sL https://www.gitignore.io/api/\$@ ;}&quot; &gt;&gt; \
+~/.bashrc &amp;&amp; source ~/.bashrc
+
+gi linux,java &gt;&gt; ~/.gitignore_global</code></pre>
+<ul>
+<li><a href="https://stackoverflow.com/questions/40427498/getting-permission-denied-public-key-on-gitlab">Getting permission denied (public key) on gitlab</a></li>
+<li><a href="https://stackoverflow.com/questions/24290358/remove-a-folder-from-git-tracking">Remove a folder from git tracking</a>
+<ul>
+<li><code>git rm -r --cached path_to_your_folder/</code></li>
+</ul></li>
+<li><a href="https://medium.com/ibm-data-science-experience/read-and-write-data-to-and-from-amazon-s3-buckets-in-rstudio-1a0f29c44fa7">Read and Write Data To and From Amazon S3 buckets in RStudio</a></li>
+<li><a href="https://stackoverflow.com/questions/10770698/understanding-dates-and-plotting-a-histogram-with-ggplot2-in-r">Understanding dates and plotting a histogram with ggplot2 in R</a></li>
+<li><a href="https://stackoverflow.com/questions/46344879/r-read-csv-with-column-names-in-variables">R: read csv with column names in variables</a></li>
+</ul>
+<center>
+<img src="https://wiki.teamfortress.com/w/images/e/ee/Engywithsg.png" title="fig:" alt="“Need a sentry here!”" />
+<p class="caption">
+“Need a sentry here!”
+</p>
+</center>
+</div>

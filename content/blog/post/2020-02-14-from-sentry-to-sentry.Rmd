@@ -1,0 +1,203 @@
+---
+title: From sentRy to Sentry
+author: Qiu Rui
+date: '2020-02-14'
+slug: sentry
+categories: []
+tags:
+  - telegram
+  - AWS
+  - R
+---
+
+
+```
+      ___           ___           ___                         ___                   
+     /  /\         /  /\         /  /\          ___          /  /\          __      
+    /  /::\       /  /::\       /  /::|        /__/\        /  /::\        |  |\    
+   /__/:/\:\     /  /:/\:\     /  /:|:|        \  \:\      /  /:/\:\       |  |:|   
+  _\_ \:\ \:\   /  /::\ \:\   /  /:/|:|__       \__\:\    /  /::\ \:\      |  |:|   
+ /__/\ \:\ \:\ /__/:/\:\ \:\ /__/:/ |:| /\      /  /::\  /__/:/\:\_\:\     |__|:|__ 
+ \  \:\ \:\_\/ \  \:\ \:\_\/ \__\/  |:|/:/     /  /:/\:\ \__\/~|::\/:/     /  /::::\
+  \  \:\_\:\    \  \:\ \:\       |  |:/:/     /  /:/__\/    |  |:|::/     /  /:/~~~~
+   \  \:\/:/     \  \:\_\/       |__|::/     /__/:/         |  |:|\/     /__/:/     
+    \  \::/       \  \:\         /__/:/      \__\/          |__|:|~      \__\/      
+     \__\/         \__\/         \__\/                       \__\|                  
+```
+
+## tl;dr
+
+<img class="special-img-class" style="width:100%" src="/image/sentry/map.png" />
+
+Implemented a alerting (kinda hard to call it "monitoring") system for Django with R Server and a Telegram bot.
+
+A typical instance of its report is like this:
+
+> Some errors occurred in the last 15 minutes on the server, a copy of log will be processed by sentRy. It will identify those new errors which have not been reported yet and save them to local storage. Meanwhile, the incremental part will be parsed to a telegram bot, sending error summaries and a recent 12-hour bar chart to a channel. At the same time, an updated copy of notifications (of course, errors) will be synced to Shinyapps.io and the Shiny app should have the latest info displayed.
+
+<center>
+<img class="special-img-class" style="width:50%" src="/image/sentry/bot.png" /></center>
+
+It was designed to fulfill a particular job and I guess it got things done to some extent. But recently, our dev team deployed a fully functional monitoring system called [Sentry](https://sentry.io/welcome/). I mean, what a coincidence. I had no idea about this and only named it after the sentry gun in Team Fortress 2.
+
+## Dependencies
+
+- `tidyverse`
+- `telegram.bot`
+- `cronR`
+- `shinyFiles`
+- `aws.s3`
+
+## How to use it (anyway)?
+
+1. In Telegram, create a new bot under the permission of @BotFather. Follow the order and make sure you have a valid API Token.
+2. You can test the basic message functionality with `bot_script.r`. But it won't be needed in the main script.
+3. You can also test run the actual process with `log_process.r`.
+4. If there are problems no more, click `Addin` in RStudio and select "*Schedule R scripts on Linux/Unix*".
+
+<img class="special-img-class" style="width:100%" src="/image/sentry/cronR.png" />
+
+## Related files
+
+- `bot_script.r` The script for testing Telegram bot creation. Will be dropped later.
+- `dashboard` A shiny app displaying all the errors.
+- `error.log` An error log copied from Django.
+- `global.r` The script dedicated to setting up S3 connection.
+- `log_process.r` The main script which needs to run periodically.
+- `notification.csv` The formatted backup of errors captured by this monitoring script. It is de facto very similar to `error.log`.
+- `settings.csv` A file to save some setting parameters including the latest reported error time.
+- `log_process.log` The R console log for running `log_process.r`. Potentially useful when debugging.
+
+## Issues
+
+1. Even the files published to shinyapps.io do not involve any unchecked files (when publishing), they will be verified any ways, thus leading to some filename and path related error returning. A better idea is to create a separate folder and zip it before uploading. Since I claimed all the paths absolute in my code due to the limitation of `cronR`, I have to `scp` another copy to the directory of shiny after writing to `notification`.
+
+2. You can always refer to the "Log" tab in shiny app to debug. Really helpful.
+
+3. Very hard to read a csv file without any column names in S3 bucket. The function `aws.s3::s3read_using(FUN, ..., object, bucket, opts = NULL)` is problematic, as `FUN` cannot insert any extra parameters. It is a shame that `readr::read_delim` cannot be used as well. At last a blog post on [Medium](https://medium.com/ibm-data-science-experience/read-and-write-data-to-and-from-amazon-s3-buckets-in-rstudio-1a0f29c44fa7) saved my life.
+
+4. Something weird happens when `meta1` and `meta2` extracted have different length. Specifically, 
+`meta1` with “`ERROR|WARNING|CRITICAL`” has fewer than the number of rows. That is to say, some lines are not starting with “`ERROR…`” Turns out my regex should start with a `^` otherwise things like `"    self._log(ERROR, msg, args, **kwargs)”` could be matched as well. In short,
+
+```
+^
+```
+
+## References
+
+- telegram.bot. [GitHub](https://github.com/ebeneditos/telegram.bot). [API](https://core.telegram.org/bots/api).
+- [R list of lists to data.frame](https://stackoverflow.com/questions/29674661/r-list-of-lists-to-data-frame)
+
+```r
+dd <- as.data.frame(matrix(unlist(listHolder), nrow=length(unlist(listHolder[1]))))
+```
+- [Coerce time-series objects to tibble](https://business-science.github.io/timetk/reference/tk_tbl.html). Use `timetk` package.
+
+- [dplyr rename() - For Renaming Columns](https://honingds.com/blog/dplyr-rename/).
+- [Paste multiple columns together](https://stackoverflow.com/questions/14568662/paste-multiple-columns-together).
+
+```r
+# your starting data..
+data <- data.frame('a' = 1:3, 'b' = c('a','b','c'), 'c' = c('d', 'e', 'f'), 'd' = c('g', 'h', 'i')) 
+
+# columns to paste together
+cols <- c( 'b' , 'c' , 'd' )
+
+# create a new column `x` with the three columns collapsed together
+data$x <- apply( data[ , cols ] , 1 , paste , collapse = "-" )
+
+# remove the unnecessary columns
+data <- data[ , !( names( data ) %in% cols ) ]
+```
+
+- [Telegram Bot - how to get a group chat id?](https://stackoverflow.com/questions/32423837/telegram-bot-how-to-get-a-group-chat-id)
+- [strsplit with vertical bar (pipe)](https://stackoverflow.com/questions/23193219/strsplit-with-vertical-bar-pipe). Cannot use double pipes `||` as separator/deliminator.
+- [Multicharacter separator/deliminator in read_delim of tidyverse](https://github.com/tidyverse/readr/issues/721)
+- [Import text file as single character string](https://stackoverflow.com/questions/9068397/import-text-file-as-single-character-string)
+  - `readr::read_file()`
+- [cronR README](https://cran.r-project.org/web/packages/cronR/README.html)
+- [Parse datetime with lubridate](https://stackoverflow.com/questions/35807501/parse-datetime-with-lubridate).
+  - `lubridate::ymd_hms("2004-05-07 18:24:58.666424")`
+- [R: split text with multiple regex patterns and exceptions](https://stackoverflow.com/questions/18697005/r-split-text-with-multiple-regex-patterns-and-exceptions)
+  - `strsplit` [doc](https://stat.ethz.ch/R-manual/R-patched/library/base/html/strsplit.html)
+- [readtext: Import and handling for plain and formatted text files]
+- `stringr::str_split()` [doc](https://stringr.tidyverse.org/reference/str_split.html)
+- `stringr` [regular expressions](https://stringr.tidyverse.org/articles/regular-expressions.html)
+- [split string and extract according to a pattern to form data frame](https://stackoverflow.com/questions/43485419/split-string-and-extract-according-to-a-pattern-to-form-data-frame)
+- [R: Removing blanks from the list](https://stackoverflow.com/questions/29144759/r-removing-blanks-from-the-list)
+  
+```r
+L[] <- lapply(L, function(x) x[!x %in% ""])
+```
+
+- [Change timezone in a POSIXct object](https://stackoverflow.com/questions/14141537/change-timezone-in-a-posixct-object)
+  - `attr(data$dateTime, "tzone") <- "Europe/Paris"`
+
+- [How to find the length of a string in R](https://stackoverflow.com/questions/11134812/how-to-find-the-length-of-a-string-in-r)
+  - `nchar("foo")`
+- [Select first element of nested list](https://stackoverflow.com/questions/20428742/select-first-element-of-nested-list)
+  - `lapply(x, `[[`, 1)`
+- [Send file via SCP in R](https://stackoverflow.com/questions/51195696/send-file-via-scp-in-r)
+  - `system(terminal command)`
+  - [Copying files between local computer and instance (AWS)](https://github.com/juanfrans/notes/wiki/Copying-Files-Between-Local-Computer-and-Instance-(AWS))
+- [How to run RStudio on AWS in under 3 minutes for free](https://towardsdatascience.com/how-to-run-rstudio-on-aws-in-under-3-minutes-for-free-65f8d0b6ccda)
+- [RStudio Community - Automation through R](https://community.rstudio.com/t/automation-through-r/4394)
+- [How to append a whole dataframe to a CSV in R](https://stackoverflow.com/questions/25436737/how-to-append-a-whole-dataframe-to-a-csv-in-r)
+  - `write.table(myDF, "myDF.csv", sep = ",", col.names = !file.exists("myDF.csv"), append = T)`
+- [Automating R Scripts with Cron](https://stevenmortimer.com/automating-r-scripts-with-cron/)
+- [How to parse milliseconds?](https://stackoverflow.com/questions/2150138/how-to-parse-milliseconds)
+
+```r
+ z <- strptime("2010-01-15 13:55:23.975", "%Y-%m-%d %H:%M:%OS")
+ z # prints without fractional seconds
+ op <- options(digits.secs=3)
+ z
+ options(op) #reset options
+```
+
+- With `lubridate`? [RStudio Community](https://community.rstudio.com/t/recovering-date-time-milliseconds-w-lubridate/15797/2)
+- [R lubridate ymd_hms millisecond diff](https://stackoverflow.com/questions/54369298/r-lubridate-ymd-hms-millisecond-diff)
+- [Running R on AWS EC2 and Logging into RStudio from Anywhere](https://jagg19.github.io/2019/08/aws-r/#long_way)
+- [How to install RStudio Server on CentOS 7](https://www.vultr.com/docs/how-to-install-rstudio-server-on-centos-7)
+- [How to create users and groups in CentOS7?](https://manage.accuwebhosting.com/knowledgebase/2959/How-to-create-users-and-groups-in-CentOS7.html)
+
+```bash
+# adding a new user
+ssh root@server_ip_address
+adduser username
+passwd username
+# use the su command to switch to the new user account
+su - username
+sudo ls -la /root
+```
+
+- [crontab guru](https://crontab.guru/#*/10_*_*_*_*)
+  - "At every 10th minute": `*/10 * * * *`
+- [Run R commands after restarting shiny-server](https://community.rstudio.com/t/run-r-commands-after-restarting-shiny-server/3717)
+- [gitignore generator](https://docs.gitignore.io/use/command-line)
+  - [Installation](https://docs.gitignore.io/install/command-line).
+  - [How to use](https://docs.gitignore.io/use/command-line).
+
+```bash
+# linux bash
+echo "function gi() { curl -sL https://www.gitignore.io/api/\$@ ;}" >> \
+~/.bashrc && source ~/.bashrc
+
+gi linux,java >> ~/.gitignore_global
+```
+
+- [Getting permission denied (public key) on gitlab](https://stackoverflow.com/questions/40427498/getting-permission-denied-public-key-on-gitlab)
+- [Remove a folder from git tracking](https://stackoverflow.com/questions/24290358/remove-a-folder-from-git-tracking)
+  - `git rm -r --cached path_to_your_folder/`
+
+- [Read and Write Data To and From Amazon S3 buckets in RStudio](https://medium.com/ibm-data-science-experience/read-and-write-data-to-and-from-amazon-s3-buckets-in-rstudio-1a0f29c44fa7)
+- [Understanding dates and plotting a histogram with ggplot2 in R](https://stackoverflow.com/questions/10770698/understanding-dates-and-plotting-a-histogram-with-ggplot2-in-r)
+- [R: read csv with column names in variables](https://stackoverflow.com/questions/46344879/r-read-csv-with-column-names-in-variables)
+
+<center>
+!["Need a sentry here!"](https://wiki.teamfortress.com/w/images/e/ee/Engywithsg.png)
+<p class="caption">"Need a sentry here!"</p>
+</center>
+
+
+

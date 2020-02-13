@@ -48,6 +48,8 @@ doi: 10.1101/065524.
 
 ## Past
 
+- **sentRy (2020).** A telegram bot monitoring Django logs.
+
 - **Big Data Theoretical Recap (2018).** In this project we considered how to test hypotheses about **covariance matrices** and, since everything “eighties” is trendy again, we looked at some **multivariate time series** papers from that epoch and make them fresh again. There are interesting connections between these two topics. The aim of the project is to take the modern viewpoint and understand what happens in both situations when the dimensionality `p` of the observations becomes large. <a href="/blog/post/big-data-theoretical-recap/" class="btn btn-outline-primary">Problems</a>
 <a href="/pdf/big-data-theory.pdf" class="btn btn-outline-primary">PDF</a>
 <a href="https://github.com/rexarski/stat7017-big-data/" class="btn btn-outline-primary">GitHub</a>
