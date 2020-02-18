@@ -30,12 +30,12 @@ progressively = false
 github = "rexarski"
 # linkedin = ""
 twitter = "rexarski"
-# medium = "rexarski"
+medium = "rexarski"
 # vsco = ""
 instagram = "rexarski"
 telegram = "ghgibus"
 # unsplash = ""
-email = "rui@interetro.xyz"
+email = "qiurui416@gmail.com"
 
 [[menu.primary]]
 identifier = "blog"
@@ -44,19 +44,19 @@ url = "/blog/"
 weight = 1
 
 [[menu.primary]]
-identifier = "中文"
-name = "中文"
-url = "/cn/"
-weight = 2
-
-[[menu.primary]]
 identifier = "project"
 name = "Project"
 url = "/project/"
-weight = 3
+weight = 2
 
 [[menu.primary]]
 identifier = "telegram"
 name = "23:58"
 url = "https://t.me/its2358"
+weight = 3
+
+[[menu.primary]]
+identifier = "中文"
+name = "中文"
+url = "/cn/"
 weight = 4
