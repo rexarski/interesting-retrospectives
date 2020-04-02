@@ -18,7 +18,7 @@ disableKinds = ["taxonomy", "taxonomyTerm"]
 
 [params]
 pagetitle = "interesting retrospectives"
-copyright = "© 2019 Qiu Rui"
+copyright = "© 2020 All rights reserved."
 copyrightUrl = "https://interetro.rbind.io"
 faviconfile = "image/favicon.png"
 logofile = "image/rexarski.jpg"
@@ -30,10 +30,10 @@ progressively = false
 github = "rexarski"
 # linkedin = ""
 twitter = "rexarski"
-medium = "rexarski"
+# medium = "rexarski"
 # vsco = ""
-instagram = "rexarski"
-telegram = "ghgibus"
+# instagram = "rexarski"
+# telegram = "ghgibus"
 # unsplash = ""
 email = "qiurui416@gmail.com"
 
@@ -50,13 +50,19 @@ url = "/project/"
 weight = 2
 
 [[menu.primary]]
+identifier = "uses"
+name = "Uses"
+url = "/uses/"
+weight = 3
+
+[[menu.primary]]
 identifier = "telegram"
 name = "23:58"
 url = "https://t.me/its2358"
-weight = 3
+weight = 4
 
 [[menu.primary]]
 identifier = "中文"
 name = "中文"
 url = "/cn/"
-weight = 4
+weight = 5
