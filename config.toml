@@ -56,13 +56,19 @@ url = "/uses/"
 weight = 3
 
 [[menu.primary]]
+identifier = "photos"
+name = "🥑"
+url = "https://airavo.netlify.app"
+weight = 4
+
+[[menu.primary]]
 identifier = "telegram"
 name = "23:58"
 url = "https://t.me/its2358"
-weight = 4
+weight = 5
 
 [[menu.primary]]
 identifier = "中文"
 name = "中文"
 url = "/cn/"
-weight = 5
+weight = 76

@@ -16,20 +16,24 @@ menu: "main"
 ## Hardware
 
 **💻**
+
 - MacBook Pro 13-inch (2017)
 - Lenovo Legion Y530 16 GB (2018)
 - iPad Pro 12.9 (2017)
 
 **📱**
+
 - iPhone XR
 - iPhone 6
 
 **🎧**
+
 - AirPods (2019)
 - Bose QC 25
 - Bose SoundLink Mini 2
 
 **⌨️🖱️⌚✏️**
+
 - Logitech MX Master 3
 - Zowie ZA12
 - Logitech K780
@@ -37,6 +41,7 @@ menu: "main"
 - Apple Watch Series 4
 
 **🎮**
+
 - Nintendo Switch
 
 ## Applications
@@ -110,6 +115,7 @@ menu: "main"
 - [HandBrake](https://handbrake.fr/) - open-source video transcoder.
 - [IINA](https://iina.io/) - modern media player for macOS.
 - [iMazing](https://imazing.com/) - iPhone file manager.
+- [Open Broadcast Software](https://obsproject.com/) - Free and open source software for video recording and live streaming.
 - [PhotoBulk](https://photobulkeditor.com/) - edit, resize and optimize images.
 
 **Entertainment**
@@ -186,7 +192,6 @@ I use [Settings Sync](https://marketplace.visualstudio.com/items?itemName=Shan.c
 - [提前怀旧](https://pretro.xyz/)
 - [文化土豆](http://www.culturepotato.com/)
 - [一天世界](https://yitianshijie.net/)
-- [新闻酸菜馆](https://wasai.org/)
 - [Accidental Tech Podcast](https://atp.fm/)
 - [AppStories](https://appstories.net/)
 - [Book of Basketball 2.0](https://www.theringer.com/book-of-basketball)
@@ -198,7 +203,6 @@ I use [Settings Sync](https://marketplace.visualstudio.com/items?itemName=Shan.c
 - [Nintendo Power Podcast](https://podcasts.apple.com/au/podcast/nintendo-power-podcast/id1328076836)
 - [The R-Podcast](https://r-podcast.org/)
 - [Remaster](https://www.relay.fm/remaster)
-- [The Ringer NBA Show](https://www.theringer.com/the-nba-show)
 - [The Talk Show with John Gruber](https://daringfireball.net/thetalkshow/)
 - [Techmeme Ride Home](https://www.ridehome.info/podcast/techmeme-ride-home/)
 
