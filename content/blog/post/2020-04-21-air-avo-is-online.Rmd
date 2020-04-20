@@ -1,0 +1,22 @@
+---
+title: Air Avo is online!
+author: Qiu Rui
+date: '2020-04-21'
+slug: air-avo-is-online
+categories: []
+tags:
+  - Jekyll
+---
+
+Inspired by [Stefan’s blog post](https://stefanzweifel.io/posts/building-a-self-hosted-photo-stream-and-add-images-with-ios-shortcuts/), I set up my own photo stream as well. It’s called [Air Avo](https://airavo.netlify.app/
+), a self-hosted photo scream based on a repo by [Tim Van Damme](https://github.com/maxvoltar/photo-stream).
+
+A bunch of funny things need to point out:
+
+1. Modify `photo-stream/_includes/head.html` to change the favicon.
+2. Modify `photo-stream/index.html` to change the link in the right bottom corner of the stream page.
+3. I airdropped some photos from my iPhone to my MacBook. Some of them share an extension of `.JPG` instead of `.jpg`. Such photos won’t be rendered in the build. I manually change them back to `.jpg` but Git thinks they are literally the same.
+4. The iOS Shortcut provided by [Stefan](https://www.icloud.com/shortcuts/13a46fde2e5c4dfa8c3b65ad6b96479c) requires audio dictation in order to name the photo. Considering the fact that Siri has a funky support of Mandarin recognition, I create a new version with text input as file name. You can download the Shortcut [here](https://www.icloud.com/shortcuts/694705ce79a346e2bd8314e044589fde).
+
+Overall, it’s an awesome minimalist website and perfectly fits my “anti-instagram” mindset. Very easy to deploy, strongly recommended to give it a try and maybe make some tweaks to it.
+

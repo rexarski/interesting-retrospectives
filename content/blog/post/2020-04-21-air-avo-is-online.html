@@ -1,0 +1,23 @@
+---
+title: Air Avo is online!
+author: Qiu Rui
+date: '2020-04-21'
+slug: air-avo-is-online
+categories: []
+tags:
+  - Jekyll
+---
+
+<script src="/rmarkdown-libs/jquery/jquery.min.js"></script>
+<script src="/rmarkdown-libs/elevate-section-attrs/elevate-section-attrs.js"></script>
+
+
+<p>Inspired by <a href="https://stefanzweifel.io/posts/building-a-self-hosted-photo-stream-and-add-images-with-ios-shortcuts/">Stefan’s blog post</a>, I set up my own photo stream as well. It’s called <a href="https://airavo.netlify.app/">Air Avo</a>, a self-hosted photo scream based on a repo by <a href="https://github.com/maxvoltar/photo-stream">Tim Van Damme</a>.</p>
+<p>A bunch of funny things need to point out:</p>
+<ol style="list-style-type: decimal">
+<li>Modify <code>photo-stream/_includes/head.html</code> to change the favicon.</li>
+<li>Modify <code>photo-stream/index.html</code> to change the link in the right bottom corner of the stream page.</li>
+<li>I airdropped some photos from my iPhone to my MacBook. Some of them share an extension of <code>.JPG</code> instead of <code>.jpg</code>. Such photos won’t be rendered in the build. I manually change them back to <code>.jpg</code> but Git thinks they are literally the same.</li>
+<li>The iOS Shortcut provided by <a href="https://www.icloud.com/shortcuts/13a46fde2e5c4dfa8c3b65ad6b96479c">Stefan</a> requires audio dictation in order to name the photo. Considering the fact that Siri has a funky support of Mandarin recognition, I create a new version with text input as file name. You can download the Shortcut <a href="https://www.icloud.com/shortcuts/694705ce79a346e2bd8314e044589fde">here</a>.</li>
+</ol>
+<p>Overall, it’s an awesome minimalist website and perfectly fits my “anti-instagram” mindset. Very easy to deploy, strongly recommended to give it a try and maybe make some tweaks to it.</p>
