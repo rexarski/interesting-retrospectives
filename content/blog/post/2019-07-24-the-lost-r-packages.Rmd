@@ -29,7 +29,7 @@ installedPreviously <- read.csv('installed_previously.csv')
 baseR <- as.data.frame(installed.packages())
 toInstall <- setdiff(installedPreviously, baseR)
 
-install.packages(toInstall)
+install.packages(toInstall[,1])
 ```
 
 Still, I wish those old packages can be transfered to a new version of R painlessly.

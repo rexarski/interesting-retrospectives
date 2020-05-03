@@ -99,7 +99,7 @@ menu: "main"
 - [Affinity Designer](https://affinity.serif.com/en-gb/designer/)
 - [Figma](https://www.figma.com/)
 - [Pixelmator](https://www.pixelmator.com/mac/)
-- [Pixen](https://pixenapp.com/) - pixel art and animation editor.
+- [Asperite](https://www.aseprite.org/) - animated sprite editor and pixel art tool.
 - [Sketch](https://www.sketch.com/)
 - [Sketchpacks](https://sketchpacks.com/)
 
