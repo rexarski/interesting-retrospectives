@@ -8,8 +8,7 @@ tags:
   - R
 ---
 
-<script src="/rmarkdown-libs/jquery/jquery.min.js"></script>
-<script src="/rmarkdown-libs/elevate-section-attrs/elevate-section-attrs.js"></script>
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
 <p>On Windows, we have a package called <a href="https://cran.r-project.org/web/packages/installr/index.html"><code>installr</code></a>. Use function <code>copy.packages.between.libraries()</code>, then problem solved.</p>
@@ -25,5 +24,5 @@ installedPreviously &lt;- read.csv(&#39;installed_previously.csv&#39;)
 baseR &lt;- as.data.frame(installed.packages())
 toInstall &lt;- setdiff(installedPreviously, baseR)
 
-install.packages(toInstall)</code></pre>
+install.packages(toInstall[,1])</code></pre>
 <p>Still, I wish those old packages can be transfered to a new version of R painlessly.</p>

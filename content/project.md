@@ -15,7 +15,7 @@ description: "Projects description."
 
 ## Past
 
-- **sentRy (2020).** A telegram bot monitoring Django error logs.
+- **[sentRy](https://interetro.rbind.io/blog/post/sentry/) (2020).** A telegram bot monitoring Django error logs.
 
 - **Australian Universities Scraping System Introductive Edition (2019)**, aka "Aussie". Scraped over 76,000 courses offered by some top Australian unis in 2020. <a href="https://github.com/rexarski/aussie" class="btn btn-outline-primary">GitHub</a>
 

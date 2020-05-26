@@ -63,8 +63,8 @@ weight = 4
 
 [[menu.primary]]
 identifier = "telegram"
-name = "23:58"
-url = "https://t.me/its2358"
+name = "Telegram Channel"
+url = "https://t.me/itsnopie"
 weight = 5
 
 [[menu.primary]]

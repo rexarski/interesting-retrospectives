@@ -3,15 +3,13 @@ title: "Uses"
 menu: "main"
 ---
 
-*Updated on 2020-04-02.*
+*Updated on 2020-05-26.*
 
 - [Hardware](#hardware)
 - [Applications](#applications)
     - [macOS](#macos)
     - [iOS](#ios)
     - [Visual Studio Code Extensions](#visual-studio-code-extensions)
-- [Podcasts](#podcasts)
-- [Subscriptions](#subscriptions)
 
 ## Hardware
 
@@ -75,6 +73,7 @@ menu: "main"
 - [Fantastical](https://flexibits.com/fantastical) - calendar app.
 - [Marked](https://marked2app.com/) - preview for MD files.
 - [MindNode](https://mindnode.com/) - mindmapping.
+- [Notion](https://www.notion.so) - all-in-one workspace.
 - [Paste](https://pasteapp.me/) - clipboard manager.
 - [PDF Expert](https://pdfexpert.com/)
 - [PopClip](https://pilotmoon.com/popclip/) - appears when selecting texts on macOS.
@@ -137,6 +136,7 @@ menu: "main"
 - [Keka](https://www.keka.io/en/) - file archiver.
 - [Kindle](https://www.amazon.com/kindle-dbs/fd/kcp)
 - [Knotes](http://knotesapp.com/) - Kindle clips manager.
+- [LuLu](https://www.notion.so) - firewall.
 - [Tencent Lemon](https://mac.gj.qq.com/)
 - [PCalc](https://pcalc.com/)
 - [Rectangle](https://rectangleapp.com/) - move and resize windows in macOS.
@@ -176,54 +176,3 @@ Many I use daily on my iOS devices are actually universal applications available
 ### Visual Studio Code Extensions
 
 I use [Settings Sync](https://marketplace.visualstudio.com/items?itemName=Shan.code-settings-sync) extension to sync save and sync my installation and setting status. The config is saved as a [gist](https://gist.github.com/rexarski/2fab04625c72a5a9b2ce51cce9dc4938.js) on GitHub.
-
-## Podcasts
-
-- [博物志](https://bowuzhi.fm/)
-- [不丧](https://busangpodcast.simplecast.com/)
-- [迟早更新](https://busangpodcast.simplecast.com/)
-- [故事FM](http://storyfm.cn/)
-- [HPUP](https://hpup.fireside.fm/)
-- [GADIO](https://www.gcores.com/radios)
-- [联客](https://podcasts.apple.com/cn/podcast/%E8%81%94%E5%AE%A2/id1133653253)
-- Man立
-- [内核恐慌](https://kernelpanic.fm/)
-- [任游电波](https://podcasts.apple.com/us/podcast/%E4%BB%BB%E6%B8%B8%E7%94%B5%E6%B3%A2/id1468921607)
-- [提前怀旧](https://pretro.xyz/)
-- [文化土豆](http://www.culturepotato.com/)
-- [一天世界](https://yitianshijie.net/)
-- [Accidental Tech Podcast](https://atp.fm/)
-- [AppStories](https://appstories.net/)
-- [Book of Basketball 2.0](https://www.theringer.com/book-of-basketball)
-- [Byte.Coffee](https://byte.coffee/)
-- [Casticle](https://casticle.fm/)
-- [Cortex](https://www.relay.fm/cortex)
-- [Data Stories](https://datastori.es/)
-- [Nice Try](https://nicetry.fireside.fm/)
-- [Nintendo Power Podcast](https://podcasts.apple.com/au/podcast/nintendo-power-podcast/id1328076836)
-- [The R-Podcast](https://r-podcast.org/)
-- [Remaster](https://www.relay.fm/remaster)
-- [The Talk Show with John Gruber](https://daringfireball.net/thetalkshow/)
-- [Techmeme Ride Home](https://www.ridehome.info/podcast/techmeme-ride-home/)
-
-## Subscriptions
-
-- [1Blocker](https://1blocker.com/)
-- 1Password
-- [Bear](https://bear.app/)
-- iCloud storage
-- [Day One](https://dayoneapp.com/pricing/)
-- [Design+Code](https://designcode.io/)
-- [FlowingData](https://flowingdata.com/membership/)
-- [Hello Weather](https://helloweatherapp.com/)
-- [Inoreader](https://www.inoreader.com/upgrade)
-- [Medium](https://medium.com/)
-- [Nintendo Switch Online](https://www.nintendo.com.au/nintendo-switch/onlineservice/)
-- [Pinboard](https://pinboard.in/upgrade/)
-- Spotify
-- [raywenderlich](https://www.raywenderlich.com/)
-- [WIRED](https://www.wired.com/)
-- [VSCO](https://vsco.co/)
-- [Vultr](https://www.vultr.com/)
-- YouTube Premium
-- [灵感买家俱乐部](https://club.q24.io/)
