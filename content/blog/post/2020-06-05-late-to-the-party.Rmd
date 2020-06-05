@@ -1,0 +1,76 @@
+---
+title: Late to the party
+author: Qiu Rui
+date: '2020-06-05'
+slug: late-to-the-party
+categories: []
+tags:
+  - R
+---
+
+As a fellow redditor, I can naturally tell you what is trending on the /r/dataisbeautiful subreddit. Beautiful (or maybe not) charts come and go. One or two years back, there were ridge plots aka joy plots. Then starting from March 2019, the bar chart races swiped the the subreddit and YouTube. I tried to take a dip since then but could not finish one before its moratorium.
+
+Still, it is a fun chart and its “racing” style definitely outplays any regular bar charts. So even being late to the party, I would like to try it on my own. By saying “on my own”, I actually mean “replicating others’ work” and make some changes to see what’s going on.
+
+
+```r
+library(tidyverse)
+library(gganimate)
+library(janitor)
+library(gapminder)
+
+df <- gapminder %>%
+  janitor::clean_names() %>%
+  group_by(year) %>%
+  mutate(rank = rank(-life_exp),
+         Value_rel = life_exp/life_exp[rank==1],
+         Value_lbl = paste0(" ",round(life_exp/1e9))) %>%
+  group_by(country) %>%
+  filter(rank <= 20) %>%
+  ungroup()
+
+staticplot <- ggplot(df, aes(rank, group = country,
+                                        fill = as.factor(country),
+                                        color = as.factor(country))) +
+  geom_tile(aes(y = life_exp/2,
+                height = life_exp,
+                width = 0.9), alpha = 0.5, color = NA) +
+  geom_text(aes(y = 0, label = paste(country, " ")), vjust = 0.2, hjust = 1) +
+  geom_text(aes(y=life_exp, label = life_exp, hjust=0),size = 5 ) +
+  coord_flip(clip = "off", expand = TRUE) + 
+  scale_y_continuous(labels = scales::comma) + 
+  scale_x_reverse() +
+  # guides(color = FALSE, fill = FALSE) +
+  theme_minimal() +
+  theme(axis.line=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+        axis.title.y=element_blank(),
+        legend.position="none",
+        panel.background=element_blank(),
+        panel.border=element_blank(),
+        panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.grid.major.x = element_line( size=.1, color="grey" ),
+        panel.grid.minor.x = element_line( size=.1, color="grey" ),
+        plot.title=element_text(size=25, hjust=0.5, face="bold", colour="grey", vjust=-1),
+        plot.subtitle=element_text(size=18, hjust=0.5, face="italic", color="grey"),
+        plot.caption =element_text(size=8, hjust=0.5, face="italic", color="grey"),
+        plot.background=element_blank(),
+        plot.margin = margin(2,2, 2, 4, "cm"))
+
+anim <- staticplot + transition_states(year, transition_length = 4, state_length = 4) +
+  view_follow(fixed_x = TRUE) +
+  labs(title = "Global Life Expenctancy by Year : {closest_state}",
+       subtitle = "Top 20 Countries",
+       caption = "Source: FiveThirtyEight")
+
+animate(anim, 200, fps = 20,  width = 1200, height = 1000,
+        renderer = gifski_renderer("lifeExp.gif"))
+```
+
+![img](/image/lifeExp.gif)
+
+And yes there are lots of problems in this racing bar chart, for example, the subtitle is so closed to title, the color palette could be more carefully picked etc. But I’m just gonna leave it here because this is the “small dip” I was talking about. Not diving in too deep.
