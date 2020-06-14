@@ -13,7 +13,7 @@ tags:
 
 So with that kept in mind, I have to jot down the number of items left in each categories like obsessive-compulsory disorder in [Notion](https://www.notion.so/). Shout-out to Notion, it's an amazing workspace for most of daily work. Back to the business, but I do really guess it’s okay, 99 days have passed just in a flash. So I spent another 10 minutes this afternoon to replay this process in R.
 
-<!-- <script src="https://gist.github.com/rexarski/2b811bcdcb4548dfe757cbd0e86f7290.js"></script> -->
+<script src="https://gist.github.com/rexarski/2b811bcdcb4548dfe757cbd0e86f7290.js"></script>
 
 ![The reproducible R code is attached in  [Gist](https://gist.github.com/rexarski/2b811bcdcb4548dfe757cbd0e86f7290).](/image/declutter.gif)
 

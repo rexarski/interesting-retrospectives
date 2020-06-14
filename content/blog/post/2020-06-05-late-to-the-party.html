@@ -13,61 +13,7 @@ tags:
 
 <p>As a fellow redditor, I can naturally tell you what is trending on the /r/dataisbeautiful subreddit. Beautiful (or maybe not) charts come and go. One or two years back, there were ridge plots aka joy plots. Then starting from March 2019, the bar chart races swiped the the subreddit and YouTube. I tried to take a dip since then but could not finish one before its moratorium.</p>
 <p>Still, it is a fun chart and its “racing” style definitely outplays any regular bar charts. So even being late to the party, I would like to try it on my own. By saying “on my own”, I actually mean “replicating others’ work” and make some changes to see what’s going on.</p>
-<pre class="r"><code>library(tidyverse)
-library(gganimate)
-library(janitor)
-library(gapminder)
-
-df &lt;- gapminder %&gt;%
-  janitor::clean_names() %&gt;%
-  group_by(year) %&gt;%
-  mutate(rank = rank(-life_exp),
-         Value_rel = life_exp/life_exp[rank==1],
-         Value_lbl = paste0(&quot; &quot;,round(life_exp/1e9))) %&gt;%
-  group_by(country) %&gt;%
-  filter(rank &lt;= 20) %&gt;%
-  ungroup()
-
-staticplot &lt;- ggplot(df, aes(rank, group = country,
-                                        fill = as.factor(country),
-                                        color = as.factor(country))) +
-  geom_tile(aes(y = life_exp/2,
-                height = life_exp,
-                width = 0.9), alpha = 0.5, color = NA) +
-  geom_text(aes(y = 0, label = paste(country, &quot; &quot;)), vjust = 0.2, hjust = 1) +
-  geom_text(aes(y=life_exp, label = life_exp, hjust=0),size = 5 ) +
-  coord_flip(clip = &quot;off&quot;, expand = TRUE) + 
-  scale_y_continuous(labels = scales::comma) + 
-  scale_x_reverse() +
-  # guides(color = FALSE, fill = FALSE) +
-  theme_minimal() +
-  theme(axis.line=element_blank(),
-        axis.text.x=element_blank(),
-        axis.text.y=element_blank(),
-        axis.ticks=element_blank(),
-        axis.title.x=element_blank(),
-        axis.title.y=element_blank(),
-        legend.position=&quot;none&quot;,
-        panel.background=element_blank(),
-        panel.border=element_blank(),
-        panel.grid.major=element_blank(),
-        panel.grid.minor=element_blank(),
-        panel.grid.major.x = element_line( size=.1, color=&quot;grey&quot; ),
-        panel.grid.minor.x = element_line( size=.1, color=&quot;grey&quot; ),
-        plot.title=element_text(size=25, hjust=0.5, face=&quot;bold&quot;, colour=&quot;grey&quot;, vjust=-1),
-        plot.subtitle=element_text(size=18, hjust=0.5, face=&quot;italic&quot;, color=&quot;grey&quot;),
-        plot.caption =element_text(size=8, hjust=0.5, face=&quot;italic&quot;, color=&quot;grey&quot;),
-        plot.background=element_blank(),
-        plot.margin = margin(2,2, 2, 4, &quot;cm&quot;))
-
-anim &lt;- staticplot + transition_states(year, transition_length = 4, state_length = 4) +
-  view_follow(fixed_x = TRUE) +
-  labs(title = &quot;Global Life Expenctancy by Year : {closest_state}&quot;,
-       subtitle = &quot;Top 20 Countries&quot;,
-       caption = &quot;Source: FiveThirtyEight&quot;)
-
-animate(anim, 200, fps = 20,  width = 1200, height = 1000,
-        renderer = gifski_renderer(&quot;lifeExp.gif&quot;))</code></pre>
+<script src="https://gist.github.com/rexarski/09a03e955269e2ecbf2af81e823b610a.js"></script>
 <div class="figure">
 <img src="/image/lifeExp.gif" alt="" />
 <p class="caption">img</p>
