@@ -50,25 +50,19 @@ url = "/project/"
 weight = 2
 
 [[menu.primary]]
-identifier = "uses"
-name = "Uses"
-url = "/uses/"
-weight = 3
-
-[[menu.primary]]
-identifier = "photos"
-name = "🥑"
-url = "https://airavo.netlify.app"
-weight = 4
-
-[[menu.primary]]
 identifier = "telegram"
-name = "Telegram Channel"
+name = "Telegram"
 url = "https://t.me/itsnopie"
-weight = 5
+weight = 3
 
 [[menu.primary]]
 identifier = "中文"
 name = "中文"
 url = "/cn/"
-weight = 76
+weight = 4
+
+[[menu.primary]]
+identifier = "newblog"
+name = "NEW BLOG⚡"
+url = "https://interetro.xyz"
+weight = 5

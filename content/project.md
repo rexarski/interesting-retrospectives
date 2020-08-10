@@ -4,17 +4,9 @@ menu: "main"
 description: "Projects description."
 ---
 
-***
-
-## Ongoing
-
-- [Daily UI design challenge](https://www.behance.net/gallery/97033687/Daily-UI-Design-Challenge), a series of daily design challenges.
-- [project-euleR](https://github.com/rexarski/project-euleR), solutions to Project Euler in R.
-- [McWia](https://github.com/rexarski/McWia), use Monte Carlo simulation to solve probability questions in the book ***[Fifty Challenging Problems in Probability with Solutions](https://www.goodreads.com/book/show/613077.Fifty_Challenging_Problems_in_Probability_with_Solutions)***.
+### This blog has been archived. Please continue reading at [interetro.xyz](https://interetro.xyz).
 
 ***
-
-## Past
 
 - **[sentRy](https://interetro.rbind.io/blog/post/sentry/) (2020).** A telegram bot monitoring Django error logs.
 

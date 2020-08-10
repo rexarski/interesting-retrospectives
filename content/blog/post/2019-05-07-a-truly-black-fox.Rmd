@@ -8,7 +8,7 @@ tags:
   - Firefox
 ---
 
-As a Firefox user at night, I find [Dark Reader][Dark Reader](https://darkreader.org/) and [Shadowfox](https://overdodactyl.github.io/ShadowFox/) real MVPs of the game.
+As a Firefox user at night, I find [Dark Reader](https://darkreader.org/) and [Shadowfox](https://overdodactyl.github.io/ShadowFox/) real MVPs of the game.
 
 The former is pretty smart at turning websites into dark mode after dynamically analyzing the web-site colors and background images. You can also use shortcut like Option/Alt⌥ + Shift⇧ + D to toggle the extension.
 
