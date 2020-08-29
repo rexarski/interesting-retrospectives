@@ -27,7 +27,7 @@ tags:
 <div id="tldr" class="section level2">
 <h2>tl;dr</h2>
 <p><img class="special-img-class" style="width:100%" src="/image/sentry/map.png" /></p>
-<p>Implemented a alerting (kinda hard to call it “monitoring”) system for Django with R Server and a Telegram bot.</p>
+<p>Implemented an alerting (kinda hard to call it “monitoring”) system for Django with R Server and a Telegram bot.</p>
 <p>A typical instance of its report is like this:</p>
 <blockquote>
 <p>Some errors occurred in the last 15 minutes on the server, a copy of log will be processed by sentRy. It will identify those new errors which have not been reported yet and save them to local storage. Meanwhile, the incremental part will be parsed to a telegram bot, sending error summaries and a recent 12-hour bar chart to a channel. At the same time, an updated copy of notifications (of course, errors) will be synced to Shinyapps.io and the Shiny app should have the latest info displayed.</p>

@@ -29,7 +29,7 @@ tags:
 
 <img class="special-img-class" style="width:100%" src="/image/sentry/map.png" />
 
-Implemented a alerting (kinda hard to call it "monitoring") system for Django with R Server and a Telegram bot.
+Implemented an alerting (kinda hard to call it "monitoring") system for Django with R Server and a Telegram bot.
 
 A typical instance of its report is like this:
 

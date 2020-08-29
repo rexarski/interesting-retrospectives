@@ -14,13 +14,13 @@ Gotta say this is a really handy trick.
 \[
     \begin{split}
         a &= \left( \frac12 + \frac13 + \frac14 \right.\\
-          &\ \ \ \ \ \ \quad \left. {} + a + b + c \vphatom{\frac12}\right)\\
+          &\ \ \ \ \ \ \quad \left. {} + a + b + c \vphantom{\frac12}\right)\\
           &= x + y + z
     \end{split}
 \]
 ```
 
-The key idea is to use `\vphatom{\frac12}`, which is of the same height of previous line, to force the right parenthesis in the second line to match with its counterpart.
+The key idea is to use `\vphantom{\frac12}`, which is of the same height of previous line, to force the right parenthesis in the second line to match with its counterpart.
 
 <center>
 ![](/image/parantheses.png)
