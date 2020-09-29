@@ -35,7 +35,7 @@ twitter = "rexarski"
 # instagram = "rexarski"
 # telegram = "ghgibus"
 # unsplash = ""
-email = "qiurui416@gmail.com"
+email = "qrui@hey.com"
 
 [[menu.primary]]
 identifier = "blog"
@@ -64,5 +64,5 @@ weight = 4
 [[menu.primary]]
 identifier = "newblog"
 name = "NEW BLOG⚡"
-url = "https://interetro.xyz"
+url = "https://qrui.xyz"
 weight = 5
