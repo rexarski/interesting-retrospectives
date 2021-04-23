@@ -4,7 +4,7 @@ menu: "main"
 description: "Projects description."
 ---
 
-### This blog has been archived. Please continue reading at [qrui.xyz](https://qrui.xyz).
+### This blog has been archived. Please continue reading on [qrui.xyz](https://qrui.xyz).
 
 ***
 
